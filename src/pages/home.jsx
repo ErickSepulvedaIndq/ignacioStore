@@ -1,21 +1,24 @@
-import Carrito from '../assets/carrito.png'
-import Card from '../components/card'
+import Header from '../components/UI/header.jsx'
+import Card from '../components/UI/card'
 import Product1 from '../assets/doritos-nachos.png'
-
+import { useState } from 'react'
 export default function App() {
+  const [cartCount, setCartCount] = useState(0);
 
   return (
     <>
-      <header className="bg-[#3041A0] text-white p-6 flex justify-between items-center">
-        <h1 className="font-bold text-2xl">Ignacio Store</h1>
-        <img src={Carrito} alt="Carrito" className='h-10 hover:scale-110 transition-transform cursor-pointer'/>
-      </header>
-      <main>
-        <Card
-         productName="Producto 1"
-         price="100"
-         img={Product1}
-         />
+      <Header cartCount={cartCount} />
+
+      <main className='flex flex-wrap items-center justify-center'>
+        {Array.from({ length: 10}).map((_, i) => (
+          <Card
+           productName="Producto 1"
+           price="100"
+           img={Product1}
+           key={i}
+           setCartCount={setCartCount}
+           />
+        ))}
       </main>
     </>
   )
