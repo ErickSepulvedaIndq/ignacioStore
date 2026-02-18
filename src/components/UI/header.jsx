@@ -35,8 +35,8 @@ export default function Header() {
         </div>
 
         {/* el buscador estara fijo en moviles mas facil*/}
-        <div className="flex items-center justify-center gap-2 bg-white text-black p-2 md:p-2 rounded-lg w-80 md:w-1/3 order-1 md:order-0 mx-auto ">
-          <input
+        <div className="flex items-center justify-center  bg-white text-black p-1 md:p-2 rounded-lg w-80 md:w-1/2 order-1 md:order-0 mx-auto ">
+          <input 
             type="text"
             className="bg-white text-black p-1 md:p-2 rounded-lg w-full outline-none text-sm"
             placeholder="Buscar..."
