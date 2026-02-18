@@ -1,34 +1,25 @@
 import { useState, useEffect, useMemo } from "react";
 import { useSearch } from "../context/SearchContext";
+import Paginator from "../components/UI/Paginator";
+import { productDemoRows } from "../models/product";
 
 export default function ProductManagement() {
   const [productos, setProductos] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 10;
   const { normalizedSearch } = useSearch();
 
   useEffect(() => {
     // TODO: Fetch productos desde API
     setTimeout(() => {
-      setProductos([
-        {
-          id: 1,
-          name: "Doritos Nachos",
-          price: 25.5,
-          stock: 15,
-          status: "desactivado",
-        },
-        {
-          id: 2,
-          name: "Coca-Cola 600ml",
-          price: 15.0,
-          stock: 20,
-          status: "activo",
-        },
-      ]);
+      setProductos(productDemoRows);
       setLoading(false);
+      setCurrentPage(1);
     }, 500);
   }, []);
 
+  // filtra segun lo que se escribe en el buscador
   const filteredProducts = useMemo(() => {
     if (!normalizedSearch) {
       return productos;
@@ -39,6 +30,19 @@ export default function ProductManagement() {
       return textToSearch.includes(normalizedSearch);
     });
   }, [productos, normalizedSearch]);
+
+  // calcula las paginas disponibles
+  const totalPages = Math.ceil(filteredProducts.length / pageSize);
+  // define el rango de datos de la pagina actual
+  const startIndex = (currentPage - 1) * pageSize;
+  const endIndex = startIndex + pageSize;
+  const paginatedProducts = filteredProducts.slice(startIndex, endIndex);
+
+  // cambia la pagina y sube al inicio
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   if (loading) {
     return (
@@ -81,7 +85,7 @@ export default function ProductManagement() {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {filteredProducts.map((producto) => (
+            {paginatedProducts.map((producto) => (
               <tr key={producto.id} className="hover:bg-gray-50">
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                   {producto.name}
@@ -127,19 +131,26 @@ export default function ProductManagement() {
                 </td>
               </tr>
             ))}
-            {filteredProducts.length === 0 && (
+            {paginatedProducts.length === 0 && (
               <tr>
                 <td
                   colSpan={5}
                   className="px-6 py-8 text-center text-sm text-gray-500"
                 >
-                 No se encontraron productos
+                  No se encontraron productos
                 </td>
               </tr>
             )}
           </tbody>
         </table>
       </div>
+
+      <Paginator
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={handlePageChange}
+        loading={loading}
+      />
     </div>
   );
 }

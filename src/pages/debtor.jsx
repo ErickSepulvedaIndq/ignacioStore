@@ -7,52 +7,51 @@
 import { useState, useEffect } from 'react';
 import { useMemo } from 'react';
 import { useSearch } from '../context/SearchContext';
+import Paginator from '../components/UI/Paginator';
+import { debtorMonthlyPurchasesDemo } from '../models/purchase';
 
 export default function Debtor() {
-    const [debtors, setDebtors] = useState([]);
+    const [pendingPayments, setPendingPayments] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [currentPage, setCurrentPage] = useState(1);
+    const pageSize = 10;
     const { normalizedSearch } = useSearch();
-
+    //IMPORTANTE PARA EL BACKEND
+    //ESTO NO SE SI DEBERIA HACERLO YO AQUI PERO ESTOY SEGURO QUE EL CALCULAR LOS DIAS PARA VENCER SE TIENE QUE HACER
     useEffect(() => {
         // TODO: Fetch pendientes desde API
         setTimeout(() => {
-            setDebtors([
-                {
-                    id: 1,
-                    usuario: 'Juan Pérez',
-                    fechaCompra: '2026-02-12',
-                    diasVencimiento: 3,
-                    total: 150.50,
-                    deudaTotal: 200.50,
-                },
-                {
-                    id: 2,
-                    usuario: 'María González',
-                    fechaCompra: '2026-02-14',
-                    diasVencimiento: 1,
-                    total: 85.00,
-                    deudaTotal: 85.00,
-                },
-            ]);
+            setPendingPayments(debtorMonthlyPurchasesDemo);
             setLoading(false);
+            setCurrentPage(1);
         }, 500);
     }, []);
 
     const filteredDebtors = useMemo(() => {
         if (!normalizedSearch) {
-            return debtors;
+            return pendingPayments;
         }
 
-        return debtors.filter((debtor) => {
-            const searchableText = `${debtor.usuario} ${debtor.fechaCompra} ${debtor.total} ${debtor.deudaTotal}`.toLowerCase();
+        return pendingPayments.filter((payment) => {
+            const searchableText = `${payment.userName} ${payment.purchaseDate} ${payment.purchaseAmount} ${payment.totalDebt}`.toLowerCase();
             return searchableText.includes(normalizedSearch);
         });
-    }, [debtors, normalizedSearch]);
+    }, [pendingPayments, normalizedSearch]);
+
+    const totalPages = Math.ceil(filteredDebtors.length / pageSize);
+    const startIndex = (currentPage - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    const paginatedDebtors = filteredDebtors.slice(startIndex, endIndex);
+
+    const handlePageChange = (page) => {
+        setCurrentPage(page);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
 
     if (loading) {
         return (
             <div className="flex justify-center items-center h-96">
-                <p className="text-gray-500">Cargando pendientes...</p>
+                <p className="text-gray-500">Cargando informacion</p>
             </div>
         );
     }
@@ -79,9 +78,6 @@ export default function Debtor() {
                                     Fecha Compra
                                 </th>
                                 <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
-                                    Días para Cobro
-                                </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                                     Monto Compra
                                 </th>
                                 <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
@@ -93,45 +89,21 @@ export default function Debtor() {
                             </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
-                            {filteredDebtors.map((debtor) => (
-                                <tr
-                                    key={debtor.id}
-                                    className={`hover:bg-gray-50 ${
-                                        debtor.diasVencimiento === 0
-                                            ? 'bg-red-50'
-                                            : ''
-                                    }`}
-                                >
+                            {paginatedDebtors.map((payment) => (
+                                <tr key={payment.id} className="hover:bg-gray-50">
                                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                        {debtor.usuario}
+                                        {payment.userName}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                        {new Date(debtor.fechaCompra).toLocaleDateString(
+                                        {new Date(payment.purchaseDate).toLocaleDateString(
                                             'es-MX'
                                         )}
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm">
-                                        <span
-                                            className={`px-2 py-1 rounded-full font-semibold ${
-                                                debtor.diasVencimiento === 0
-                                                    ? 'bg-red-100 text-red-800'
-                                                    : debtor.diasVencimiento === 1
-                                                    ? 'bg-yellow-100 text-yellow-800'
-                                                    : 'bg-blue-100 text-blue-800'
-                                            }`}
-                                        >
-                                            {debtor.diasVencimiento === 0
-                                                ? '¡HOY!'
-                                                : `${debtor.diasVencimiento} día${
-                                                      debtor.diasVencimiento > 1 ? 's' : ''
-                                                  }`}
-                                        </span>
-                                    </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                        ${debtor.total.toFixed(2)}
+                                        ${payment.purchaseAmount.toFixed(2)}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">
-                                        ${debtor.deudaTotal.toFixed(2)}
+                                        ${payment.totalDebt.toFixed(2)}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                         <button className="bg-green-600 hover:bg-green-700 text-white px-4 py-1 rounded mr-2 transition">
@@ -143,6 +115,15 @@ export default function Debtor() {
                         </tbody>
                     </table>
                 </div>
+            )}
+
+            {filteredDebtors.length > 0 && (
+                <Paginator
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={handlePageChange}
+                    loading={loading}
+                />
             )}
         </div>
     );
