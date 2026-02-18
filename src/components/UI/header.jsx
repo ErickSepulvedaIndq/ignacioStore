@@ -1,5 +1,6 @@
 import { useCart } from "../../context/CartContext";
 import { useAuth } from "../../context/AuthContext";
+import { useSearch } from "../../context/SearchContext";
 import Carrito from "../../assets/carrito.png";
 import MiniCart from "../structure/miniCart";
 import Lupa from "../../assets/lupa.png";
@@ -7,6 +8,7 @@ import Lupa from "../../assets/lupa.png";
 export default function Header() {
   const { getCartCount, toggleCart } = useCart();
   const { toggleSideNav } = useAuth();
+  const { searchTerm, setSearchTerm } = useSearch();
   const cartCount = getCartCount();
 
   return (
@@ -40,6 +42,8 @@ export default function Header() {
             type="text"
             className="bg-white text-black p-1 md:p-2 rounded-lg w-full outline-none text-sm"
             placeholder="Buscar..."
+            value={searchTerm}
+            onChange={(event) => setSearchTerm(event.target.value)}
           />
           <img
             src={Lupa}

@@ -15,7 +15,7 @@ export default function Login() {
     };
 
     login(testUser);
-    navigate("/");
+    navigate("/products");
   };
 
   return (

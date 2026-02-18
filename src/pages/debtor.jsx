@@ -5,10 +5,13 @@
 ? o bien enviar un recordatorio de pago por correo :)
 */
 import { useState, useEffect } from 'react';
+import { useMemo } from 'react';
+import { useSearch } from '../context/SearchContext';
 
 export default function Debtor() {
     const [debtors, setDebtors] = useState([]);
     const [loading, setLoading] = useState(true);
+    const { normalizedSearch } = useSearch();
 
     useEffect(() => {
         // TODO: Fetch pendientes desde API
@@ -35,6 +38,17 @@ export default function Debtor() {
         }, 500);
     }, []);
 
+    const filteredDebtors = useMemo(() => {
+        if (!normalizedSearch) {
+            return debtors;
+        }
+
+        return debtors.filter((debtor) => {
+            const searchableText = `${debtor.usuario} ${debtor.fechaCompra} ${debtor.total} ${debtor.deudaTotal}`.toLowerCase();
+            return searchableText.includes(normalizedSearch);
+        });
+    }, [debtors, normalizedSearch]);
+
     if (loading) {
         return (
             <div className="flex justify-center items-center h-96">
@@ -47,10 +61,10 @@ export default function Debtor() {
         <div className="container mx-auto p-6">
             <h1 className="text-3xl font-bold mb-6 text-gray-800">Pendientes de Pago</h1>
 
-            {debtors.length === 0 ? (
+            {filteredDebtors.length === 0 ? (
                 <div className="bg-green-100 rounded-lg p-8 text-center">
                     <p className="text-green-800 font-semibold">
-                         No hay pagos pendientes
+                         No se encontraron usuarios pendientes de pago.
                     </p>
                 </div>
             ) : (
@@ -79,45 +93,45 @@ export default function Debtor() {
                             </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
-                            {debtors.map((pendiente) => (
+                            {filteredDebtors.map((debtor) => (
                                 <tr
-                                    key={pendiente.id}
+                                    key={debtor.id}
                                     className={`hover:bg-gray-50 ${
-                                        pendiente.diasVencimiento === 0
+                                        debtor.diasVencimiento === 0
                                             ? 'bg-red-50'
                                             : ''
                                     }`}
                                 >
                                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                        {pendiente.usuario}
+                                        {debtor.usuario}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                        {new Date(pendiente.fechaCompra).toLocaleDateString(
+                                        {new Date(debtor.fechaCompra).toLocaleDateString(
                                             'es-MX'
                                         )}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm">
                                         <span
                                             className={`px-2 py-1 rounded-full font-semibold ${
-                                                pendiente.diasVencimiento === 0
+                                                debtor.diasVencimiento === 0
                                                     ? 'bg-red-100 text-red-800'
-                                                    : pendiente.diasVencimiento === 1
+                                                    : debtor.diasVencimiento === 1
                                                     ? 'bg-yellow-100 text-yellow-800'
                                                     : 'bg-blue-100 text-blue-800'
                                             }`}
                                         >
-                                            {pendiente.diasVencimiento === 0
+                                            {debtor.diasVencimiento === 0
                                                 ? '¡HOY!'
-                                                : `${pendiente.diasVencimiento} día${
-                                                      pendiente.diasVencimiento > 1 ? 's' : ''
+                                                : `${debtor.diasVencimiento} día${
+                                                      debtor.diasVencimiento > 1 ? 's' : ''
                                                   }`}
                                         </span>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                        ${pendiente.total.toFixed(2)}
+                                        ${debtor.total.toFixed(2)}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">
-                                        ${pendiente.deudaTotal.toFixed(2)}
+                                        ${debtor.deudaTotal.toFixed(2)}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                         <button className="bg-green-600 hover:bg-green-700 text-white px-4 py-1 rounded mr-2 transition">
