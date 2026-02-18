@@ -1,8 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
+import { useSearch } from "../context/SearchContext";
 
 export default function ProductManagement() {
   const [productos, setProductos] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { normalizedSearch } = useSearch();
 
   useEffect(() => {
     // TODO: Fetch productos desde API
@@ -13,19 +15,30 @@ export default function ProductManagement() {
           name: "Doritos Nachos",
           price: 25.5,
           stock: 15,
-          status: "active",
+          status: "desactivado",
         },
         {
           id: 2,
           name: "Coca-Cola 600ml",
           price: 15.0,
           stock: 20,
-          status: "active",
+          status: "activo",
         },
       ]);
       setLoading(false);
     }, 500);
   }, []);
+
+  const filteredProducts = useMemo(() => {
+    if (!normalizedSearch) {
+      return productos;
+    }
+
+    return productos.filter((product) => {
+      const textToSearch = `${product.name} ${product.price} ${product.stock} ${product.status}`.toLowerCase();
+      return textToSearch.includes(normalizedSearch);
+    });
+  }, [productos, normalizedSearch]);
 
   if (loading) {
     return (
@@ -68,7 +81,7 @@ export default function ProductManagement() {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {productos.map((producto) => (
+            {filteredProducts.map((producto) => (
               <tr key={producto.id} className="hover:bg-gray-50">
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                   {producto.name}
@@ -88,7 +101,7 @@ export default function ProductManagement() {
                 <td className="px-6 py-4 whitespace-nowrap">
                   <span
                     className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                      producto.status === "active"
+                      producto.status === "activo"
                         ? "bg-green-100 text-green-800"
                         : "bg-red-100 text-red-800"
                     }`}
@@ -97,15 +110,33 @@ export default function ProductManagement() {
                   </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                  <button className="text-blue-600 hover:text-blue-900 mr-3">
-                    Editar
+                  <button
+                    className="text-[#3041A0] hover:text-[#25327D] mr-3"
+                    aria-label="Edit product"
+                    title="Edit product"
+                  >
+                    <i className="pi pi-pencil"></i>
                   </button>
-                  <button className="text-red-600 hover:text-red-900">
-                    Desactivar
+                  <button
+                    className="text-red-600 hover:text-red-900"
+                    aria-label="Deactivate product"
+                    title="Deactivate product"
+                  >
+                    <i className="pi pi-trash"></i>
                   </button>
                 </td>
               </tr>
             ))}
+            {filteredProducts.length === 0 && (
+              <tr>
+                <td
+                  colSpan={5}
+                  className="px-6 py-8 text-center text-sm text-gray-500"
+                >
+                 No se encontraron productos
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>

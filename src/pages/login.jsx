@@ -15,12 +15,12 @@ export default function Login() {
     };
 
     login(testUser);
-    navigate("/");
+    navigate("/products");
   };
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-      <div className="bg-white p-8 rounded-lg shadow-lg w-96">
+      <div className="bg-white p-8 rounded-lg shadow-lg w-96 -mt-[26vh]">
         <h1 className="text-3xl font-bold text-center text-[#3041A0] mb-6">
           IGNACIO STORE
         </h1>

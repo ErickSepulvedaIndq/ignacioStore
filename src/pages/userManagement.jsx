@@ -1,8 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
+import { useSearch } from "../context/SearchContext";
 
 export default function UserManagement() {
   const [usuarios, setUsuarios] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { normalizedSearch } = useSearch();
 
   useEffect(() => {
     // TODO: Fetch usuarios desde API
@@ -28,6 +30,17 @@ export default function UserManagement() {
       setLoading(false);
     }, 500);
   }, []);
+
+  const filteredUsers = useMemo(() => {
+    if (!normalizedSearch) {
+      return usuarios;
+    }
+
+    return usuarios.filter((userItem) => {
+      const searchableText = `${userItem.firstName} ${userItem.lastName} ${userItem.role} ${userItem.status} ${userItem.debt}`.toLowerCase();
+      return searchableText.includes(normalizedSearch);
+    });
+  }, [usuarios, normalizedSearch]);
 
   if (loading) {
     return (
@@ -70,7 +83,7 @@ export default function UserManagement() {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {usuarios.map((usuario) => (
+            {filteredUsers.map((usuario) => (
               <tr key={usuario.id} className="hover:bg-gray-50">
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                   {usuario.firstName} {usuario.lastName}
@@ -100,17 +113,34 @@ export default function UserManagement() {
                     {usuario.status}
                   </span>
                 </td>
-                     {/* debemos cambiarlos por iconos, ya miro como*/}
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                  <button className="text-blue-600 hover:text-blue-900 mr-3">
-                    Editar
+                  <button
+                    className="text-[#3041A0] hover:text-[#25327D] mr-3"
+                    aria-label="Edit user"
+                    title="Edit user"
+                  >
+                    <i className="pi pi-pencil"></i>
                   </button>
-                  <button className="text-red-600 hover:text-red-900">
-                    Desactivar
+                  <button
+                    className="text-red-600 hover:text-red-900"
+                    aria-label="Deactivate user"
+                    title="Deactivate user"
+                  >
+                    <i className="pi pi-trash"></i>
                   </button>
                 </td>
               </tr>
             ))}
+            {filteredUsers.length === 0 && (
+              <tr>
+                <td
+                  colSpan={5}
+                  className="px-6 py-8 text-center text-sm text-gray-500"
+                >
+                  No se encontraron usuarios
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>

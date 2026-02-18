@@ -1,8 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useAuth } from "../context/AuthContext";
+import { useSearch } from "../context/SearchContext";
 
 export default function Purchase() {
   const { user } = useAuth();
+  const { normalizedSearch } = useSearch();
   const [shopping, setShopping] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -28,6 +30,17 @@ export default function Purchase() {
     }, 500);
   }, [user]);
 
+  const filteredPurchases = useMemo(() => {
+    if (!normalizedSearch) {
+      return shopping;
+    }
+
+    return shopping.filter((purchase) => {
+      const searchableText = `${purchase.id} ${purchase.date} ${purchase.result} ${purchase.status}`.toLowerCase();
+      return searchableText.includes(normalizedSearch);
+    });
+  }, [shopping, normalizedSearch]);
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-96">
@@ -40,9 +53,9 @@ export default function Purchase() {
     <div className="container mx-auto p-6">
       <h1 className="text-3xl font-bold mb-6 text-gray-800">Mis Compras</h1>
 
-      {shopping.length === 0 ? (
+      {filteredPurchases.length === 0 ? (
         <div className="bg-gray-100 rounded-lg p-8 text-center">
-          <p className="text-gray-500">No tienes compras registradas</p>
+          <p className="text-gray-500">No se encontraron compras.</p>
         </div>
       ) : (
         <div className="bg-white rounded-lg shadow overflow-hidden">
@@ -64,23 +77,23 @@ export default function Purchase() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {shopping.map((compra) => (
-                <tr key={compra.id} className="hover:bg-gray-50">
+              {filteredPurchases.map((purchase) => (
+                <tr key={purchase.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {new Date(compra.date).toLocaleDateString("es-MX")}
+                    {new Date(purchase.date).toLocaleDateString("es-MX")}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">
-                    ${compra.result.toFixed(2)}
+                    ${purchase.result.toFixed(2)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span
                       className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        compra.status === "Pagado"
+                        purchase.status === "Pagado"
                           ? "bg-green-100 text-green-800"
                           : "bg-yellow-100 text-yellow-800"
                       }`}
                     >
-                      {compra.status}
+                      {purchase.status}
                     </span>
                   </td>
                   
