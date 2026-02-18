@@ -33,7 +33,7 @@ export default function MiniCart() {
             <h2 className="font-bold text-xl">Carrito de Compras</h2>
             <button
               onClick={closeCart}
-              className="text-2xl hover:text-red-400 transition"
+              className="text-2xl cursor-pointer transition-all duration-200 ease-in-out hover:scale-145 hover:text-red-400 active:scale-100"
             >
               ×
             </button>
