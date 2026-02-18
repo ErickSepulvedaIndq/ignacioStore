@@ -41,12 +41,12 @@ export default function Card({ productName, price, img, productId }) {
             <img src={img} alt={productName} className="h-50" />
           </div>
           <h2 className="font-bold pb-2 pl-2">{productName}</h2>
-          <p className="font-bold pb-2 pl-2">${price}</p>
-          <div className="flex items-center justify-center gap-10">
+          <p className="font-bold pb-2 pl-2 ml-1.5">${price}</p>
+          <div className="flex items-center justify-center gap-10 mt-3 mb-7">
             <img
               src={Minus}
               alt="Plus"
-              className="h-6 hover:rounded-full hover:scale-110 hover:bg-[#D8D7D5] cursor-pointer"
+              className="h-7 hover:rounded-full hover:scale-110 hover:bg-[#D8D7D5] cursor-pointer mr-1.5"
               onClick={() => handleQuantityChange(quantity - 1)}
               disabled={quantity === 1}
             />
@@ -54,7 +54,7 @@ export default function Card({ productName, price, img, productId }) {
             <img
               src={Plus}
               alt="Minus"
-              className="h-6 hover:rounded-lg hover:scale-110 hover:bg-[#D8D7D5] cursor-pointer"
+              className="h-7 hover:rounded-full hover:scale-110 hover:bg-[#D8D7D5] cursor-pointer"
               onClick={() => handleQuantityChange(quantity + 1)}
             />
           </div>
