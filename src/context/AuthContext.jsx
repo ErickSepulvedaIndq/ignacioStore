@@ -56,8 +56,9 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('username');
+    localStorage.removeItem('userId');
     localStorage.removeItem('role');
-    
+    setUser(null);
   };
 
   const isAdmin = () => {

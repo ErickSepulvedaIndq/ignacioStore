@@ -15,9 +15,10 @@ export default function Card({ productName, price, img, productId }) {
   };
 
   const handleAddToCart = () => {
-    // por default estamos manejando el caso de que el producto no tenga un id, pero esto no debe pasar por eso mismo debemos evitar este posible caso
+    // estructura del producto para el carrito normalizada con _id y id
     const product = {
-      id: productId || `product-${Date.now()}-${Math.random()}`,
+      _id: productId,
+      id: productId,
       name: productName,
       price: parseFloat(price),
       img: img,

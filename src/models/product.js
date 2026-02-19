@@ -1,8 +1,3 @@
-/**
- * Product Model
- * Estructura básica de datos para producto
- */
-
 export const productModel = {
   id: "string|required",
   name: "string|required",
@@ -13,24 +8,6 @@ export const productModel = {
   updatedAt: "string|timestamp",
 };
 
-/**
- * Ejemplo de respuesta de la API:
- * {
- *   docs: [
- *     { id: 1, name: "Doritos Nachos", price: 25.5, stock: 15, status: "active" },
- 
- *   ],
- *   totalDocs: 50,
- *   limit: 10,
- *   page: 1,
- *   totalPages: 5,
- *   hasNextPage: true,
- *   hasPrevPage: false,
- *   nextPage: 2,
- *   prevPage: null
- * }
- */
-
 export const productExample = {
   id: 1,
   name: "Doritos Nachos",
@@ -40,90 +17,3 @@ export const productExample = {
   createdAt: "2026-02-10T09:15:00Z",
   updatedAt: "2026-02-18T16:45:00Z",
 };
-
-export const productDemoRows = [
-  {
-    id: 1,
-    name: "Doritos Nachos",
-    price: 25.5,
-    stock: 15,
-    status: "activo",
-  },
-  {
-    id: 2,
-    name: "Coca-Cola 600ml",
-    price: 15.0,
-    stock: 20,
-    status: "activo",
-  },
-  {
-    id: 3,
-    name: "Sprite 500ml",
-    price: 12.5,
-    stock: 5,
-    status: "activo",
-  },
-  {
-    id: 4,
-    name: "Doritos Cool Americáno",
-    price: 26.0,
-    stock: 0,
-    status: "desactivado",
-  },
-  {
-    id: 5,
-    name: "Cheetos Pufos",
-    price: 22.0,
-    stock: 8,
-    status: "activo",
-  },
-  {
-    id: 6,
-    name: "Gatorade Azul",
-    price: 18.5,
-    stock: 30,
-    status: "activo",
-  },
-  {
-    id: 7,
-    name: "Pan Integral",
-    price: 3.5,
-    stock: 50,
-    status: "activo",
-  },
-  {
-    id: 8,
-    name: "Leche Descremada",
-    price: 2.8,
-    stock: 40,
-    status: "activo",
-  },
-  {
-    id: 9,
-    name: "Queso Manchego",
-    price: 35.0,
-    stock: 2,
-    status: "activo",
-  },
-  {
-    id: 10,
-    name: "Jamón de Pavo",
-    price: 28.5,
-    stock: 12,
-    status: "activo",
-  },
-  {
-    id: 11,
-    name: "Yogurt Natural",
-    price: 4.2,
-    stock: 25,
-    status: "activo",
-  },
-  {
-    id: 12,
-    name: "Chocolate Blanco",
-    price: 8.0,
-    stock: 3,
-    status: "desactivado",
-  },
-];

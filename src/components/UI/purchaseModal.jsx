@@ -1,20 +1,11 @@
 /**
- * NUEVO COMPONENTE CREADO EN ESTA SESIÓN
- * Modal de Compra con Validaciones
+ * modal que aparece para confirmar si quieres hacer la compra
  * 
- * UTILIDAD:
- * - Formulario validado para crear nuevas compras
- * - Usa Yup para validación de datos
- * - Usa Formik para gestión de estado del formulario
- * - Muestra errores en tiempo real
- * 
- * PROPIEDADES:
  * - isOpen: boolean - si el modal está visible
  * - onClose: function - callback cuando se cierra
  * - onSubmit: function - callback cuando se envía el formulario
  * - initialValues: object - valores iniciales (opcional)
  * 
- * Archivo: src/components/UI/PurchaseModal.jsx
  */
 
 import { Formik, Form, Field, ErrorMessage } from "formik";

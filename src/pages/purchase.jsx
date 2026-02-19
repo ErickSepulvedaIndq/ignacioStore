@@ -1,13 +1,3 @@
-/**
- * MIS COMPRAS
- * Esta página muestra un historial de compras del usuario, con detalles como fecha, total y estado.
- * las columnas mas o menos son, luego se me olvidan
- * - Fecha
- * - Total
- * - Estado
- * - Acciones
- *
- */
 import { useState, useEffect, useMemo } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useSearch } from "../context/SearchContext";
@@ -26,19 +16,17 @@ export default function Purchase() {
   const [showModal, setShowModal] = useState(false);
   const pageSize = 10;
 
-  useEffect(() => {
-    fetchUserPurchases();
-  }, [user]);
-
   const fetchUserPurchases = async () => {
-    if (!user || !user.userId) {
+    const userId = localStorage.getItem("userId");
+    
+    if (!userId) {
       setLoading(false);
       return;
     }
 
     try {
       setLoading(true);
-      const response = await getBuyLogsByUserId(user.userId);
+      const response = await getBuyLogsByUserId(userId);
       
       // La respuesta viene en formato { data: [...], message: "...", success: true }
       const buyLogs = response.data || [];
@@ -55,6 +43,10 @@ export default function Purchase() {
       setLoading(false);
     }
   }
+
+  useEffect(() => {
+    fetchUserPurchases();
+  }, []);
 
   const filteredPurchases = useMemo(() => {
     if (!normalizedSearch) {
@@ -231,8 +223,13 @@ export default function Purchase() {
                 <div className="bg-gray-50 rounded p-3 space-y-2 max-h-48 overflow-y-auto">
                   {selectedPurchase.products.map((product, idx) => (
                     <div key={idx} className="flex justify-between text-sm">
-                      <span className="text-gray-700">{product.name}</span>
-                      <span className="font-semibold text-gray-900">${product.price.toFixed(2)}</span>
+                      <div className="flex-1">
+                        <span className="text-gray-700">{product.name}</span>
+                        <span className="text-gray-500 ml-2">x{product.quantity || 1}</span>
+                      </div>
+                      <span className="font-semibold text-gray-900">
+                        ${((product.price || 0) * (product.quantity || 1)).toFixed(2)}
+                      </span>
                     </div>
                   ))}
                 </div>

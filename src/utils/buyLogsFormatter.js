@@ -3,40 +3,28 @@ export const formatBuyLogsForTable = (buyLogs) => {
     return [];
   }
 
-  // Agrupar por fecha 
-  const groupedByDate = buyLogs.reduce((acc, log) => {
-    const date = new Date(log.createdAt).toLocaleDateString("es-MX");
-    
-    if (!acc[date]) {
-      acc[date] = {
+  // convertir cada log individual en una fila de la tabla
+  return buyLogs
+    .map((log, index) => {
+      // calcular total considerando cantidad de cada producto
+      const total = log.products.reduce((sum, product) => {
+        const quantity = product.quantity || 1;
+        return sum + (product.price * quantity);
+      }, 0);
+
+      return {
+        id: log._id || index,
         date: log.createdAt,
-        displayDate: date,
-        totalAmount: 0,
-        products: [],
-        status: "Pagado", // por defecto sera "Pagado" pero pueden modificarlo en un futuro pero tambien deben moverle a la API
+        displayDate: new Date(log.createdAt).toLocaleDateString("es-MX"),
+        total: total,
+        status: "Pagado",
+        products: log.products.map(p => ({
+          ...p,
+          quantity: p.quantity || 1
+        })),
       };
-    }
-
-    // Sumar total y agregar productos
-    log.products.forEach((product) => {
-      acc[date].totalAmount += product.price;
-      acc[date].products.push(product);
-    });
-
-    return acc;
-  }, {});
-
-  // Convertir a array y ordenar por fecha
-  return Object.values(groupedByDate)
-    .sort((a, b) => new Date(b.date) - new Date(a.date))
-    .map((item, index) => ({
-      id: index, // ID único para la tabla
-      date: item.date,
-      displayDate: item.displayDate,
-      total: item.totalAmount,
-      status: item.status,
-      products: item.products,
-    }));
+    })
+    .sort((a, b) => new Date(b.date) - new Date(a.date));
 };
 
 /**
