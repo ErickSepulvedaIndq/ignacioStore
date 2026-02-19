@@ -1,9 +1,5 @@
 import axios from "axios";
 
-
-   //CONFIGURACIÓN BASE DE AXIOS
-
-
 const API = axios.create({
   baseURL: "http://localhost:5000/api/products",
 });
@@ -24,7 +20,7 @@ export const getAllProducts = async (page = 1, limit = 10) => {
   const response = await API.get("/", {
     params: { page, limit }
   });
-
+  console.log(response.data);
   return response.data.data;
 };
 
@@ -85,3 +81,9 @@ export const deleteProduct = async (id, deletedBy) => {
   });
   return response.data;
 };
+
+export const buyProduct = async (products) => {
+  const response = await API.post("/buy", { products })
+  return response.data
+}
+

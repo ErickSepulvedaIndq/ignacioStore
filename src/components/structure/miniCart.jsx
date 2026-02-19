@@ -1,4 +1,7 @@
 import { useCart } from "../../context/CartContext";
+import Swal from "sweetalert2";
+import { buyProduct } from "../../services/productService";
+import { Toast } from "../UI/toast";
 
 export default function MiniCart() {
   const {
@@ -8,7 +11,55 @@ export default function MiniCart() {
     removeFromCart,
     getCartTotal,
     closeCart,
+    clearCart
   } = useCart();
+
+  const handleConfirmPurchase = async () => {
+
+    const confirm = await Swal.fire({
+      title: "Confirmar compra",
+      text: "¿Deseas comprar estos productos?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Sí, comprar",
+      cancelButtonText: "Cancelar",
+    });
+
+    if (!confirm.isConfirmed) return;
+
+    Swal.showLoading();
+
+    try {
+
+      await buyProduct(
+        cartItems.map(item => ({
+          id: item.id,
+          quantity: item.quantity
+        }))
+      );
+
+      Swal.close();
+
+      Toast.fire({
+        icon: "success",
+        title: "Compra realizada",
+      });
+
+      clearCart();
+
+    } catch (error) {
+      console.log(error)
+      console.log(error.stack)
+
+      Swal.close();
+
+      Toast.fire({
+        icon: "error",
+        title: "No se pudo completar la compra",
+      });
+    }
+  };
+
 
   return (
     <>
@@ -73,7 +124,7 @@ export default function MiniCart() {
                           onClick={() =>
                             updateQuantity(item.id, item.quantity - 1)
                           }
-                          className="bg-gray-200 px-2 py-1 rounded hover:bg-gray-300 text-sm"
+                          className="bg-gray-200 px-2 py-1 rounded hover:bg-gray-300 text-sm cursor-pointer"
                         >
                           -
                         </button>
@@ -84,7 +135,7 @@ export default function MiniCart() {
                           onClick={() =>
                             updateQuantity(item.id, item.quantity + 1)
                           }
-                          className="bg-gray-200 px-2 py-1 rounded hover:bg-gray-500 text-sm"
+                          className="bg-gray-200 px-2 py-1 rounded hover:bg-gray-500 text-sm cursor-pointer"
                         >
                           +
                         </button>
@@ -98,7 +149,7 @@ export default function MiniCart() {
 
                       <button
                         onClick={() => removeFromCart(item.id)}
-                        className="text-red-500 hover:text-red-700 text-xs"
+                        className="text-red-500 hover:text-red-700 text-xs cursor-pointer"
                       >
                         Eliminar
                       </button>
@@ -117,7 +168,9 @@ export default function MiniCart() {
                   ${getCartTotal().toFixed(2)}
                 </span>
               </div>
-              <button className="w-full bg-[#3041A0] text-white py-3 rounded-lg hover:bg-[#25327D] transition font-bold">
+              <button className="w-full bg-[#3041A0] text-white py-3 rounded-lg hover:bg-[#25327D] transition font-bold cursor-pointer"
+              onClick={handleConfirmPurchase}
+              >
                 Proceder al Pago
               </button>
             </div>
