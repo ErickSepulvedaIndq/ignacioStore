@@ -1,4 +1,6 @@
+import { useState } from "react";
 import { useCart } from "../../context/CartContext";
+import PurchaseConfirmDialog from "../UI/purchaseConfirmDialog";
 
 export default function MiniCart() {
   const {
@@ -8,11 +10,61 @@ export default function MiniCart() {
     removeFromCart,
     getCartTotal,
     closeCart,
+    handleCheckout,
   } = useCart();
+
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [notification, setNotification] = useState(null);
+
+  // abrir el dialogo de confirmacion
+  const openCheckoutDialog = () => {
+    setIsDialogOpen(true);
+  };
+
+  // cerrar el dialogo
+  const closeDialog = () => {
+    setIsDialogOpen(false);
+  };
+
+  // procesar la compra cuando el usuario confirma
+  const confirmPurchase = async () => {
+    const result = await handleCheckout();
+    
+    closeDialog();
+    
+    // mostrar notificacion de exito o error
+    setNotification(result);
+    
+    // ocultar notificacion despues de 3 segundos
+    setTimeout(() => {
+      setNotification(null);
+      if (result.success) {
+        closeCart();
+      }
+    }, 3000);
+  };
 
   return (
     <>
-      {/* Con esto podremos cerrar el mini carrito al hacer click fuera de él */}
+      {/* notificacion flotante NECESITO PASARLO A UN COMPONENTE*/}
+      {notification && (
+        <div
+          className={`fixed top-4 right-4 z-60 px-6 py-3 rounded-lg shadow-lg text-white font-semibold ${
+            notification.success ? "bg-green-500" : "bg-red-500"
+          }`}
+        >
+          {notification.message}
+        </div>
+      )}
+
+      <PurchaseConfirmDialog
+        isOpen={isDialogOpen}
+        onClose={closeDialog}
+        onConfirm={confirmPurchase}
+        total={getCartTotal()}
+      />
+
+      {/* con esto podremos cerrar el mini carrito al hacer click fuera de el */}
       <div
         className={`fixed inset-0 bg-black/50 z-40  transition-all duration-300 ${
           isCartOpen ? "opacity-100" : "opacity-0 pointer-events-none"
@@ -53,7 +105,6 @@ export default function MiniCart() {
                     key={item.id}
                     className="flex items-center gap-4 p-3 border rounded-lg hover:shadow-lg transition"
                   >
-                    {/* El tamaño no deberia ser asi, no puede ser tan estatico */}
                     <img
                       src={item.imageUrl || item.img}
                       alt={item.name}
@@ -117,7 +168,10 @@ export default function MiniCart() {
                   ${getCartTotal().toFixed(2)}
                 </span>
               </div>
-              <button className="w-full bg-[#3041A0] text-white py-3 rounded-lg hover:bg-[#25327D] transition font-bold">
+              <button
+                onClick={openCheckoutDialog}
+                className="w-full bg-[#3041A0] text-white py-3 rounded-lg hover:bg-[#25327D] transition font-bold"
+              >
                 Proceder al Pago
               </button>
             </div>

@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect } from "react";
+import { createBuyLog } from "../api/buyLogsService";
 
 const CartContext = createContext();
 
@@ -83,6 +84,49 @@ export const CartProvider = ({ children }) => {
     setIsCartOpen(false);
   };
 
+  // procesar la compra y registrarla en la BD
+  const handleCheckout = async () => {
+    try {
+      const userId = localStorage.getItem("userId");
+      
+      if (!userId) {
+        throw new Error("usuario no autenticado");
+      }
+
+      if (cartItems.length === 0) {
+        throw new Error("carrito vacio");
+      }
+
+      // Necesito verificar por que aqui hay un problema, los productos deben acomplarse en un array y parece que los esta subiendo uno por uno
+      const purchaseData = {
+        id_user: userId,
+        products: cartItems.map(item => ({
+          id: item._id || item.id,
+          name: item.name,
+          price: item.price,
+          quantity: item.quantity
+        }))
+      };
+
+      const response = await createBuyLog(purchaseData);
+      
+      // si todo salio bien limpiamos el carrito
+      if (response.success) {
+        clearCart();
+        return { success: true, message: "compra realizada exitosamente" };
+      }
+      
+      throw new Error("error al procesar la compra");
+      
+    } catch (error) {
+      console.error("error en checkout:", error);
+      return { 
+        success: false, 
+        message: error.message || "error al procesar la compra" 
+      };
+    }
+  };
+
   const value = {
     cartItems,
     isCartOpen,
@@ -94,6 +138,7 @@ export const CartProvider = ({ children }) => {
     getCartCount,
     toggleCart,
     closeCart,
+    handleCheckout,
   };
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
