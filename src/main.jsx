@@ -23,9 +23,10 @@ createRoot(document.getElementById('root')).render(
         <CartProvider>
           <SearchProvider>
             <Routes>
+              <Route path="/login" element={<Login />} />
+            </Routes>
+            <Routes>
               <Route path="/" element={<Layout />}>
-                <Route index element={<Login />} />
-                <Route path="login" element={<Login />} />
                 <Route path="products" element={<Product />} />
                 <Route path="purchases" element={<Purchase />} />
                 <Route path="admin/users" element={<UserManagement />} />
