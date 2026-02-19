@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useCart } from "../../context/CartContext";
 import Swal from "sweetalert2";
 import { buyProduct } from "../../services/productService";

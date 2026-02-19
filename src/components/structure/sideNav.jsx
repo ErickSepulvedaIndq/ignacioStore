@@ -71,7 +71,7 @@ export default function SideNav() {
             </div>
             <button
               onClick={closeSideNav}
-              className="text-2xl cursor-pointer transition-all duration-200 ease-in-out hover:scale-145 hover:text-red-400 active:scale-100"
+              className="text-2xl cursor-pointer transition-all duration-200 ease-in-out hover:scale-175 hover:text-red-500 active:scale-100"
             >
               ×
             </button>

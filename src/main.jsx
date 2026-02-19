@@ -1,22 +1,22 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import ProductManagement from './pages/productManagement.jsx'
-import { SearchProvider } from './context/SearchContext.jsx'
-import { CartProvider } from './context/CartContext.jsx'
-import { AuthProvider } from './context/AuthContext.jsx'
-import UserManagement from './pages/userManagement.jsx'
-import Layout from './components/layout/Layout.jsx'
-import { createRoot } from 'react-dom/client'
-import Purchase from './pages/purchase.jsx'
-import Product from './pages/product.jsx'
-import Debtor from './pages/debtor.jsx'
-import Report from './pages/report.jsx'
-import Login from './pages/login.jsx'
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import ProductManagement from "./pages/productManagement.jsx";
+import { SearchProvider } from "./context/SearchContext.jsx";
+import { CartProvider } from "./context/CartContext.jsx";
+import { AuthProvider } from "./context/AuthContext.jsx";
+import UserManagement from "./pages/userManagement.jsx";
+import Layout from "./components/layout/Layout.jsx";
+import { createRoot } from "react-dom/client";
+import Purchase from "./pages/purchase.jsx";
+import Product from "./pages/product.jsx";
+import Debtor from "./pages/debtor.jsx";
+import Report from "./pages/report.jsx";
+import Login from "./pages/login.jsx";
 
-import { StrictMode } from 'react'
-import 'primeicons/primeicons.css'
-import './index.css'
+import { StrictMode } from "react";
+import "primeicons/primeicons.css";
+import "./index.css";
 
-createRoot(document.getElementById('root')).render(
+createRoot(document.getElementById("root")).render(
   <StrictMode>
     <BrowserRouter>
       <AuthProvider>
@@ -40,4 +40,4 @@ createRoot(document.getElementById('root')).render(
       </AuthProvider>
     </BrowserRouter>
   </StrictMode>,
-)
+);

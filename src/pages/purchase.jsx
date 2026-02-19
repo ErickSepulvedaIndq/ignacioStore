@@ -1,12 +1,11 @@
 import { useState, useEffect, useMemo } from "react";
-import { useAuth } from "../context/AuthContext";
 import { useSearch } from "../context/SearchContext";
 import Paginator from "../components/UI/Paginator";
+import PurchaseDetailModal from "../components/UI/purchaseDetailModal";
 import { getBuyLogsByUserId } from "../api/buyLogsService";
 import { formatBuyLogsForTable } from "../utils/buyLogsFormatter";
 
 export default function Purchase() {
-  const { user } = useAuth();
   const { normalizedSearch } = useSearch();
   const [purchases, setPurchases] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -16,9 +15,17 @@ export default function Purchase() {
   const [showModal, setShowModal] = useState(false);
   const pageSize = 10;
 
+  const formatDateLong = (value) => {
+    return new Date(value).toLocaleDateString("es-MX", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+  };
+
   const fetchUserPurchases = async () => {
     const userId = localStorage.getItem("userId");
-    
+
     if (!userId) {
       setLoading(false);
       return;
@@ -27,13 +34,14 @@ export default function Purchase() {
     try {
       setLoading(true);
       const response = await getBuyLogsByUserId(userId);
-      
+
       // La respuesta viene en formato { data: [...], message: "...", success: true }
       const buyLogs = response.data || [];
       const formattedPurchases = formatBuyLogsForTable(buyLogs);
-      
+
       setPurchases(formattedPurchases);
       setCurrentPage(1);
+      console.log("Compras formateadas:", formattedPurchases);
       setError(null);
     } catch (err) {
       console.error("Error fetching purchases:", err);
@@ -42,7 +50,7 @@ export default function Purchase() {
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   useEffect(() => {
     fetchUserPurchases();
@@ -54,8 +62,9 @@ export default function Purchase() {
     }
 
     return purchases.filter((purchase) => {
+      const longDate = formatDateLong(purchase.date);
       const searchableText =
-        `${purchase.id} ${purchase.date} ${purchase.total} ${purchase.status}`.toLowerCase();
+        `${purchase.id} ${purchase.date} ${longDate} ${purchase.total} ${purchase.status}`.toLowerCase();
       return searchableText.includes(normalizedSearch);
     });
   }, [purchases, normalizedSearch]);
@@ -94,7 +103,7 @@ export default function Purchase() {
         <h1 className="text-3xl font-bold mb-6 text-gray-800">Mis Compras</h1>
         <div className="bg-red-100 rounded-lg p-8 text-center">
           <p className="text-red-600">{error}</p>
-          <button 
+          <button
             onClick={fetchUserPurchases}
             className="mt-4 bg-[#3041A0] text-white px-4 py-2 rounded hover:bg-[#25348a] transition"
           >
@@ -139,8 +148,8 @@ export default function Purchase() {
               <tbody className="bg-white divide-y divide-gray-200">
                 {paginatedPurchases.map((purchase) => (
                   <tr key={purchase.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {new Date(purchase.date).toLocaleDateString("es-MX")}
+                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {formatDateLong(purchase.date)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">
                       ${purchase.total.toFixed(2)}
@@ -159,7 +168,7 @@ export default function Purchase() {
 
                     {/* acciones por compra */}
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium ">
-                      <button 
+                      <button
                         onClick={() => handleViewDetails(purchase)}
                         className="bg-[#687bd7] hover:bg-[#0d3395] text-white px-4 py-1 rounded mr-2 transition"
                       >
@@ -183,75 +192,11 @@ export default function Purchase() {
         />
       )}
 
-      {/* Modal de detalles de compra */}
-      {showModal && selectedPurchase && (
-        <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 p-6">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold text-gray-800">Detalles de Compra</h2>
-              <button 
-                onClick={handleCloseModal}
-                className="text-gray-500 hover:text-gray-700"
-              >
-                ✕
-              </button>
-            </div>
-
-            <div className="space-y-4">
-              <div>
-                <p className="text-sm text-gray-500">Fecha</p>
-                <p className="text-lg font-semibold text-gray-900">
-                  {new Date(selectedPurchase.date).toLocaleDateString("es-MX")}
-                </p>
-              </div>
-
-              <div>
-                <p className="text-sm text-gray-500">Estado</p>
-                <span
-                  className={`inline-block px-3 py-1 text-sm font-semibold rounded-full ${
-                    selectedPurchase.status === "Pagado"
-                      ? "bg-green-100 text-green-800"
-                      : "bg-yellow-100 text-yellow-800"
-                  }`}
-                >
-                  {selectedPurchase.status}
-                </span>
-              </div>
-
-              <div>
-                <p className="text-sm text-gray-500 mb-2">Productos</p>
-                <div className="bg-gray-50 rounded p-3 space-y-2 max-h-48 overflow-y-auto">
-                  {selectedPurchase.products.map((product, idx) => (
-                    <div key={idx} className="flex justify-between text-sm">
-                      <div className="flex-1">
-                        <span className="text-gray-700">{product.name}</span>
-                        <span className="text-gray-500 ml-2">x{product.quantity || 1}</span>
-                      </div>
-                      <span className="font-semibold text-gray-900">
-                        ${((product.price || 0) * (product.quantity || 1)).toFixed(2)}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="pt-4 border-t border-gray-200">
-                <div className="flex justify-between items-center">
-                  <span className="text-lg font-bold text-gray-800">Total</span>
-                  <span className="text-2xl font-bold text-[#3041A0]">${selectedPurchase.total.toFixed(2)}</span>
-                </div>
-              </div>
-            </div>
-
-            <button 
-              onClick={handleCloseModal}
-              className="w-full mt-6 bg-[#3041A0] text-white py-2 rounded font-semibold hover:bg-[#25348a] transition"
-            >
-              Cerrar
-            </button>
-          </div>
-        </div>
-      )}
+      <PurchaseDetailModal
+        isOpen={showModal}
+        purchase={selectedPurchase}
+        onClose={handleCloseModal}
+      />
     </div>
   );
 }
