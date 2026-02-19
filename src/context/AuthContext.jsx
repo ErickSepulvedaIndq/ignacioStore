@@ -32,6 +32,7 @@ export const AuthProvider = ({ children }) => {
       const payload = JSON.parse(atob(token.split('.')[1]));
       localStorage.setItem("username", payload.username);
       localStorage.setItem("role", payload.role);
+      localStorage.setItem("id", payload.userId);
 
       setUser(payload);
 
