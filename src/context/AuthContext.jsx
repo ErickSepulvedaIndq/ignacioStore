@@ -4,6 +4,7 @@
 * por que falta la parte del back, asi que quedara asi un tiempo
 */
 import { createContext, useContext, useState } from 'react';
+import { authService } from '../api/authService';
 
 const AuthContext = createContext();
 
@@ -16,35 +17,43 @@ export const useAuth = () => {
 };
 
 export const AuthProvider = ({ children }) => {
-  // pues de momento no esta listo el JWT
-  const [user] = useState({
-    id: 1,
-    firstName: 'Admin',
-    lastName: 'Kristal',
-    role: 'admin',
-  });
+  const [user, setUser] = useState(null);
 
   const [isSideNavOpen, setIsSideNavOpen] = useState(false);
 
-  const login = (userData) => {
-    if (!userData) return;
-    if (userData.role === 'admin') {
-      isAdmin()
+  const login = async (userData) => {
+    try {
+      const response = await authService(userData);
+      console.log(response);
+
+      const token = response.data
+
+      localStorage.setItem("token", token);
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      localStorage.setItem("username", payload.username);
+      localStorage.setItem("role", payload.role);
+
+      setUser(payload);
+
+      return true;
+    } catch (error) {
+      console.error(error);
+      return false;
     }
-    // TODO: Impletar JWT
-    console.log('Login pendiente de implementar', userData);
   };
 
   const logout = () => {
-    localStorage.removeItem('cart_INDQ');
-    // TODO: tambien debe olviar el JWT por que ahi vienen sus permisos IMPORTANTE
-    // localStorage.removeItem('cart_INDQ');
+    localStorage.removeItem('token');
+    localStorage.removeItem('username');
+    localStorage.removeItem('role');
     
   };
 
   const isAdmin = () => {
-    // ps de momento siempre retorna true
-    return true;
+    if(localStorage.getItem('role') === 'admin') {
+      return true;
+    }
+    return false;
   };
 
   const isAuthenticated = () => {
