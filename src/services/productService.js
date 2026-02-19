@@ -20,9 +20,9 @@ API.interceptors.request.use((config) => {
 /*PRODUCTOS*/
 
 //Obtener todos los productos
-export const getAllProducts = async (page = 1, limit = 10) => {
+export const getAllProducts = async () => {
   const response = await API.get("/", {
-    params: { page, limit }
+    params: {  }
   });
 
   return response.data.data;
@@ -85,3 +85,8 @@ export const deleteProduct = async (id, deletedBy) => {
   });
   return response.data;
 };
+
+export const buyProduct = async (products) => {
+  const response = await API.post("/buy", { products })
+  return response.data
+}

@@ -16,10 +16,12 @@ export default function Product() {
         const fetchProducts = async () => {
             try {
                 const response = await getAllProducts();
+                console.log("Productos cargados:", response);
 
                 // Ajusta dependiendo de tu customResponse
                 // Si tu backend responde { data: [...] }
-                setProductos(response.data || response);
+                setProductos(response.docs || response);
+
 
             } catch (err) {
                 setError("Error al cargar productos");

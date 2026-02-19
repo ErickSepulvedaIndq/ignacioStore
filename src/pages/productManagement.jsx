@@ -1,42 +1,79 @@
 import { useState, useEffect, useMemo } from "react";
 import { useSearch } from "../context/SearchContext";
 import Paginator from "../components/UI/Paginator";
-import { productDemoRows } from "../models/product";
+import { getAllProducts } from "../services/productService";
+import Loading from "../components/UI/Loading";
+import RegisterProductForm from "../components/forms/RegisterProductForm";
 
 export default function ProductManagement() {
   const [productos, setProductos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalMode, setModalMode] = useState("create");
+  const [selectedProductId, setSelectedProductId] = useState(null);
+
   const pageSize = 10;
   const { normalizedSearch } = useSearch();
 
-  useEffect(() => {
-    // TODO: Fetch productos desde API
-    setTimeout(() => {
-      setProductos(productDemoRows);
+    const handleCreateModal = () => {
+    setModalMode("create");
+    setSelectedProductId(null);
+    setModalOpen(true);
+  };
+
+  const handleEditModal = (id) => {
+    setModalMode("edit");
+    setSelectedProductId(id);
+    setModalOpen(true);
+  };
+
+  const handleViewModal = (id) => {
+    setModalMode("view");
+    setSelectedProductId(id);
+    setModalOpen(true);
+  };
+
+  const fetchProducts = async (page = 1) => {
+    try {
+      setLoading(true);
+      const response = await getAllProducts(page, pageSize); 
+      
+      const data = response?.docs || [];
+      setProductos(data);
+      setTotalPages(response?.totalPages || 1);
+      setCurrentPage(response?.page || 1);
+    } catch (error) {
+      console.error("Error cargando productos:", error);
+      setProductos([]);
+      setTotalPages(1);
+    } finally {
       setLoading(false);
-      setCurrentPage(1);
-    }, 500);
-  }, []);
-
-  // filtra segun lo que se escribe en el buscador
-  const filteredProducts = useMemo(() => {
-    if (!normalizedSearch) {
-      return productos;
     }
+  };
 
-    return productos.filter((product) => {
+
+  
+  useEffect(() => {
+    fetchProducts(currentPage);
+  }, [currentPage]);
+
+  // Filtrado según buscador
+  const filteredProducts = useMemo(() => {
+    if (!normalizedSearch) return productos || [];
+    return (productos || []).filter((product) => {
       const textToSearch = `${product.name} ${product.price} ${product.stock} ${product.status}`.toLowerCase();
       return textToSearch.includes(normalizedSearch);
     });
   }, [productos, normalizedSearch]);
+  
 
-  // calcula las paginas disponibles
-  const totalPages = Math.ceil(filteredProducts.length / pageSize);
-  // define el rango de datos de la pagina actual
-  const startIndex = (currentPage - 1) * pageSize;
-  const endIndex = startIndex + pageSize;
-  const paginatedProducts = filteredProducts.slice(startIndex, endIndex);
+    console.log("Productos cargados:", productos);
+
+  
+
 
   // cambia la pagina y sube al inicio
   const handlePageChange = (page) => {
@@ -46,9 +83,7 @@ export default function ProductManagement() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-96">
-        <p className="text-gray-500">Cargando productos...</p>
-      </div>
+      <Loading />
     );
   }
 
@@ -58,7 +93,10 @@ export default function ProductManagement() {
         <h1 className="text-3xl font-bold text-gray-800">
           Administrar Productos
         </h1>
-        <button className="bg-[#3041A0] hover:bg-[#25327D] text-white px-6 py-2 rounded-lg font-semibold transition">
+        <button 
+        className="bg-[#3041A0] hover:bg-[#25327D] text-white px-6 py-2 rounded-lg font-semibold transition"
+        onClick={handleCreateModal}                                                                             
+        >
           + Nuevo Producto
         </button>
       </div>
@@ -85,8 +123,8 @@ export default function ProductManagement() {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {paginatedProducts.map((producto) => (
-              <tr key={producto.id} className="hover:bg-gray-50">
+            {filteredProducts.map((producto) => (
+              <tr key={producto._id} className="hover:bg-gray-50">
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                   {producto.name}
                 </td>
@@ -105,7 +143,7 @@ export default function ProductManagement() {
                 <td className="px-6 py-4 whitespace-nowrap">
                   <span
                     className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                      producto.status === "activo"
+                      producto.status === "active"
                         ? "bg-green-100 text-green-800"
                         : "bg-red-100 text-red-800"
                     }`}
@@ -118,6 +156,7 @@ export default function ProductManagement() {
                     className="text-[#3041A0] hover:text-[#25327D] mr-3"
                     aria-label="Edit product"
                     title="Edit product"
+                    onClick={() => handleEditModal(producto._id)}
                   >
                     <i className="pi pi-pencil"></i>
                   </button>
@@ -125,13 +164,14 @@ export default function ProductManagement() {
                     className="text-red-600 hover:text-red-900"
                     aria-label="Deactivate product"
                     title="Deactivate product"
+                    onClick={() => handleViewModal(producto._id)}
                   >
                     <i className="pi pi-trash"></i>
                   </button>
                 </td>
               </tr>
             ))}
-            {paginatedProducts.length === 0 && (
+            {filteredProducts.length === 0 && (
               <tr>
                 <td
                   colSpan={5}
@@ -150,6 +190,12 @@ export default function ProductManagement() {
         totalPages={totalPages}
         onPageChange={handlePageChange}
         loading={loading}
+      />
+
+      <RegisterProductForm
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        onSuccess={() => fetchProducts(currentPage)}
       />
     </div>
   );

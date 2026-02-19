@@ -8,6 +8,19 @@ import { authService } from '../api/authService';
 
 const AuthContext = createContext();
 
+function parseJwt(token) {
+  const base64Url = token.split('.')[1];
+  const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+  const jsonPayload = decodeURIComponent(
+    atob(base64)
+      .split('')
+      .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+      .join('')
+  );
+
+  return JSON.parse(jsonPayload);
+}
+
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
@@ -29,7 +42,7 @@ export const AuthProvider = ({ children }) => {
       const token = response.data
 
       localStorage.setItem("token", token);
-      const payload = JSON.parse(atob(token.split('.')[1]));
+      const payload = parseJwt(token);
       localStorage.setItem("username", payload.username);
       localStorage.setItem("role", payload.role);
 
