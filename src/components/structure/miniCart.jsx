@@ -64,24 +64,6 @@ export default function MiniCart() {
 
   return (
     <>
-      {/* notificacion flotante NECESITO PASARLO A UN COMPONENTE*/}
-      {notification && (
-        <div
-          className={`fixed top-4 right-4 z-60 px-6 py-3 rounded-lg shadow-lg text-white font-semibold ${
-            notification.success ? "bg-green-500" : "bg-red-500"
-          }`}
-        >
-          {notification.message}
-        </div>
-      )}
-
-      <PurchaseConfirmDialog
-        isOpen={isDialogOpen}
-        onClose={closeDialog}
-        onConfirm={confirmPurchase}
-        total={getCartTotal()}
-      />
-
       {/* con esto podremos cerrar el mini carrito al hacer click fuera de el */}
       <div
         className={`fixed inset-0 bg-black/50 z-40  transition-all duration-300 ${
