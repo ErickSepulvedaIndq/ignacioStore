@@ -1,24 +1,34 @@
-import { useState, useEffect, useMemo } from "react";
-import { useAuth } from "../context/AuthContext";
-import { useSearch } from "../context/SearchContext";
-import Paginator from "../components/UI/Paginator";
-import { getBuyLogsByUserId } from "../api/buyLogsService";
+import PurchaseDetailModal from "../components/UI/purchaseDetailModal";
+import DateRangeFilter from "../components/forms/DateRangeFilter";
 import { formatBuyLogsForTable } from "../utils/buyLogsFormatter";
+import { getBuyLogsByUserId } from "../api/buyLogsService";
+import Paginator from "../components/UI/Paginator";
+import Loading from "../components/UI/Loading";
+import { useState, useEffect } from "react";
 
 export default function Purchase() {
-  const { user } = useAuth();
-  const { normalizedSearch } = useSearch();
-  const [purchases, setPurchases] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [error, setError] = useState(null);
   const [selectedPurchase, setSelectedPurchase] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [purchases, setPurchases] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
   const pageSize = 10;
 
-  const fetchUserPurchases = async () => {
+  const formatDateLong = (value) => {
+    return new Date(value).toLocaleDateString("es-MX", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+  };
+
+  const fetchUserPurchases = async (page = 1, from = "", to = "") => {
     const userId = localStorage.getItem("userId");
-    
+
     if (!userId) {
       setLoading(false);
       return;
@@ -26,44 +36,38 @@ export default function Purchase() {
 
     try {
       setLoading(true);
-      const response = await getBuyLogsByUserId(userId);
-      
-      // La respuesta viene en formato { data: [...], message: "...", success: true }
-      const buyLogs = response.data || [];
+      const response = await getBuyLogsByUserId(
+        userId,
+        page,
+        pageSize,
+        from,
+        to,
+      );
+
+      // ahora la API regresa metadata de paginacion y docs
+      const buyLogs = response.data?.docs || [];
       const formattedPurchases = formatBuyLogsForTable(buyLogs);
-      
+
       setPurchases(formattedPurchases);
-      setCurrentPage(1);
+      setCurrentPage(response.data?.page || page);
+      setTotalPages(response.data?.totalPages || 1);
+      console.log("Compras formateadas:", formattedPurchases);
       setError(null);
     } catch (err) {
       console.error("Error fetching purchases:", err);
       setError("No se pudieron cargar las compras");
       setPurchases([]);
+      setTotalPages(1);
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   useEffect(() => {
-    fetchUserPurchases();
+    fetchUserPurchases(1, "", "");
   }, []);
 
-  const filteredPurchases = useMemo(() => {
-    if (!normalizedSearch) {
-      return purchases;
-    }
-
-    return purchases.filter((purchase) => {
-      const searchableText =
-        `${purchase.id} ${purchase.date} ${purchase.total} ${purchase.status}`.toLowerCase();
-      return searchableText.includes(normalizedSearch);
-    });
-  }, [purchases, normalizedSearch]);
-
-  const totalPages = Math.ceil(filteredPurchases.length / pageSize);
-  const startIndex = (currentPage - 1) * pageSize;
-  const endIndex = startIndex + pageSize;
-  const paginatedPurchases = filteredPurchases.slice(startIndex, endIndex);
+  const paginatedPurchases = purchases;
 
   const handleViewDetails = (purchase) => {
     setSelectedPurchase(purchase);
@@ -76,17 +80,19 @@ export default function Purchase() {
   };
 
   const handlePageChange = (page) => {
-    setCurrentPage(page);
+    fetchUserPurchases(page, fromDate, toDate);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center h-96">
-        <p className="text-gray-500">Cargando compras...</p>
-      </div>
-    );
-  }
+  const handleApplyDateFilter = () => {
+    fetchUserPurchases(1, fromDate, toDate);
+  };
+
+  const handleClearDateFilter = () => {
+    setFromDate("");
+    setToDate("");
+    fetchUserPurchases(1, "", "");
+  };
 
   if (error) {
     return (
@@ -94,8 +100,8 @@ export default function Purchase() {
         <h1 className="text-3xl font-bold mb-6 text-gray-800">Mis Compras</h1>
         <div className="bg-red-100 rounded-lg p-8 text-center">
           <p className="text-red-600">{error}</p>
-          <button 
-            onClick={fetchUserPurchases}
+          <button
+            onClick={() => fetchUserPurchases(1, fromDate, toDate)}
             className="mt-4 bg-[#3041A0] text-white px-4 py-2 rounded hover:bg-[#25348a] transition"
           >
             Reintentar
@@ -109,7 +115,18 @@ export default function Purchase() {
     <div className="container mx-auto p-4">
       <h1 className="text-3xl font-bold mb-6 text-gray-800">Mis Compras</h1>
 
-      {filteredPurchases.length === 0 ? (
+      <DateRangeFilter
+        fromDate={fromDate}
+        toDate={toDate}
+        onFromDateChange={setFromDate}
+        onToDateChange={setToDate}
+        onApply={handleApplyDateFilter}
+        onClear={handleClearDateFilter}
+      />
+
+      {loading ? (
+        <Loading />
+      ) : purchases.length === 0 ? (
         <div className="bg-gray-100 rounded-lg p-8 text-center">
           <p className="text-gray-500">No se encontraron compras.</p>
         </div>
@@ -140,7 +157,7 @@ export default function Purchase() {
                 {paginatedPurchases.map((purchase) => (
                   <tr key={purchase.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {new Date(purchase.date).toLocaleDateString("es-MX")}
+                      {formatDateLong(purchase.date)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">
                       ${purchase.total.toFixed(2)}
@@ -159,7 +176,7 @@ export default function Purchase() {
 
                     {/* acciones por compra */}
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium ">
-                      <button 
+                      <button
                         onClick={() => handleViewDetails(purchase)}
                         className="bg-[#687bd7] hover:bg-[#0d3395] text-white px-4 py-1 rounded mr-2 transition"
                       >
@@ -174,7 +191,7 @@ export default function Purchase() {
         </div>
       )}
 
-      {filteredPurchases.length > 0 && (
+      {purchases.length > 0 && (
         <Paginator
           currentPage={currentPage}
           totalPages={totalPages}
@@ -183,75 +200,11 @@ export default function Purchase() {
         />
       )}
 
-      {/* Modal de detalles de compra */}
-      {showModal && selectedPurchase && (
-        <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 p-6">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold text-gray-800">Detalles de Compra</h2>
-              <button 
-                onClick={handleCloseModal}
-                className="text-gray-500 hover:text-gray-700"
-              >
-                ✕
-              </button>
-            </div>
-
-            <div className="space-y-4">
-              <div>
-                <p className="text-sm text-gray-500">Fecha</p>
-                <p className="text-lg font-semibold text-gray-900">
-                  {new Date(selectedPurchase.date).toLocaleDateString("es-MX")}
-                </p>
-              </div>
-
-              <div>
-                <p className="text-sm text-gray-500">Estado</p>
-                <span
-                  className={`inline-block px-3 py-1 text-sm font-semibold rounded-full ${
-                    selectedPurchase.status === "Pagado"
-                      ? "bg-green-100 text-green-800"
-                      : "bg-yellow-100 text-yellow-800"
-                  }`}
-                >
-                  {selectedPurchase.status}
-                </span>
-              </div>
-
-              <div>
-                <p className="text-sm text-gray-500 mb-2">Productos</p>
-                <div className="bg-gray-50 rounded p-3 space-y-2 max-h-48 overflow-y-auto">
-                  {selectedPurchase.products.map((product, idx) => (
-                    <div key={idx} className="flex justify-between text-sm">
-                      <div className="flex-1">
-                        <span className="text-gray-700">{product.name}</span>
-                        <span className="text-gray-500 ml-2">x{product.quantity || 1}</span>
-                      </div>
-                      <span className="font-semibold text-gray-900">
-                        ${((product.price || 0) * (product.quantity || 1)).toFixed(2)}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="pt-4 border-t border-gray-200">
-                <div className="flex justify-between items-center">
-                  <span className="text-lg font-bold text-gray-800">Total</span>
-                  <span className="text-2xl font-bold text-[#3041A0]">${selectedPurchase.total.toFixed(2)}</span>
-                </div>
-              </div>
-            </div>
-
-            <button 
-              onClick={handleCloseModal}
-              className="w-full mt-6 bg-[#3041A0] text-white py-2 rounded font-semibold hover:bg-[#25348a] transition"
-            >
-              Cerrar
-            </button>
-          </div>
-        </div>
-      )}
+      <PurchaseDetailModal
+        isOpen={showModal}
+        purchase={selectedPurchase}
+        onClose={handleCloseModal}
+      />
     </div>
   );
 }
