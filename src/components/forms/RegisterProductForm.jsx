@@ -1,10 +1,15 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { createProduct } from "../../services/productService";
 import { useAuth } from "../../context/AuthContext";
 
 export default function RegisterProductForm({ isOpen, onClose, onSuccess }) {
-    const { user } = useAuth();
+
+  const { user } = useAuth();
+  
+
+  useEffect(() => {
     console.log("Usuario actual:", user);
+  }, [user]); // vacío, se ejecuta solo al montar
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -38,14 +43,21 @@ export default function RegisterProductForm({ isOpen, onClose, onSuccess }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if(!user){
+      console.error("No hay usuario autenticado");
+      return;
+    }
     setLoading(true);
 
     try {
 
          const productData = {
         ...formData,
-        author: user._id
+        createdBy: user.userId
          };
+
+      console.log("Datos a enviar:", productData);
 
       await createProduct(productData);
       onSuccess();
