@@ -1,9 +1,5 @@
 import axios from "axios";
 
-
-   //CONFIGURACIÓN BASE DE AXIOS
-
-
 const API = axios.create({
   baseURL: "http://localhost:5000/api/products",
 });
@@ -24,7 +20,7 @@ export const getAllProducts = async () => {
   const response = await API.get("/", {
     params: {  }
   });
-
+  console.log(response.data);
   return response.data.data;
 };
 

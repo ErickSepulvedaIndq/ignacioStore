@@ -45,6 +45,7 @@ export const AuthProvider = ({ children }) => {
       const payload = parseJwt(token);
       localStorage.setItem("username", payload.username);
       localStorage.setItem("role", payload.role);
+      localStorage.setItem("id", payload.userId);
 
       setUser(payload);
 
