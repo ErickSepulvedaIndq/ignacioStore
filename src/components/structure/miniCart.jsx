@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useCart } from "../../context/CartContext";
 import Swal from "sweetalert2";
 import { buyProduct } from "../../services/productService";
@@ -63,7 +64,25 @@ export default function MiniCart() {
 
   return (
     <>
-      {/* Con esto podremos cerrar el mini carrito al hacer click fuera de él */}
+      {/* notificacion flotante NECESITO PASARLO A UN COMPONENTE*/}
+      {notification && (
+        <div
+          className={`fixed top-4 right-4 z-60 px-6 py-3 rounded-lg shadow-lg text-white font-semibold ${
+            notification.success ? "bg-green-500" : "bg-red-500"
+          }`}
+        >
+          {notification.message}
+        </div>
+      )}
+
+      <PurchaseConfirmDialog
+        isOpen={isDialogOpen}
+        onClose={closeDialog}
+        onConfirm={confirmPurchase}
+        total={getCartTotal()}
+      />
+
+      {/* con esto podremos cerrar el mini carrito al hacer click fuera de el */}
       <div
         className={`fixed inset-0 bg-black/50 z-40  transition-all duration-300 ${
           isCartOpen ? "opacity-100" : "opacity-0 pointer-events-none"
@@ -104,7 +123,6 @@ export default function MiniCart() {
                     key={item.id}
                     className="flex items-center gap-4 p-3 border rounded-lg hover:shadow-lg transition"
                   >
-                    {/* El tamaño no deberia ser asi, no puede ser tan estatico */}
                     <img
                       src={item.imageUrl || item.img}
                       alt={item.name}

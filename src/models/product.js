@@ -1,8 +1,3 @@
-/**
- * Product Model
- * Estructura básica de datos para producto
- */
-
 export const productModel = {
   id: "string|required",
   name: "string|required",
@@ -12,24 +7,6 @@ export const productModel = {
   createdAt: "string|timestamp",
   updatedAt: "string|timestamp",
 };
-
-/**
- * Ejemplo de respuesta de la API:
- * {
- *   docs: [
- *     { id: 1, name: "Doritos Nachos", price: 25.5, stock: 15, status: "active" },
- 
- *   ],
- *   totalDocs: 50,
- *   limit: 10,
- *   page: 1,
- *   totalPages: 5,
- *   hasNextPage: true,
- *   hasPrevPage: false,
- *   nextPage: 2,
- *   prevPage: null
- * }
- */
 
 export const productExample = {
   id: 1,

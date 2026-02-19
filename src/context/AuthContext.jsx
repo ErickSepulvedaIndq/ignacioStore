@@ -2,6 +2,12 @@
 * este contexto maneja la autenticación del usuario, su información y el estado de la barra lateral
 * por ahora, el login es simulado y siempre retorna un usuario admin para facilitar el desarrollo
 * por que falta la parte del back, asi que quedara asi un tiempo
+
+ * Cambios:
+ * - Se agregó userId al objeto user y localStorage
+ *   El userId es necesario para obtener las compras específicas del usuario en la página "Mis Compras"
+ * - Ahora al hacer login, se extrae userId del JWT y se guarda en localStorage
+ * - El objeto user ahora contiene: { userId, username, role }
 */
 import { createContext, useContext, useState } from 'react';
 import { authService } from '../api/authService';
@@ -39,15 +45,20 @@ export const AuthProvider = ({ children }) => {
       const response = await authService(userData);
       console.log(response);
 
-      const token = response.data
+      const token = response.data;
 
       localStorage.setItem("token", token);
       const payload = parseJwt(token);
       localStorage.setItem("username", payload.username);
+      localStorage.setItem("userId", payload.userId);
       localStorage.setItem("role", payload.role);
       localStorage.setItem("id", payload.userId);
 
-      setUser(payload);
+      setUser({
+        userId: payload.userId,
+        username: payload.username,
+        role: payload.role,
+      });
 
       return true;
     } catch (error) {
@@ -59,8 +70,9 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('username');
+    localStorage.removeItem('userId');
     localStorage.removeItem('role');
-    
+    setUser(null);
   };
 
   const isAdmin = () => {
