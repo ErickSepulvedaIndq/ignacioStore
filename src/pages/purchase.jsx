@@ -1,18 +1,19 @@
+import PurchaseDetailModal from "../components/UI/purchaseDetailModal";
+import { formatBuyLogsForTable } from "../utils/buyLogsFormatter";
+import { getBuyLogsByUserId } from "../api/buyLogsService";
 import { useState, useEffect, useMemo } from "react";
 import { useSearch } from "../context/SearchContext";
 import Paginator from "../components/UI/Paginator";
-import PurchaseDetailModal from "../components/UI/purchaseDetailModal";
-import { getBuyLogsByUserId } from "../api/buyLogsService";
-import { formatBuyLogsForTable } from "../utils/buyLogsFormatter";
 
 export default function Purchase() {
-  const { normalizedSearch } = useSearch();
-  const [purchases, setPurchases] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [error, setError] = useState(null);
   const [selectedPurchase, setSelectedPurchase] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [purchases, setPurchases] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const { normalizedSearch } = useSearch();
+  const [error, setError] = useState(null);
   const pageSize = 10;
 
   const formatDateLong = (value) => {
@@ -23,7 +24,7 @@ export default function Purchase() {
     });
   };
 
-  const fetchUserPurchases = async () => {
+  const fetchUserPurchases = async (page = 1) => {
     const userId = localStorage.getItem("userId");
 
     if (!userId) {
@@ -33,20 +34,22 @@ export default function Purchase() {
 
     try {
       setLoading(true);
-      const response = await getBuyLogsByUserId(userId);
+      const response = await getBuyLogsByUserId(userId, page, pageSize);
 
-      // La respuesta viene en formato { data: [...], message: "...", success: true }
-      const buyLogs = response.data || [];
+      // ahora la API regresa metadata de paginacion y docs
+      const buyLogs = response.data?.docs || [];
       const formattedPurchases = formatBuyLogsForTable(buyLogs);
 
       setPurchases(formattedPurchases);
-      setCurrentPage(1);
+      setCurrentPage(response.data?.page || page);
+      setTotalPages(response.data?.totalPages || 1);
       console.log("Compras formateadas:", formattedPurchases);
       setError(null);
     } catch (err) {
       console.error("Error fetching purchases:", err);
       setError("No se pudieron cargar las compras");
       setPurchases([]);
+      setTotalPages(1);
     } finally {
       setLoading(false);
     }
@@ -69,10 +72,7 @@ export default function Purchase() {
     });
   }, [purchases, normalizedSearch]);
 
-  const totalPages = Math.ceil(filteredPurchases.length / pageSize);
-  const startIndex = (currentPage - 1) * pageSize;
-  const endIndex = startIndex + pageSize;
-  const paginatedPurchases = filteredPurchases.slice(startIndex, endIndex);
+  const paginatedPurchases = filteredPurchases;
 
   const handleViewDetails = (purchase) => {
     setSelectedPurchase(purchase);
@@ -85,7 +85,7 @@ export default function Purchase() {
   };
 
   const handlePageChange = (page) => {
-    setCurrentPage(page);
+    fetchUserPurchases(page);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -104,7 +104,7 @@ export default function Purchase() {
         <div className="bg-red-100 rounded-lg p-8 text-center">
           <p className="text-red-600">{error}</p>
           <button
-            onClick={fetchUserPurchases}
+            onClick={() => fetchUserPurchases(1)}
             className="mt-4 bg-[#3041A0] text-white px-4 py-2 rounded hover:bg-[#25348a] transition"
           >
             Reintentar
@@ -148,7 +148,7 @@ export default function Purchase() {
               <tbody className="bg-white divide-y divide-gray-200">
                 {paginatedPurchases.map((purchase) => (
                   <tr key={purchase.id} className="hover:bg-gray-50">
-                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       {formatDateLong(purchase.date)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">
