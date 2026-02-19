@@ -6,6 +6,7 @@ export default function SideNav() {
   const { user, isAdmin, isSideNavOpen, closeSideNav, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const role = user?.role || localStorage.getItem("role");
 
   const isActive = (path) => location.pathname === path;
 
@@ -60,12 +61,10 @@ export default function SideNav() {
               <h2 className="font-bold text-xl">IGNACIO STORE</h2>
               {user && (
                 <p className="text-sm text-gray-300 mt-1">
-                  {user.firstName} {user.lastName}
-                  {/*Admin() && */}{(
-                    <span className="ml-2 text-xs bg-yellow-500 text-black px-2 py-0.5 rounded">
-                      ADMIN
-                    </span>
-                  )}
+                  {user.username}
+                  <span className="ml-2 text-xs bg-yellow-500 text-black px-2 py-0.5 rounded">
+                    {role.toUpperCase()}
+                  </span>
                 </p>
               )}
             </div>
@@ -139,7 +138,7 @@ export default function SideNav() {
                 closeSideNav();
                 navigate("/login");
               }}
-              className="w-full bg-red-600 hover:bg-red-700 text-white py-3 rounded-lg transition font-semibold flex items-center justify-center gap-2"
+              className="w-full bg-red-600 hover:bg-red-700 text-white py-3 rounded-lg transition font-semibold flex items-center justify-center gap-2 cursor-pointer"
             >
               <i className="pi pi-sign-out"></i>
               <span>Cerrar Sesión</span>

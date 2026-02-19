@@ -3,18 +3,32 @@ import Minus from "../../assets/minus.png";
 import { useState } from "react";
 import { useCart } from "../../context/CartContext";
 
-export default function Card({ productName, price, img, productId }) {
+export default function Card({ productName, price, img, productId, stock}) {
   const [quantity, setQuantity] = useState(1);
-  const { addToCart } = useCart();
+  const { addToCart, cartItems } = useCart();
+
+  const currentInCart = cartItems
+  .filter(item => item.id === productId)
+  .reduce((acc, item) => acc + item.quantity, 0);
+
 
   const handleQuantityChange = (value) => {
-    if (value < 1) {
+    if (value < 1 || value > stock) {
       return;
     }
     setQuantity(value);
   };
 
   const handleAddToCart = () => {
+
+    const currentInCart = cartItems
+      .filter(item => item.id === productId)
+      .reduce((acc, item) => acc + item.quantity, 0);
+
+    if (currentInCart + quantity > stock) {
+      alert("No puedes agregar más productos de los disponibles en stock");
+      return;
+    }
     // estructura del producto para el carrito normalizada con _id y id
     const product = {
       _id: productId,
@@ -22,13 +36,10 @@ export default function Card({ productName, price, img, productId }) {
       name: productName,
       price: parseFloat(price),
       img: img,
-      imageUrl: img,
+      imageUrl: img
     };
 
-    // añadir la cantidad de productos al carrito
-    for (let i = 0; i < quantity; i++) {
-      addToCart(product);
-    }
+    addToCart(product, quantity, stock)
 
     // resetear el valor
     setQuantity(1);
@@ -47,7 +58,7 @@ export default function Card({ productName, price, img, productId }) {
             <img
               src={Minus}
               alt="Plus"
-              className="h-7 hover:rounded-full hover:scale-110 hover:bg-[#D8D7D5] cursor-pointer mr-1.5"
+              className="h-7 hover:rounded-full hover:scale-125 cursor-pointer mr-1.5 transition-all duration-200"
               onClick={() => handleQuantityChange(quantity - 1)}
               disabled={quantity === 1}
             />
@@ -55,7 +66,7 @@ export default function Card({ productName, price, img, productId }) {
             <img
               src={Plus}
               alt="Minus"
-              className="h-7 hover:rounded-full hover:scale-110 hover:bg-[#D8D7D5] cursor-pointer"
+              className="h-7 hover:rounded-full hover:scale-125 cursor-pointer transition-all duration-200"
               onClick={() => handleQuantityChange(quantity + 1)}
             />
           </div>

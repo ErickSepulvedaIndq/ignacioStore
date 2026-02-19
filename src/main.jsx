@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import ProductManagement from './pages/productManagement.jsx'
 import { SearchProvider } from './context/SearchContext.jsx'
 import { CartProvider } from './context/CartContext.jsx'
@@ -15,6 +15,7 @@ import Login from './pages/login.jsx'
 import { StrictMode } from 'react'
 import 'primeicons/primeicons.css'
 import './index.css'
+import ProtectedRoute from './components/guards/protectedRoutes.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -24,16 +25,20 @@ createRoot(document.getElementById('root')).render(
           <SearchProvider>
             <Routes>
               <Route path="/login" element={<Login />} />
-            </Routes>
-            <Routes>
-              <Route path="/" element={<Layout />}>
-                <Route path="products" element={<Product />} />
-                <Route path="purchases" element={<Purchase />} />
-                <Route path="admin/users" element={<UserManagement />} />
-                <Route path="admin/products" element={<ProductManagement />} />
-                <Route path="admin/debtors" element={<Debtor />} />
-                <Route path="admin/reports" element={<Report />} />
+
+              <Route element={<ProtectedRoute />}>
+                <Route path="/" element={<Layout />}>
+                  <Route index element={<Navigate to="/products" replace />} />
+                  <Route path="products" element={<Product />} />
+                  <Route path="purchases" element={<Purchase />} />
+                  <Route path="admin/users" element={<UserManagement />} />
+                  <Route path="admin/products" element={<ProductManagement />} />
+                  <Route path="admin/debtors" element={<Debtor />} />
+                  <Route path="admin/reports" element={<Report />} />
+                </Route>
               </Route>
+
+              <Route path="*" element={<Navigate to="/login" replace />} />
             </Routes>
           </SearchProvider>
         </CartProvider>
