@@ -1,9 +1,9 @@
+import RegisterProductForm from "../components/forms/RegisterProductForm";
+import { getAllProducts } from "../services/productService";
 import { useState, useEffect, useMemo } from "react";
 import { useSearch } from "../context/SearchContext";
 import Paginator from "../components/UI/Paginator";
-import { getAllProducts } from "../services/productService";
 import Loading from "../components/UI/Loading";
-import RegisterProductForm from "../components/forms/RegisterProductForm";
 
 export default function ProductManagement() {
   const [productos, setProductos] = useState([]);

@@ -1,7 +1,7 @@
 import axios from "axios";
 
 // Obtener compras del usuario autenticado
-export const getBuyLogsByUserId = async (userId, page = 1, limit = 10) => {
+export const getBuyLogsByUserId = async (userId, page = 1, limit = 10, from = "", to = "") => {
     const token = localStorage.getItem("token");
     const res = await axios.get(
         `${import.meta.env.VITE_API_URL}/api/buylogs/user/${userId}`,
@@ -9,6 +9,8 @@ export const getBuyLogsByUserId = async (userId, page = 1, limit = 10) => {
             params: {
                 page,
                 limit,
+                from,
+                to,
             },
             headers: {
                 Authorization: `Bearer ${token}`,

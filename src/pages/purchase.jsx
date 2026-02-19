@@ -1,9 +1,10 @@
 import PurchaseDetailModal from "../components/UI/purchaseDetailModal";
+import DateRangeFilter from "../components/forms/DateRangeFilter";
 import { formatBuyLogsForTable } from "../utils/buyLogsFormatter";
 import { getBuyLogsByUserId } from "../api/buyLogsService";
-import { useState, useEffect, useMemo } from "react";
-import { useSearch } from "../context/SearchContext";
 import Paginator from "../components/UI/Paginator";
+import Loading from "../components/UI/Loading";
+import { useState, useEffect } from "react";
 
 export default function Purchase() {
   const [selectedPurchase, setSelectedPurchase] = useState(null);
@@ -12,8 +13,9 @@ export default function Purchase() {
   const [totalPages, setTotalPages] = useState(1);
   const [purchases, setPurchases] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { normalizedSearch } = useSearch();
   const [error, setError] = useState(null);
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
   const pageSize = 10;
 
   const formatDateLong = (value) => {
@@ -24,7 +26,7 @@ export default function Purchase() {
     });
   };
 
-  const fetchUserPurchases = async (page = 1) => {
+  const fetchUserPurchases = async (page = 1, from = "", to = "") => {
     const userId = localStorage.getItem("userId");
 
     if (!userId) {
@@ -34,7 +36,13 @@ export default function Purchase() {
 
     try {
       setLoading(true);
-      const response = await getBuyLogsByUserId(userId, page, pageSize);
+      const response = await getBuyLogsByUserId(
+        userId,
+        page,
+        pageSize,
+        from,
+        to,
+      );
 
       // ahora la API regresa metadata de paginacion y docs
       const buyLogs = response.data?.docs || [];
@@ -56,23 +64,10 @@ export default function Purchase() {
   };
 
   useEffect(() => {
-    fetchUserPurchases();
+    fetchUserPurchases(1, "", "");
   }, []);
 
-  const filteredPurchases = useMemo(() => {
-    if (!normalizedSearch) {
-      return purchases;
-    }
-
-    return purchases.filter((purchase) => {
-      const longDate = formatDateLong(purchase.date);
-      const searchableText =
-        `${purchase.id} ${purchase.date} ${longDate} ${purchase.total} ${purchase.status}`.toLowerCase();
-      return searchableText.includes(normalizedSearch);
-    });
-  }, [purchases, normalizedSearch]);
-
-  const paginatedPurchases = filteredPurchases;
+  const paginatedPurchases = purchases;
 
   const handleViewDetails = (purchase) => {
     setSelectedPurchase(purchase);
@@ -85,17 +80,19 @@ export default function Purchase() {
   };
 
   const handlePageChange = (page) => {
-    fetchUserPurchases(page);
+    fetchUserPurchases(page, fromDate, toDate);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center h-96">
-        <p className="text-gray-500">Cargando compras...</p>
-      </div>
-    );
-  }
+  const handleApplyDateFilter = () => {
+    fetchUserPurchases(1, fromDate, toDate);
+  };
+
+  const handleClearDateFilter = () => {
+    setFromDate("");
+    setToDate("");
+    fetchUserPurchases(1, "", "");
+  };
 
   if (error) {
     return (
@@ -104,7 +101,7 @@ export default function Purchase() {
         <div className="bg-red-100 rounded-lg p-8 text-center">
           <p className="text-red-600">{error}</p>
           <button
-            onClick={() => fetchUserPurchases(1)}
+            onClick={() => fetchUserPurchases(1, fromDate, toDate)}
             className="mt-4 bg-[#3041A0] text-white px-4 py-2 rounded hover:bg-[#25348a] transition"
           >
             Reintentar
@@ -118,7 +115,18 @@ export default function Purchase() {
     <div className="container mx-auto p-4">
       <h1 className="text-3xl font-bold mb-6 text-gray-800">Mis Compras</h1>
 
-      {filteredPurchases.length === 0 ? (
+      <DateRangeFilter
+        fromDate={fromDate}
+        toDate={toDate}
+        onFromDateChange={setFromDate}
+        onToDateChange={setToDate}
+        onApply={handleApplyDateFilter}
+        onClear={handleClearDateFilter}
+      />
+
+      {loading ? (
+        <Loading />
+      ) : purchases.length === 0 ? (
         <div className="bg-gray-100 rounded-lg p-8 text-center">
           <p className="text-gray-500">No se encontraron compras.</p>
         </div>
@@ -183,7 +191,7 @@ export default function Purchase() {
         </div>
       )}
 
-      {filteredPurchases.length > 0 && (
+      {purchases.length > 0 && (
         <Paginator
           currentPage={currentPage}
           totalPages={totalPages}
