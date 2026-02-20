@@ -4,7 +4,6 @@ import { useState, useEffect, useMemo } from "react";
 import { useSearch } from "../context/SearchContext";
 import Paginator from "../components/UI/Paginator";
 import Loading from "../components/UI/Loading";
-import RegisterProductForm from "../components/forms/RegisterProductForm";
 import ProductDetailsForm from "../components/forms/ProductDetailsForm";
 import { ConfirmAction } from "../components/UI/ConfirmAction";
 import { deleteProduct } from "../services/productService";

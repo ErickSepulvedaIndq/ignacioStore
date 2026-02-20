@@ -17,7 +17,7 @@ API.interceptors.request.use((config) => {
 
 //Obtener todos los productos
 export const getAllProducts = async (page = 1, limit = 10) => {
-  const response = await API.get("/", {
+  const response = await API.get("/products/", {
     params: { page, limit }
   });
   console.log(response.data);

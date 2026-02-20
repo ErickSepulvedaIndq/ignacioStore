@@ -2,7 +2,7 @@ import axios from "axios";
 
 // Crear instancia de Axios para usuarios
 const API_USERS = axios.create({
-  baseURL: `${import.meta.env.VITE_API_URL}/api/users`,
+  baseURL: `${import.meta.env.VITE_API_URL}/users`,
 });
 
 // Interceptor para enviar JWT automáticamente
