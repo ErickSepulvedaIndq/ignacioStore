@@ -9,7 +9,7 @@ export default function RegisterProductForm({ isOpen, onClose, onSuccess }) {
 
   useEffect(() => {
     console.log("Usuario actual:", user);
-  }, [user]); // vacío, se ejecuta solo al montar
+  }, [user]);
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -76,13 +76,12 @@ export default function RegisterProductForm({ isOpen, onClose, onSuccess }) {
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
       <div className="bg-gray-100 rounded-2xl shadow-2xl w-full max-w-3xl p-10 relative animate-fade-in">
         
-        {/* Header */}
         <div className="flex justify-between items-center mb-8">
-          <h2 className="text-2xl font-bold text-gray-800">
+          <h2 className="text-2xl font-bold text-[#3041A0]">
             Crear Producto
           </h2>
           <button
-            className="text-gray-500 hover:text-gray-800 text-xl transition"
+            className="text-gray-500 hover:text-red-600 text-xl hover:scale-110 transition-transform cursor-pointer"
             onClick={() => {
               resetForm();
               onClose();
@@ -99,7 +98,6 @@ export default function RegisterProductForm({ isOpen, onClose, onSuccess }) {
         ) : (
           <form onSubmit={handleSubmit} className="space-y-6">
 
-            {/* Nombre */}
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">
                 Nombre
@@ -114,7 +112,6 @@ export default function RegisterProductForm({ isOpen, onClose, onSuccess }) {
               />
             </div>
 
-            {/* Descripción */}
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">
                 Descripción
@@ -128,7 +125,6 @@ export default function RegisterProductForm({ isOpen, onClose, onSuccess }) {
               />
             </div>
 
-            {/* Precio y Stock */}
             <div className="grid grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -159,7 +155,6 @@ export default function RegisterProductForm({ isOpen, onClose, onSuccess }) {
               </div>
             </div>
 
-            {/* Estado */}
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">
                 Estado
@@ -168,14 +163,13 @@ export default function RegisterProductForm({ isOpen, onClose, onSuccess }) {
                 name="status"
                 value={formData.status}
                 onChange={handleChange}
-                className="w-full rounded-lg border-2 border-gray-300 bg-white px-4 py-3 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition"
+                className="w-full rounded-lg cursor-pointer border-2 border-gray-300 bg-white px-4 py-3 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition"
               >
                 <option value="active">Activo</option>
                 <option value="blocked">Bloqueado</option>
               </select>
             </div>
 
-            {/* Imagen */}
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">
                 Imagen
@@ -197,11 +191,10 @@ export default function RegisterProductForm({ isOpen, onClose, onSuccess }) {
               />
             </div>
 
-            {/* Botones */}
             <div className="flex justify-end space-x-4 pt-4">
               <button
                 type="button"
-                className="px-6 py-3 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 transition font-medium"
+                className="px-6 py-3 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 transition font-medium cursor-pointer"
                 onClick={() => {
                   resetForm();
                   onClose();
@@ -212,7 +205,7 @@ export default function RegisterProductForm({ isOpen, onClose, onSuccess }) {
 
               <button
                 type="submit"
-                className="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition font-semibold shadow-md"
+                className="px-6 py-3 bg-[#3041A0] text-white rounded-lg hover:bg-[#2b3b92] transition font-semibold shadow-md cursor-pointer"
               >
                 Crear
               </button>

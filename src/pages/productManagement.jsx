@@ -50,8 +50,8 @@ export default function ProductManagement() {
       cancelButtonText: "Cancelar",
       onConfirm: async () => {
         console.log("Eliminando producto con ID:", id);
-        await deleteProduct(id); // llamada a tu API para eliminar
-        fetchProducts(currentPage); // refrescar tabla
+        await deleteProduct(id);
+        fetchProducts(currentPage);
         Swal.fire({
           icon: "success",
           title: "Producto eliminado",
@@ -118,7 +118,7 @@ export default function ProductManagement() {
           Administrar Productos
         </h1>
         <button 
-        className="bg-[#3041A0] hover:bg-[#25327D] text-white px-6 py-2 rounded-lg font-semibold transition"
+        className="bg-[#3041A0] hover:bg-[#25327D] text-white px-6 py-2 rounded-lg font-semibold transition cursor-pointer hover:scale-105"
         onClick={handleCreateModal}                                                                             
         >
           + Nuevo Producto
@@ -177,7 +177,7 @@ export default function ProductManagement() {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                   <button
-                    className="text-[#3041A0] hover:text-[#25327D] mr-3"
+                    className="text-[#3041A0] hover:text-[#25327D] mr-3 hover:scale-110 transition-transform cursor-pointer"
                     aria-label="Edit product"
                     title="Edit product"
                     onClick={() => handleEditModal(producto._id)}
@@ -185,7 +185,7 @@ export default function ProductManagement() {
                     <i className="pi pi-pencil"></i>
                   </button>
                   <button
-                    className="text-[#3041A0] hover:text-[#25327D] mr-3"
+                    className="text-[#3041A0] hover:text-[#25327D] mr-3 hover:scale-110 transition-transform cursor-pointer"
                     aria-label="View product"
                     title="View product"
                     onClick={() => handleViewModal(producto._id)}
@@ -193,7 +193,7 @@ export default function ProductManagement() {
                     <i className="pi pi-eye"></i>
                   </button>
                   <button
-                    className="text-red-600 hover:text-red-800"
+                    className="text-red-600 hover:text-red-800 cursor-pointer hover:scale-110 transition-transform"
                     aria-label="Delete product"
                     title="Delete product"
                     onClick={() => handleDelete(producto._id)}

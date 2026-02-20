@@ -28,7 +28,7 @@ export default function Header() {
             className="text-white bg-[#2b3b92] hover:bg-[#25327D] p-2 rounded-lg transition mr-4"
           >
             <svg
-              className="w-6 h-6"
+              className="w-6 h-6 cursor-pointer hover:scale-110 transition-transform"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"

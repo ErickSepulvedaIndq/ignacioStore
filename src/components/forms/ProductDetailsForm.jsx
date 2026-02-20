@@ -11,7 +11,7 @@ export default function ProductDetailsForm({ isOpen, onClose, onSuccess, product
     price: "",
     stock: "",
     status: "active",
-    image: null, // puede ser string (URL) o File
+    image: null,
   });
 
   const [loading, setLoading] = useState(false);
@@ -31,7 +31,7 @@ export default function ProductDetailsForm({ isOpen, onClose, onSuccess, product
       const response = await getProductById(productId);
       console.log("Respuesta de la API:", response);
 
-      const productData = response?.data; // <--- ACCEDER A data
+      const productData = response?.data; 
       if (!productData) {
         console.warn("No se encontró data en la respuesta");
         setFormData({
@@ -53,7 +53,7 @@ export default function ProductDetailsForm({ isOpen, onClose, onSuccess, product
         price: productData.price || "",
         stock: productData.stock || "",
         status: productData.status || "active",
-        image: productData.image?.url || null, // <--- extraer URL de la imagen
+        image: productData.image?.url || null, 
       });
 
       console.log("formData actualizado:", {
@@ -99,7 +99,7 @@ export default function ProductDetailsForm({ isOpen, onClose, onSuccess, product
         }
         const updated = await updateProduct(productId, productData);
         console.log("Producto actualizado (respuesta backend):", updated);
-        onSuccess(); // recarga tabla
+        onSuccess();
         onClose();
     } catch (err) {
         console.error("Error actualizando producto:", err);
@@ -117,13 +117,12 @@ export default function ProductDetailsForm({ isOpen, onClose, onSuccess, product
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
       <div className="bg-gray-100 rounded-2xl shadow-2xl w-full max-w-3xl p-10 relative animate-fade-in">
-        {/* Header */}
         <div className="flex justify-between items-center mb-8">
-          <h2 className="text-2xl font-bold text-gray-800">
+          <h2 className="text-2xl font-bold text-[#3041A0]">
             {mode === "edit" ? "Editar Producto" : "Ver Producto"}
           </h2>
           <button
-            className="text-gray-500 hover:text-gray-800 text-xl transition"
+            className="text-gray-500 text-xl cursor-pointer hover:scale-110 transition-transform duration-300 hover:text-red-600"
             onClick={() => {
               console.log("Cerrando modal");
               onClose();
@@ -139,7 +138,6 @@ export default function ProductDetailsForm({ isOpen, onClose, onSuccess, product
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Nombre */}
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">
                 Nombre
@@ -155,7 +153,6 @@ export default function ProductDetailsForm({ isOpen, onClose, onSuccess, product
               />
             </div>
 
-            {/* Descripción */}
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">
                 Descripción
@@ -170,7 +167,6 @@ export default function ProductDetailsForm({ isOpen, onClose, onSuccess, product
               />
             </div>
 
-            {/* Precio y Stock */}
             <div className="grid grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -203,7 +199,6 @@ export default function ProductDetailsForm({ isOpen, onClose, onSuccess, product
               </div>
             </div>
 
-            {/* Estado */}
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">
                 Estado
@@ -213,14 +208,13 @@ export default function ProductDetailsForm({ isOpen, onClose, onSuccess, product
                 value={formData.status}
                 onChange={handleChange}
                 disabled={mode === "view"}
-                className="w-full rounded-lg border-2 border-gray-300 bg-white px-4 py-3 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition disabled:bg-gray-100"
+                className="w-full rounded-lg border-2 border-gray-300 bg-white px-4 py-3 focus:border-indigo-500 focus:ring-2 cursor-pointer focus:ring-indigo-200 transition disabled:bg-gray-100"
               >
                 <option value="active">Activo</option>
                 <option value="blocked">Bloqueado</option>
               </select>
             </div>
 
-            {/* Imagen */}
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">
                 Imagen
@@ -247,12 +241,11 @@ export default function ProductDetailsForm({ isOpen, onClose, onSuccess, product
               />
             </div>
 
-            {/* Botones */}
             {mode !== "view" && (
               <div className="flex justify-end space-x-4 pt-4">
                 <button
                   type="button"
-                  className="px-6 py-3 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 transition font-medium"
+                  className="px-6 py-3 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 font-medium cursor-pointer"
                   onClick={onClose}
                 >
                   Cancelar
@@ -260,7 +253,7 @@ export default function ProductDetailsForm({ isOpen, onClose, onSuccess, product
 
                 <button
                   type="submit"
-                  className="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition font-semibold shadow-md"
+                  className="px-6 py-3 bg-[#3041A0] text-white rounded-lg hover:bg-[#2b3b92] font-semibold shadow-md cursor-pointer"
                 >
                   Guardar
                 </button>

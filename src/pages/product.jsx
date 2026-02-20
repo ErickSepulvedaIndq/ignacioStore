@@ -1,5 +1,4 @@
 import { useSearch } from '../context/SearchContext';
-import Product1 from '../assets/doritos-nachos.png';
 import Card from '../components/UI/card';
 import { useMemo, useState, useEffect } from 'react';
 import { getAllProducts } from '../services/productService';
