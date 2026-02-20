@@ -75,7 +75,7 @@ export default function PurchaseDetailModal({ isOpen, purchase, onClose }) {
 
 				<button
 					onClick={onClose}
-					className="w-full mt-6 bg-[#3041A0] text-white py-2 rounded font-semibold hover:bg-[#25348a] hover:shadow-lg hover:scale-104 transition"
+					className="w-full mt-6 cursor-pointer bg-[#3041A0] text-white py-2 rounded font-semibold hover:bg-[#25348a] hover:shadow-lg hover:scale-104 transition"
 				>
 					Cerrar
 				</button>

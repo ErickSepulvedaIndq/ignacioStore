@@ -16,6 +16,7 @@ export default function UserDetailsForm({
     password: "",
     role: "user",
     debt: 0,
+    status: "active",
   });
 
   const [loading, setLoading] = useState(false);
@@ -40,6 +41,7 @@ export default function UserDetailsForm({
           password: "",
           role: userData.role || "user",
           debt: userData.debt ?? 0,
+          status: userData.status || "active",
         });
       } catch (error) {
         console.error("Error cargando usuario:", error);
@@ -184,8 +186,23 @@ export default function UserDetailsForm({
               </div>
             )}
 
-            {/* Rol y Deuda */}
-            <div className="grid grid-cols-2 gap-6">
+            {/* Rol, Deuda y Status*/}
+            <div className="grid grid-cols-3 gap-6">
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Estado
+                </label>
+                <select
+                  name="status"
+                  value={formData.status}
+                  onChange={handleChange}
+                  disabled={mode === "view"}
+                  className="w-full rounded-lg border-2 border-gray-300 bg-white px-4 py-3 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition disabled:bg-gray-100"
+                >
+                  <option value="active">Activo</option>
+                  <option value="inactive">Inactivo</option>
+                </select>
+              </div>
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
                   Rol

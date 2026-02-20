@@ -11,12 +11,11 @@ export default function DateRangeFilter({
   onClear,
   fromLabel = "desde",
   toLabel = "hasta",
-  applyText = "aplicar filtro",
-  clearText = "limpiar filtro",
+  applyText = "Aplicar filtro",
+  clearText = "Limpiar filtro",
 }) {
   return (
     <div className="bg-white rounded-lg shadow p-4 mb-6 border border-gray-100">
-      {/* inputs para rango de fechas */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -43,17 +42,16 @@ export default function DateRangeFilter({
         </div>
       </div>
 
-      {/* acciones del filtro */}
       <div className="flex flex-wrap gap-3 mt-4">
         <button
           onClick={onApply}
-          className="bg-[#3041A0] text-white px-4 py-2 rounded-lg font-semibold hover:bg-[#25348a] transition"
+          className="bg-[#3041A0] text-white px-4 py-2 rounded-lg font-semibold hover:bg-[#25348a] transition cursor-pointer"
         >
           {applyText}
         </button>
         <button
           onClick={onClear}
-          className="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg font-semibold hover:bg-gray-300 transition"
+          className="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg font-semibold hover:bg-gray-300 transition cursor-pointer"
         >
           {clearText}
         </button>

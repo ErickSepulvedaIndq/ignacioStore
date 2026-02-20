@@ -127,7 +127,7 @@ export default function UserManagement() {
         </h1>
 
         <button
-          className="bg-[#3041A0] hover:bg-[#25327D] text-white px-6 py-2 rounded-lg font-semibold transition"
+          className="bg-[#3041A0] hover:bg-[#5060be] text-white px-6 py-2 rounded-lg font-semibold transition cursor-pointer"
           onClick={handleCreateModal}
         >
           + Nuevo Usuario
@@ -209,21 +209,24 @@ export default function UserManagement() {
 
                 <td className="px-6 py-4 text-sm font-medium">
                   <button
-                    className="text-[#3041A0] hover:text-[#25327D] mr-3 cursor-pointer"
+                    className="text-[#3041A0] hover:text-[#25327D] mr-3 cursor-pointer hover:scale-140 
+                    transform transition-all duration-200 ease-in-out"
                     onClick={() => handleEditModal(usuario._id)}
                   >
                     <i className="pi pi-pencil"></i>
                   </button>
 
                   <button
-                    className="text-[#3041A0] hover:text-[#25327D] mr-3 cursor-pointer"
+                    className="text-[#3041A0] hover:text-[#25327D] mr-3 cursor-pointer hover:scale-140
+                    transform transition-all duration-200 ease-in-out"
                     onClick={() => handleViewModal(usuario._id)}
                   >
                     <i className="pi pi-eye"></i>
                   </button>
 
                   <button
-                    className="text-red-600 hover:text-red-800 cursor-pointer"
+                    className="text-red-600 hover:text-red-800 cursor-pointer hover:scale-140
+                    transform transition-all duration-200 ease-in-out"
                     onClick={() => handleDelete(usuario._id)}
                   >
                     <i className="pi pi-trash"></i>

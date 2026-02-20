@@ -28,7 +28,7 @@ export default function Debtor() {
 
       const normalizedLogs = logs.map((log, index) => ({
         id: log._id || index,
-        id_user: log.id_user?._id || log.id_user, // obtener el ID del usuario
+        id_user: log.id_user?._id || log.id_user, 
         userName: log.userName || "Usuario",
         purchaseDate: log.createdAt,
         purchaseAmount: Number(log.purchaseAmount || 0),
@@ -209,7 +209,7 @@ export default function Debtor() {
                     <button
                       onClick={() => handleCollectPayment(payment.id, payment)}
                       disabled={payingId === payment.id}
-                      className="bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white px-4 py-1 rounded mr-2 transition"
+                      className="bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white px-4 py-1 rounded mr-2 transition cursor-pointer"
                     >
                       {payingId === payment.id ? "Cobrando..." : "Cobrar"}
                     </button>

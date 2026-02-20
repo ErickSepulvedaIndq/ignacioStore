@@ -9,7 +9,6 @@ import { ConfirmAction } from "../components/UI/ConfirmAction";
 import { deleteProduct } from "../services/productService";
 import Swal from "sweetalert2";
 
-
 export default function ProductManagement() {
   const [productos, setProductos] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -23,7 +22,7 @@ export default function ProductManagement() {
   const pageSize = 10;
   const { normalizedSearch } = useSearch();
 
-    const handleCreateModal = () => {
+  const handleCreateModal = () => {
     setModalMode("create");
     setSelectedProductId(null);
     setModalOpen(true);
@@ -63,8 +62,8 @@ export default function ProductManagement() {
   const fetchProducts = async (page = 1) => {
     try {
       setLoading(true);
-      const response = await getAllProducts(page, pageSize); 
-      
+      const response = await getAllProducts(page, pageSize);
+
       const data = response?.docs || [];
       setProductos(data);
       setTotalPages(response?.totalPages || 1);
@@ -78,8 +77,6 @@ export default function ProductManagement() {
     }
   };
 
-
-  
   useEffect(() => {
     fetchProducts(1);
   }, []);
@@ -88,16 +85,13 @@ export default function ProductManagement() {
   const filteredProducts = useMemo(() => {
     if (!normalizedSearch) return productos || [];
     return (productos || []).filter((product) => {
-      const textToSearch = `${product.name} ${product.price} ${product.stock} ${product.status}`.toLowerCase();
+      const textToSearch =
+        `${product.name} ${product.price} ${product.stock} ${product.status}`.toLowerCase();
       return textToSearch.includes(normalizedSearch);
     });
   }, [productos, normalizedSearch]);
-  
 
-    console.log("Productos cargados:", productos);
-
-  
-
+  console.log("Productos cargados:", productos);
 
   // cambia la pagina y sube al inicio
   const handlePageChange = (page) => {
@@ -106,9 +100,7 @@ export default function ProductManagement() {
   };
 
   if (loading) {
-    return (
-      <Loading />
-    );
+    return <Loading />;
   }
 
   return (

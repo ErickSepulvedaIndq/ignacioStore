@@ -16,9 +16,6 @@ export default function Product() {
             try {
                 const response = await getAllProducts();
                 console.log("Productos cargados:", response);
-
-                // Ajusta dependiendo de tu customResponse
-                // Si tu backend responde { data: [...] }
                 setProductos(response.docs || response);
 
 

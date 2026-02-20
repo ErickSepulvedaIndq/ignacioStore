@@ -3,9 +3,7 @@ import { createProduct } from "../../services/productService";
 import { useAuth } from "../../context/AuthContext";
 
 export default function RegisterProductForm({ isOpen, onClose, onSuccess }) {
-
   const { user } = useAuth();
-  
 
   useEffect(() => {
     console.log("Usuario actual:", user);
@@ -44,18 +42,17 @@ export default function RegisterProductForm({ isOpen, onClose, onSuccess }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if(!user){
+    if (!user) {
       console.error("No hay usuario autenticado");
       return;
     }
     setLoading(true);
 
     try {
-
-         const productData = {
+      const productData = {
         ...formData,
-        createdBy: user.userId
-         };
+        createdBy: user.userId,
+      };
 
       console.log("Datos a enviar:", productData);
 

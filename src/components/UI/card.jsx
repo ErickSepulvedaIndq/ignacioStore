@@ -20,6 +20,8 @@ export default function Card({ productName, price, img, productId, stock }) {
     ? Math.max(0, normalizedStock - currentInCart)
     : Infinity;
 
+  const isOutOfStock = availableStock === 0;
+
   const handleButtonChange = (value) => {
     const numValue = Number(value);
     if (isNaN(numValue) || numValue < 1) {
@@ -155,11 +157,11 @@ export default function Card({ productName, price, img, productId, stock }) {
               alt="Plus"
               className="h-7 hover:rounded-full hover:scale-125 cursor-pointer mr-1.5 transition-all duration-200"
               onClick={() => handleButtonChange(quantity - 1)}
-              disabled={quantity === 1}
+              disabled={isOutOfStock}
             />
             <input
               type="number"
-              value={quantity}
+              value={quantity ? (isOutOfStock ? 0 : quantity) : 1}
               onChange={(e) => setQuantity(e.target.value)}
               onBlur={(e) => handleInputValidation(e.target.value)}
               className="w-6 text-center font-bold bg-transparent border-0 focus:outline-none focus:bg-white/20 rounded-md transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
@@ -184,18 +186,23 @@ export default function Card({ productName, price, img, productId, stock }) {
           >
             <div className="flex flex-col gap-2">
               <button
-                className="w-full bg-[#3041A0] p-2 text-white rounded-lg cursor-pointer hover:bg-[#25327D]"
+                className="w-full bg-[#3041A0] p-2 text-white rounded-lg cursor-pointer hover:bg-[#25327D] disabled:opacity-60 disabled:cursor-not-allowed"
                 onClick={handleAddToCart}
+                disabled={isOutOfStock}
               >
                 Agregar al carrito
               </button>
 
               <button
-                className="w-full bg-[#FFA41C] p-2 text-white rounded-lg cursor-pointer hover:bg-[#FF8F00]"
+                className="w-full bg-[#FFA41C] p-2 text-white rounded-lg cursor-pointer hover:bg-[#FF8F00] disabled:opacity-60 disabled:cursor-not-allowed"
                 onClick={handleBuyNow}
+                disabled={isOutOfStock}
               >
                 Comprar
               </button>
+              {isOutOfStock && (
+                <p className="text-red-500 text-center font-semibold">Agotado</p>
+              )}
             </div>
           </div>
         </div>

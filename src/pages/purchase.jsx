@@ -172,11 +172,10 @@ export default function Purchase() {
                       </span>
                     </td>
 
-                    {/* acciones por compra */}
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium ">
                       <button
                         onClick={() => handleViewDetails(purchase)}
-                        className="bg-[#687bd7] hover:bg-[#0d3395] text-white px-4 py-1 rounded mr-2 transition"
+                        className="bg-[#687bd7] hover:bg-[#0d3395] text-white px-4 py-1 rounded mr-2 transition cursor-pointer"
                       >
                         Ver Detalles
                       </button>
