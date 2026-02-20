@@ -1,57 +1,96 @@
-/*
-* componente pensado para tener tener a los usuarios que tienen deudas
-* permitirle al admin cobrar la deuda en persona y marcarla como pagada
-* la idea es que se junten las compras por dia
-? o bien enviar un recordatorio de pago por correo :)
-*/
-import { useState, useEffect } from 'react';
-import { useMemo } from 'react';
-import { useSearch } from '../context/SearchContext';
-import Paginator from '../components/UI/Paginator';
-import { debtorMonthlyPurchasesDemo } from '../models/purchase';
+import { useState, useEffect } from "react";
+import DateRangeFilter from "../components/forms/DateRangeFilter";
+import Paginator from "../components/UI/Paginator";
+import Loading from "../components/UI/Loading";
+import {
+    getPendingBuyLogs,
+    markBuyLogAsPaid,
+} from "../api/buyLogsService";
 
 export default function Debtor() {
     const [pendingPayments, setPendingPayments] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [fromDate, setFromDate] = useState("");
+    const [toDate, setToDate] = useState("");
+    const [payingId, setPayingId] = useState(null);
     const pageSize = 10;
-    const { normalizedSearch } = useSearch();
-    //IMPORTANTE PARA EL BACKEND
-    //ESTO NO SE SI DEBERIA HACERLO YO AQUI PERO ESTOY SEGURO QUE EL CALCULAR LOS DIAS PARA VENCER SE TIENE QUE HACER
-    useEffect(() => {
-        // TODO: Fetch pendientes desde API
-        setTimeout(() => {
-            setPendingPayments(debtorMonthlyPurchasesDemo);
+
+    const fetchPendingPayments = async (page = 1, from = "", to = "") => {
+        try {
+            setLoading(true);
+            const response = await getPendingBuyLogs(page, pageSize, from, to);
+            const logs = response.data?.docs || [];
+
+            const normalizedLogs = logs.map((log, index) => ({
+                id: log._id || index,
+                userName: log.userName || "Usuario",
+                purchaseDate: log.createdAt,
+                purchaseAmount: Number(log.purchaseAmount || 0),
+                totalDebt: Number(log.totalDebt || 0),
+            }));
+
+            setPendingPayments(normalizedLogs);
+            setCurrentPage(response.data?.page || page);
+            setTotalPages(response.data?.totalPages || 1);
+            setError(null);
+        } catch (err) {
+            console.error("Error al cargar pendientes:", err);
+            setError("No se pudieron cargar los pendientes de pago");
+            setPendingPayments([]);
+            setTotalPages(1);
+        } finally {
             setLoading(false);
-            setCurrentPage(1);
-        }, 500);
-    }, []);
-
-    const filteredDebtors = useMemo(() => {
-        if (!normalizedSearch) {
-            return pendingPayments;
         }
-
-        return pendingPayments.filter((payment) => {
-            const searchableText = `${payment.userName} ${payment.purchaseDate} ${payment.purchaseAmount} ${payment.totalDebt}`.toLowerCase();
-            return searchableText.includes(normalizedSearch);
-        });
-    }, [pendingPayments, normalizedSearch]);
-
-    const totalPages = Math.ceil(filteredDebtors.length / pageSize);
-    const startIndex = (currentPage - 1) * pageSize;
-    const endIndex = startIndex + pageSize;
-    const paginatedDebtors = filteredDebtors.slice(startIndex, endIndex);
-
-    const handlePageChange = (page) => {
-        setCurrentPage(page);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    if (loading) {
+    useEffect(() => {
+        fetchPendingPayments(1, "", "");
+    }, []);
+
+    const handlePageChange = (page) => {
+        fetchPendingPayments(page, fromDate, toDate);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    };
+
+    const handleApplyDateFilter = () => {
+        fetchPendingPayments(1, fromDate, toDate);
+    };
+
+    const handleClearDateFilter = () => {
+        setFromDate("");
+        setToDate("");
+        fetchPendingPayments(1, "", "");
+    };
+
+    const handleCollectPayment = async (buyLogId) => {
+        try {
+            setPayingId(buyLogId);
+            await markBuyLogAsPaid(buyLogId);
+            await fetchPendingPayments(currentPage, fromDate, toDate);
+        } catch (err) {
+            console.error("Error cobrando venta:", err);
+            setError("No se pudo cobrar la venta seleccionada");
+        } finally {
+            setPayingId(null);
+        }
+    };
+
+    if (error) {
         return (
-            <div className="flex justify-center items-center h-96">
-                <p className="text-gray-500">Cargando informacion</p>
+            <div className="container mx-auto p-6">
+                <h1 className="text-3xl font-bold mb-6 text-gray-800">Pendientes de Pago</h1>
+                <div className="bg-red-100 rounded-lg p-8 text-center">
+                    <p className="text-red-600">{error}</p>
+                    <button
+                        onClick={() => fetchPendingPayments(1, fromDate, toDate)}
+                        className="mt-4 bg-[#3041A0] text-white px-4 py-2 rounded hover:bg-[#25348a] transition"
+                    >
+                        Reintentar
+                    </button>
+                </div>
             </div>
         );
     }
@@ -60,10 +99,21 @@ export default function Debtor() {
         <div className="container mx-auto p-6">
             <h1 className="text-3xl font-bold mb-6 text-gray-800">Pendientes de Pago</h1>
 
-            {filteredDebtors.length === 0 ? (
+            <DateRangeFilter
+                fromDate={fromDate}
+                toDate={toDate}
+                onFromDateChange={setFromDate}
+                onToDateChange={setToDate}
+                onApply={handleApplyDateFilter}
+                onClear={handleClearDateFilter}
+            />
+
+            {loading ? (
+                <Loading />
+            ) : pendingPayments.length === 0 ? (
                 <div className="bg-green-100 rounded-lg p-8 text-center">
                     <p className="text-green-800 font-semibold">
-                         No se encontraron usuarios pendientes de pago.
+                        No se encontraron usuarios pendientes de pago.
                     </p>
                 </div>
             ) : (
@@ -89,15 +139,13 @@ export default function Debtor() {
                             </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
-                            {paginatedDebtors.map((payment) => (
+                            {pendingPayments.map((payment) => (
                                 <tr key={payment.id} className="hover:bg-gray-50">
                                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                                         {payment.userName}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                        {new Date(payment.purchaseDate).toLocaleDateString(
-                                            'es-MX'
-                                        )}
+                                        {new Date(payment.purchaseDate).toLocaleDateString("es-MX")}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                         ${payment.purchaseAmount.toFixed(2)}
@@ -106,8 +154,12 @@ export default function Debtor() {
                                         ${payment.totalDebt.toFixed(2)}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                        <button className="bg-green-600 hover:bg-green-700 text-white px-4 py-1 rounded mr-2 transition">
-                                            Cobrar
+                                        <button
+                                            onClick={() => handleCollectPayment(payment.id)}
+                                            disabled={payingId === payment.id}
+                                            className="bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white px-4 py-1 rounded mr-2 transition"
+                                        >
+                                            {payingId === payment.id ? "Cobrando..." : "Cobrar"}
                                         </button>
                                     </td>
                                 </tr>
@@ -117,7 +169,7 @@ export default function Debtor() {
                 </div>
             )}
 
-            {filteredDebtors.length > 0 && (
+            {pendingPayments.length > 0 && (
                 <Paginator
                     currentPage={currentPage}
                     totalPages={totalPages}
