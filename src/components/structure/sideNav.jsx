@@ -82,7 +82,7 @@ export default function SideNav() {
               {user && (
                 <p className="text-sm text-gray-300 mt-1">
                   {user.username}
-                  <span className="ml-2 text-xs bg-yellow-500 text-black px-2 py-0.5 rounded">
+                  <span className="ml-2 text-xs bg-green-300 text-black px-2 py-0.5 rounded">
                     {role.toUpperCase()}
                   </span>
                 </p>
