@@ -26,40 +26,64 @@ export const CartProvider = ({ children }) => {
     localStorage.setItem("cart_INDQ", JSON.stringify(cartItems));
   }, [cartItems]);
 
-  const addToCart = (product) => {
+  const addToCart = (product, quantity = 1, stock) => {
     setCartItems((prev) => {
       const existingItem = prev.find((item) => item.id === product.id);
+      const effectiveStock =
+        typeof stock === "number"
+          ? stock
+          : typeof existingItem?.stock === "number"
+            ? existingItem.stock
+            : typeof product?.stock === "number"
+              ? product.stock
+              : Number(stock);
 
       if (existingItem) {
-        //si el producto ya existe en el carrito, en vez de agregarlo como un nuevo item, simplemente aumentamos la cantidad de ese producto en el carrito al parecer
+        const newQty = existingItem.quantity + quantity;
+
+        if (Number.isFinite(effectiveStock) && newQty > effectiveStock) {
+          alert("No hay suficiente stock disponible");
+          return prev;
+        }
+
         return prev.map((item) =>
           item.id === product.id
-            ? { ...item, quantity: item.quantity + 1 }
-            : item,
+            ? { ...item, quantity: newQty }
+            : item
         );
       }
 
-      // Si no existe agregamos con cantidad 1
-      return [...prev, { ...product, quantity: 1 }];
+      if (Number.isFinite(effectiveStock) && quantity > effectiveStock) {
+        alert("No hay suficiente stock disponible");
+        return prev;
+      }
+
+      return [...prev, { ...product, quantity, stock: effectiveStock }];
     });
   };
+
 
   const removeFromCart = (productId) => {
     setCartItems((prev) => prev.filter((item) => item.id !== productId));
   };
 
   const updateQuantity = (productId, quantity) => {
-    if (quantity <= 0) {
-      removeFromCart(productId);
-      return;
-    }
+    setCartItems(prev =>
+      prev.map(item => {
+        if (item.id !== productId) return item;
 
-    setCartItems((prev) =>
-      prev.map((item) =>
-        item.id === productId ? { ...item, quantity } : item,
-      ),
+        if (quantity <= 0) return null;
+
+        if (quantity > item.stock) {
+          alert("No hay suficiente stock disponible");
+          return item;
+        }
+
+        return { ...item, quantity };
+      }).filter(Boolean)
     );
   };
+
 
   const clearCart = () => {
     setCartItems([]);
@@ -104,7 +128,8 @@ export const CartProvider = ({ children }) => {
           id: item._id || item.id,
           name: item.name,
           price: item.price,
-          quantity: item.quantity
+          quantity: item.quantity,
+          stock: item.stock
         }))
       };
 

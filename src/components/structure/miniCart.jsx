@@ -134,7 +134,7 @@ export default function MiniCart() {
                           onClick={() =>
                             updateQuantity(item.id, item.quantity + 1)
                           }
-                          className="bg-gray-200 px-2 py-1 rounded hover:bg-gray-500 text-sm cursor-pointer"
+                          className="bg-gray-200 px-2 py-1 rounded hover:bg-gray-300 text-sm cursor-pointer"
                         >
                           +
                         </button>
