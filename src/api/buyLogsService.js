@@ -22,13 +22,18 @@ export const getBuyLogsByUserId = async (userId, page = 1, limit = 10, from = ""
 
 // Crear un registro de compra
 export const createBuyLog = async (data) => {
-    const token = localStorage.getItem("token");
-    const res = await axios.post(`${import.meta.env.VITE_API_URL}/buylogs`, data, {
-        headers: {
-            Authorization: `Bearer ${token}`,
-        },
-    });
-    return res.data;
+    try {
+        const token = localStorage.getItem("token");
+        const res = await axios.post(`${import.meta.env.VITE_API_URL}/buylogs`, data, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return res.data;
+    } catch (error) {
+        console.error("Error createBuyLog:", error);
+        throw error;
+    }
 };
 
 export const getPendingBuyLogs = async (page = 1, limit = 10, from = "", to = "") => {

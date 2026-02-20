@@ -71,6 +71,17 @@ export const updateUserDebt = async (id, amount) => {
   }
 };
 
+// Restar deuda del usuario (cuando se cobra)
+export const subtractUserDebtController = async (id, amount, subtractedBy) => {
+  try {
+    const response = await API_USERS.put(`/${id}/subtract-debt`, { amount, subtractedBy });
+    return response.data;
+  } catch (error) {
+    console.error("Error subtractUserDebt:", error);
+    throw error;
+  }
+};
+
 // Eliminar usuario
 export const deleteUser = async (id) => {
   try {

@@ -1,5 +1,4 @@
 import { createContext, useContext, useState, useEffect } from "react";
-import { createBuyLog } from "../api/buyLogsService";
 import { showToast } from "../components/UI/toast";
 
 const CartContext = createContext();
@@ -133,52 +132,8 @@ export const CartProvider = ({ children }) => {
   const closeCart = () => {
     setIsCartOpen(false);
   };
-
-  // procesar la compra y registrarla en la BD
-  const handleCheckout = async () => {
-    try {
-      const userId = localStorage.getItem("userId");
-
-      if (!userId) {
-        throw new Error("usuario no autenticado");
-      }
-
-      if (cartItems.length === 0) {
-        throw new Error("carrito vacio");
-      }
-
-      // Necesito verificar por que aqui hay un problema, los productos deben acomplarse en un array y parece que los esta subiendo uno por uno
-      //
-      const purchaseData = {
-        id_user: userId,
-        totalCost: getCartTotal(),
-        isPaid: false,
-        products: cartItems.map((item) => ({
-          id: item._id || item.id,
-          name: item.name,
-          price: item.price,
-          quantity: item.quantity,
-          stock: item.stock,
-        })),
-      };
-
-      const response = await createBuyLog(purchaseData);
-
-      // si todo salio bien limpiamos el carrito
-      if (response.success) {
-        clearCart();
-        return { success: true, message: "compra realizada exitosamente" };
-      }
-
-      throw new Error("error al procesar la compra");
-    } catch (error) {
-      console.error("error en checkout:", error);
-      return {
-        success: false,
-        message: error.message || "error al procesar la compra",
-      };
-    }
-  };
+  // lo tenia mal el handleBuyNow en card.jsx porque ahi tenemos todo en buy product
+  // el backend al parecer registra automáticamente la deuda en buyLogs.createLog
 
   const value = {
     cartItems,
@@ -191,7 +146,6 @@ export const CartProvider = ({ children }) => {
     getCartCount,
     toggleCart,
     closeCart,
-    handleCheckout,
   };
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

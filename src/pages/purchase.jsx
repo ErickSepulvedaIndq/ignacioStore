@@ -51,11 +51,9 @@ export default function Purchase() {
       setPurchases(formattedPurchases);
       setCurrentPage(response.data?.page || page);
       setTotalPages(response.data?.totalPages || 1);
-      console.log("Compras formateadas:", formattedPurchases);
       setError(null);
     } catch (err) {
-      console.error("Error fetching purchases:", err);
-      setError("No se pudieron cargar las compras");
+      setError("No se pudieron cargar las compras"+err);
       setPurchases([]);
       setTotalPages(1);
     } finally {
