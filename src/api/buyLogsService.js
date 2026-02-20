@@ -30,3 +30,38 @@ export const createBuyLog = async (data) => {
     });
     return res.data;
 };
+
+export const getPendingBuyLogs = async (page = 1, limit = 10, from = "", to = "") => {
+    const token = localStorage.getItem("token");
+    const res = await axios.get(
+        `${import.meta.env.VITE_API_URL}/api/buylogs/debtors`,
+        {
+            params: {
+                page,
+                limit,
+                from,
+                to,
+            },
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        }
+    );
+
+    return res.data;
+};
+
+export const markBuyLogAsPaid = async (buyLogId) => {
+    const token = localStorage.getItem("token");
+    const res = await axios.patch(
+        `${import.meta.env.VITE_API_URL}/api/buylogs/${buyLogId}/pay`,
+        {},
+        {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        }
+    );
+
+    return res.data;
+};

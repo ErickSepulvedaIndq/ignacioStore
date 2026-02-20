@@ -124,6 +124,8 @@ export const CartProvider = ({ children }) => {
       // Necesito verificar por que aqui hay un problema, los productos deben acomplarse en un array y parece que los esta subiendo uno por uno
       const purchaseData = {
         id_user: userId,
+        totalCost: getCartTotal(),
+        isPaid: false,
         products: cartItems.map(item => ({
           id: item._id || item.id,
           name: item.name,
