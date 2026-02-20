@@ -18,10 +18,10 @@ export default function MiniCart() {
 
     const confirm = await Swal.fire({
       title: "Confirmar compra",
-      text: "¿Deseas comprar estos productos?",
+      text: "Realizar la compra?",
       icon: "question",
       showCancelButton: true,
-      confirmButtonText: "Sí, comprar",
+      confirmButtonText: "Confirmar",
       cancelButtonText: "Cancelar",
     });
 
@@ -107,7 +107,7 @@ export default function MiniCart() {
                     <img
                       src={item.imageUrl || item.img}
                       alt={item.name}
-                      className="w-14 h-20 object-cover rounded"
+                      className="w-18 h-20 rounded object-contain"
                     />
                     <div className="flex-1">
                       <h3 className="font-semibold text-sm text-gray-800">
@@ -123,7 +123,7 @@ export default function MiniCart() {
                           onClick={() =>
                             updateQuantity(item.id, item.quantity - 1)
                           }
-                          className="bg-gray-200 px-2 py-1 rounded hover:bg-gray-300 text-sm cursor-pointer"
+                          className="bg-gray-200 px-2 py-1 rounded hover:bg-gray-300 text-sm cursor-pointer mr-2 "
                         >
                           -
                         </button>
@@ -134,7 +134,7 @@ export default function MiniCart() {
                           onClick={() =>
                             updateQuantity(item.id, item.quantity + 1)
                           }
-                          className="bg-gray-200 px-2 py-1 rounded hover:bg-gray-300 text-sm cursor-pointer"
+                          className="bg-gray-200 px-2 py-1 rounded hover:bg-gray-300 text-sm cursor-pointer ml-2"
                         >
                           +
                         </button>

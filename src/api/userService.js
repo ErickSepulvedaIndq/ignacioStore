@@ -60,6 +60,17 @@ export const updateUser = async (id, userData) => {
   }
 };
 
+// Actualizar deuda del usuario (agregar monto a la deuda)
+export const updateUserDebt = async (id, amount) => {
+  try {
+    const response = await API_USERS.put(`/${id}/add-debt`, { amount });
+    return response.data;
+  } catch (error) {
+    console.error("Error updateUserDebt:", error);
+    throw error;
+  }
+};
+
 // Eliminar usuario
 export const deleteUser = async (id) => {
   try {
@@ -70,3 +81,4 @@ export const deleteUser = async (id) => {
     throw error;
   }
 };
+

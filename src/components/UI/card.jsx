@@ -1,33 +1,62 @@
+//tal vez el handleBuyNow deberia ir en otro componente para no mezclar responsabilidades el handleBuyNow
 import Plus from "../../assets/plus.png";
 import Minus from "../../assets/minus.png";
 import { useState } from "react";
 import { useCart } from "../../context/CartContext";
+import { buyProduct } from "../../services/productService";
+import { Toast, showToast } from "./toast";
+import { showBuyConfirmDialog } from "./buyConfirmDialog";
 
-export default function Card({ productName, price, img, productId, stock}) {
+export default function Card({ productName, price, img, productId, stock }) {
   const [quantity, setQuantity] = useState(1);
   const { addToCart, cartItems } = useCart();
 
   const currentInCart = cartItems
-  .filter(item => item.id === productId)
-  .reduce((acc, item) => acc + item.quantity, 0);
+    .filter((item) => item.id === productId)
+    .reduce((acc, item) => acc + item.quantity, 0);
 
   const normalizedStock = typeof stock === "number" ? stock : Number(stock);
   const availableStock = Number.isFinite(normalizedStock)
     ? Math.max(0, normalizedStock - currentInCart)
     : Infinity;
 
-
-  const handleQuantityChange = (value) => {
-    if (value < 1 || value > availableStock) {
+  const handleButtonChange = (value) => {
+    const numValue = Number(value);
+    if (isNaN(numValue) || numValue < 1) {
+      setQuantity(1);
       return;
     }
-    setQuantity(value);
+    if (numValue > availableStock) {
+      setQuantity(availableStock);
+      return;
+    }
+    setQuantity(numValue);
+  };
+
+  const handleInputValidation = (value) => {
+    if (value === "" || value < 1) {
+      setQuantity(1);
+      return;
+    }
+    const numValue = Number(value);
+    if (numValue > availableStock) {
+      setQuantity(availableStock);
+      return;
+    }
+    setQuantity(numValue);
   };
 
   const handleAddToCart = () => {
+    const safeQuantity = Number(quantity) || 1;
 
-    if (quantity > availableStock) {
-      alert("No puedes agregar más productos de los disponibles en stock");
+    // este mensaje sale si quieres meter mas piezas de las que hay en tienda estando en el carrito
+    if (safeQuantity > availableStock) {
+      showToast({
+        icon: "error",
+        title: "no se puede agregar porque no hay stock",
+        position: "top",
+        timer: 1200,
+      });
       return;
     }
     // estructura del producto para el carrito normalizada con _id y id
@@ -37,21 +66,86 @@ export default function Card({ productName, price, img, productId, stock}) {
       name: productName,
       price: parseFloat(price),
       img: img,
-      imageUrl: img
+      imageUrl: img,
     };
 
-    addToCart(product, quantity, stock)
+    const wasAdded = addToCart(product, safeQuantity, stock);
+
+    if (!wasAdded) {
+      return;
+    }
+
+    // este mensaje sale cuando si se guardo en el carrito
+    showToast({
+      icon: "success",
+      title: `${safeQuantity} ${productName} agregado al carrito`,
+      position: "top",
+      timer: 1200,
+    });
 
     // resetear el valor
     setQuantity(1);
   };
 
+  const handleBuyNow = async () => {
+    const safeQuantity = Number(quantity) || 1;
+
+    // este mensaje sale si quieres comprar algo sin piezas disponibles
+    if (safeQuantity > availableStock) {
+      Toast.fire({
+        icon: "error",
+        title: "no se puede comprar porque no hay stock",
+        position: "top",
+        timer: 900,
+      });
+      return;
+    }
+    // mostrar dialog de confirmación con detalles del producto
+    const confirm = await showBuyConfirmDialog({
+      img,
+      productName,
+      price,
+      quantity: safeQuantity,
+    });
+
+    if (!confirm.isConfirmed) return;
+
+    try {
+      await buyProduct([{ id: productId, quantity: safeQuantity }]);
+
+      // este mensaje sale cuando la compra termino bien
+      Toast.fire({
+        icon: "success",
+        title: "Compra realizada exitosamente",
+        position: "top",
+        timer: 1000,
+      });
+
+      setQuantity(1);
+    } catch (error) {
+      console.error(error);
+
+      // este mensaje sale si la api responde con error al comprar
+      Toast.fire({
+        icon: "error",
+        title:
+          error.response?.data?.message || "No se pudo completar la compra",
+        position: "top",
+        timer: 900,
+      });
+    }
+  };
+
   return (
     <>
       <div className="p-10">
-        <div className="group relative bg-[#0000000D] rounded-lg w-64 hover:scale-105 transition-all duration-300">
-          <div className="flex items-center justify-center py-4">
-            <img src={img} alt={productName} className="h-50" />
+        <div className="group relative bg-[#0000000D] rounded-lg w-69 hover:scale-105 transition-all duration-300">
+          <div className="flex items-center justify-center py-3 px-1">
+            <img
+              src={img}
+              alt={productName}
+              className="h-40 w-50 object-contain"
+            />
           </div>
           <h2 className="font-bold pb-2 pl-2">{productName}</h2>
           <p className="font-bold pb-2 pl-2 ml-1.5">${price}</p>
@@ -60,17 +154,25 @@ export default function Card({ productName, price, img, productId, stock}) {
               src={Minus}
               alt="Plus"
               className="h-7 hover:rounded-full hover:scale-125 cursor-pointer mr-1.5 transition-all duration-200"
-              onClick={() => handleQuantityChange(quantity - 1)}
+              onClick={() => handleButtonChange(quantity - 1)}
               disabled={quantity === 1}
             />
-            <p className="font-bold">{quantity}</p>
+            <input
+              type="number"
+              value={quantity}
+              onChange={(e) => setQuantity(e.target.value)}
+              onBlur={(e) => handleInputValidation(e.target.value)}
+              className="w-6 text-center font-bold bg-transparent border-0 focus:outline-none focus:bg-white/20 rounded-md transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+              min="1"
+              max={availableStock}
+            />
             <img
               src={Plus}
               alt="Minus"
               className="h-7 hover:rounded-full hover:scale-125 cursor-pointer transition-all duration-200"
               onClick={() => {
                 if (quantity >= availableStock) return;
-                handleQuantityChange(quantity + 1);
+                handleButtonChange(quantity + 1);
               }}
               style={{ opacity: quantity >= availableStock ? 0.5 : 1 }}
             />
@@ -88,7 +190,10 @@ export default function Card({ productName, price, img, productId, stock}) {
                 Agregar al carrito
               </button>
 
-              <button className="w-full bg-[#FFA41C] p-2 text-white rounded-lg cursor-pointer hover:bg-[#FF8F00]">
+              <button
+                className="w-full bg-[#FFA41C] p-2 text-white rounded-lg cursor-pointer hover:bg-[#FF8F00]"
+                onClick={handleBuyNow}
+              >
                 Comprar
               </button>
             </div>
