@@ -4,6 +4,12 @@ import { useState, useEffect, useMemo } from "react";
 import { useSearch } from "../context/SearchContext";
 import Paginator from "../components/UI/Paginator";
 import Loading from "../components/UI/Loading";
+import RegisterProductForm from "../components/forms/RegisterProductForm";
+import ProductDetailsForm from "../components/forms/ProductDetailsForm";
+import { ConfirmAction } from "../components/UI/ConfirmAction";
+import { deleteProduct } from "../services/productService";
+import Swal from "sweetalert2";
+
 
 export default function ProductManagement() {
   const [productos, setProductos] = useState([]);
@@ -12,7 +18,7 @@ export default function ProductManagement() {
   const [totalPages, setTotalPages] = useState(1);
 
   const [modalOpen, setModalOpen] = useState(false);
-  const [modalMode, setModalMode] = useState("create");
+  const [modalMode, setModalMode] = useState("create"); //create, edit, view
   const [selectedProductId, setSelectedProductId] = useState(null);
 
   const pageSize = 10;
@@ -36,6 +42,25 @@ export default function ProductManagement() {
     setModalOpen(true);
   };
 
+  const handleDelete = async (id) => {
+    ConfirmAction({
+      title: "Eliminar producto",
+      text: "¿Estás seguro que deseas eliminar este producto?",
+      icon: "warning",
+      confirmButtonText: "Sí, eliminar",
+      cancelButtonText: "Cancelar",
+      onConfirm: async () => {
+        console.log("Eliminando producto con ID:", id);
+        await deleteProduct(id); // llamada a tu API para eliminar
+        fetchProducts(currentPage); // refrescar tabla
+        Swal.fire({
+          icon: "success",
+          title: "Producto eliminado",
+        });
+      },
+    });
+  };
+
   const fetchProducts = async (page = 1) => {
     try {
       setLoading(true);
@@ -57,8 +82,8 @@ export default function ProductManagement() {
 
   
   useEffect(() => {
-    fetchProducts(currentPage);
-  }, [currentPage]);
+    fetchProducts(1);
+  }, []);
 
   // Filtrado según buscador
   const filteredProducts = useMemo(() => {
@@ -77,7 +102,7 @@ export default function ProductManagement() {
 
   // cambia la pagina y sube al inicio
   const handlePageChange = (page) => {
-    setCurrentPage(page);
+    fetchProducts(page);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -161,10 +186,18 @@ export default function ProductManagement() {
                     <i className="pi pi-pencil"></i>
                   </button>
                   <button
-                    className="text-red-600 hover:text-red-900"
-                    aria-label="Deactivate product"
-                    title="Deactivate product"
+                    className="text-[#3041A0] hover:text-[#25327D] mr-3"
+                    aria-label="View product"
+                    title="View product"
                     onClick={() => handleViewModal(producto._id)}
+                  >
+                    <i className="pi pi-eye"></i>
+                  </button>
+                  <button
+                    className="text-red-600 hover:text-red-800"
+                    aria-label="Delete product"
+                    title="Delete product"
+                    onClick={() => handleDelete(producto._id)}
                   >
                     <i className="pi pi-trash"></i>
                   </button>
@@ -192,11 +225,23 @@ export default function ProductManagement() {
         loading={loading}
       />
 
+      {/*Formulario para crear*/}
       <RegisterProductForm
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
         onSuccess={() => fetchProducts(currentPage)}
       />
+
+      {/*Formulario para editar/ver*/}
+      {(modalMode === "edit" || modalMode === "view") && (
+        <ProductDetailsForm
+          isOpen={modalOpen}
+          onClose={() => setModalOpen(false)}
+          onSuccess={() => fetchProducts(currentPage)}
+          productId={selectedProductId}
+          mode={modalMode} // edit o view
+        />
+      )}
     </div>
   );
 }

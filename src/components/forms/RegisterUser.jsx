@@ -1,70 +1,54 @@
-import { useState, useEffect } from "react";
-import { createProduct } from "../../services/productService";
-import { useAuth } from "../../context/AuthContext";
+import { useState } from "react";
+import { createUser } from "../../api/userService";
 
-export default function RegisterProductForm({ isOpen, onClose, onSuccess }) {
-
-  const { user } = useAuth();
-  
-
-  useEffect(() => {
-    console.log("Usuario actual:", user);
-  }, [user]); // vacío, se ejecuta solo al montar
+export default function RegisterUserForm({ isOpen, onClose, onSuccess }) {
   const [formData, setFormData] = useState({
-    name: "",
-    description: "",
-    price: "",
-    stock: "",
+    firstName: "",
+    lastName: "",
+    username: "",
+    password: "",
+    role: "user",
+    debt: 0,
     status: "active",
-    image: null,
   });
 
   const [loading, setLoading] = useState(false);
 
   const resetForm = () => {
     setFormData({
-      name: "",
-      description: "",
-      price: "",
-      stock: "",
+      firstName: "",
+      lastName: "",
+      username: "",
+      password: "",
+      role: "user",
+      debt: 0,
       status: "active",
-      image: null,
     });
   };
 
   const handleChange = (e) => {
-    const { name, value, files } = e.target;
+    const { name, value } = e.target;
 
     setFormData((prev) => ({
       ...prev,
-      [name]: files ? files[0] : value,
+      [name]: name === "debt" ? Number(value) : value,
     }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if(!user){
-      console.error("No hay usuario autenticado");
-      return;
-    }
     setLoading(true);
 
     try {
+      console.log("Datos usuario a enviar:", formData);
 
-         const productData = {
-        ...formData,
-        createdBy: user.userId
-         };
+      await createUser(formData);
 
-      console.log("Datos a enviar:", productData);
-
-      await createProduct(productData);
       onSuccess();
       resetForm();
       onClose();
-    } catch (err) {
-      console.error("Error creando producto:", err);
+    } catch (error) {
+      console.error("Error creando usuario:", error);
     } finally {
       setLoading(false);
     }
@@ -75,12 +59,9 @@ export default function RegisterProductForm({ isOpen, onClose, onSuccess }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
       <div className="bg-gray-100 rounded-2xl shadow-2xl w-full max-w-3xl p-10 relative animate-fade-in">
-        
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
-          <h2 className="text-2xl font-bold text-gray-800">
-            Crear Producto
-          </h2>
+          <h2 className="text-2xl font-bold text-gray-800">Crear Usuario</h2>
           <button
             className="text-gray-500 hover:text-gray-800 text-xl transition"
             onClick={() => {
@@ -94,106 +75,116 @@ export default function RegisterProductForm({ isOpen, onClose, onSuccess }) {
 
         {loading ? (
           <div className="flex justify-center py-16 text-lg font-medium">
-            Creando producto...
+            Creando usuario...
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Nombre y Apellido */}
+            <div className="grid grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Nombre
+                </label>
+                <input
+                  type="text"
+                  name="firstName"
+                  value={formData.firstName}
+                  onChange={handleChange}
+                  required
+                  className="w-full rounded-lg border-2 border-gray-300 bg-white px-4 py-3 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition"
+                />
+              </div>
 
-            {/* Nombre */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Apellido
+                </label>
+                <input
+                  type="text"
+                  name="lastName"
+                  value={formData.lastName}
+                  onChange={handleChange}
+                  required
+                  className="w-full rounded-lg border-2 border-gray-300 bg-white px-4 py-3 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition"
+                />
+              </div>
+            </div>
+
+            {/* Username */}
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Nombre
+                Username
               </label>
               <input
                 type="text"
-                name="name"
-                value={formData.name}
+                name="username"
+                value={formData.username}
                 onChange={handleChange}
                 required
                 className="w-full rounded-lg border-2 border-gray-300 bg-white px-4 py-3 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition"
               />
             </div>
 
-            {/* Descripción */}
+            {/* Password */}
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Descripción
+                Contraseña
               </label>
-              <textarea
-                name="description"
-                value={formData.description}
+              <input
+                type="password"
+                name="password"
+                value={formData.password}
                 onChange={handleChange}
-                rows={4}
+                required
                 className="w-full rounded-lg border-2 border-gray-300 bg-white px-4 py-3 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition"
               />
             </div>
 
-            {/* Precio y Stock */}
+            {/* Rol y Estado */}
             <div className="grid grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Precio
+                  Rol
                 </label>
-                <input
-                  type="number"
-                  name="price"
-                  value={formData.price}
+                <select
+                  name="role"
+                  value={formData.role}
                   onChange={handleChange}
-                  required
                   className="w-full rounded-lg border-2 border-gray-300 bg-white px-4 py-3 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition"
-                />
+                >
+                  <option value="user">Usuario</option>
+                  <option value="admin">Administrador</option>
+                </select>
               </div>
 
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Stock
+                  Estado
                 </label>
-                <input
-                  type="number"
-                  name="stock"
-                  value={formData.stock}
+                <select
+                  name="status"
+                  value={formData.status}
                   onChange={handleChange}
-                  required
                   className="w-full rounded-lg border-2 border-gray-300 bg-white px-4 py-3 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition"
-                />
+                >
+                  <option value="active">Activo</option>
+                  <option value="inactive">Inactivo</option>
+                </select>
               </div>
             </div>
 
-            {/* Estado */}
+            {/* Deuda */}
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Estado
+                Deuda
               </label>
-              <select
-                name="status"
-                value={formData.status}
+              <input
+                type="number"
+                name="debt"
+                value={formData.debt}
+                min={0}
                 onChange={handleChange}
                 className="w-full rounded-lg border-2 border-gray-300 bg-white px-4 py-3 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition"
-              >
-                <option value="active">Activo</option>
-                <option value="blocked">Bloqueado</option>
-              </select>
-            </div>
-
-            {/* Imagen */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Imagen
-              </label>
-
-              {formData.image && (
-                <img
-                  src={URL.createObjectURL(formData.image)}
-                  alt="Preview"
-                  className="w-40 h-40 object-cover rounded-lg mb-4 border-2 border-gray-300"
-                />
-              )}
-
-              <input
-                type="file"
-                name="image"
-                onChange={handleChange}
-                className="w-full rounded-lg border-2 border-dashed border-gray-400 bg-white px-4 py-3 cursor-pointer hover:border-indigo-500 transition"
               />
             </div>
 
