@@ -3,9 +3,7 @@ import { createProduct } from "../../services/productService";
 import { useAuth } from "../../context/AuthContext";
 
 export default function RegisterProductForm({ isOpen, onClose, onSuccess }) {
-
   const { user } = useAuth();
-  
 
   useEffect(() => {
     console.log("Usuario actual:", user);
@@ -44,18 +42,17 @@ export default function RegisterProductForm({ isOpen, onClose, onSuccess }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if(!user){
+    if (!user) {
       console.error("No hay usuario autenticado");
       return;
     }
     setLoading(true);
 
     try {
-
-         const productData = {
+      const productData = {
         ...formData,
-        createdBy: user.userId
-         };
+        createdBy: user.userId,
+      };
 
       console.log("Datos a enviar:", productData);
 
@@ -75,14 +72,11 @@ export default function RegisterProductForm({ isOpen, onClose, onSuccess }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
       <div className="bg-gray-100 rounded-2xl shadow-2xl w-full max-w-3xl p-10 relative animate-fade-in">
-        
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
-          <h2 className="text-2xl font-bold text-gray-800">
-            Crear Producto
-          </h2>
+          <h2 className="text-2xl font-bold text-gray-800">Crear Producto</h2>
           <button
-            className="text-gray-500 hover:text-gray-800 text-xl transition"
+            className="text-gray-500 hover:text-gray-800 text-xl transition cursor-pointer hover:scale-125"
             onClick={() => {
               resetForm();
               onClose();
@@ -98,7 +92,6 @@ export default function RegisterProductForm({ isOpen, onClose, onSuccess }) {
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-6">
-
             {/* Nombre */}
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -201,7 +194,7 @@ export default function RegisterProductForm({ isOpen, onClose, onSuccess }) {
             <div className="flex justify-end space-x-4 pt-4">
               <button
                 type="button"
-                className="px-6 py-3 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 transition font-medium"
+                className="px-6 py-3 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 transition font-medium cursor-pointer"
                 onClick={() => {
                   resetForm();
                   onClose();
@@ -212,7 +205,7 @@ export default function RegisterProductForm({ isOpen, onClose, onSuccess }) {
 
               <button
                 type="submit"
-                className="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition font-semibold shadow-md"
+                className="px-6 py-3 bg-[#3041A0] text-white rounded-lg hover:bg-[#4250a1] transition font-semibold shadow-md cursor-pointer"
               >
                 Crear
               </button>

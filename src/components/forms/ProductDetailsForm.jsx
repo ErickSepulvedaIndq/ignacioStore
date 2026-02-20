@@ -2,9 +2,14 @@ import { useState, useEffect } from "react";
 import { getProductById, updateProduct } from "../../services/productService";
 import { useAuth } from "../../context/AuthContext";
 
-export default function ProductDetailsForm({ isOpen, onClose, onSuccess, productId, mode = "edit" }) {
-
-    const { user } = useAuth();
+export default function ProductDetailsForm({
+  isOpen,
+  onClose,
+  onSuccess,
+  productId,
+  mode = "edit",
+}) {
+  const { user } = useAuth();
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -19,61 +24,61 @@ export default function ProductDetailsForm({ isOpen, onClose, onSuccess, product
 
   // Traer datos del producto
   useEffect(() => {
-  if (!productId) {
-    console.log("No hay productId, no se cargará nada");
-    return;
-  }
-
-  const fetchProduct = async () => {
-    console.log("Fetching producto con ID:", productId);
-    setFetching(true);
-    try {
-      const response = await getProductById(productId);
-      console.log("Respuesta de la API:", response);
-
-      const productData = response?.data; // <--- ACCEDER A data
-      if (!productData) {
-        console.warn("No se encontró data en la respuesta");
-        setFormData({
-          name: "",
-          description: "",
-          price: "",
-          stock: "",
-          status: "active",
-          image: null,
-        });
-        return;
-      }
-
-      console.log("Producto cargado (data):", productData);
-
-      setFormData({
-        name: productData.name || "",
-        description: productData.description || "",
-        price: productData.price || "",
-        stock: productData.stock || "",
-        status: productData.status || "active",
-        image: productData.image?.url || null, // <--- extraer URL de la imagen
-      });
-
-      console.log("formData actualizado:", {
-        name: productData.name || "",
-        description: productData.description || "",
-        price: productData.price || "",
-        stock: productData.stock || "",
-        status: productData.status || "active",
-        image: productData.image?.url || null,
-      });
-    } catch (err) {
-      console.error("Error cargando producto:", err);
-    } finally {
-      setFetching(false);
-      console.log("fetching set a false");
+    if (!productId) {
+      console.log("No hay productId, no se cargará nada");
+      return;
     }
-  };
 
-  fetchProduct();
-}, [productId]);
+    const fetchProduct = async () => {
+      console.log("Fetching producto con ID:", productId);
+      setFetching(true);
+      try {
+        const response = await getProductById(productId);
+        console.log("Respuesta de la API:", response);
+
+        const productData = response?.data; // <--- ACCEDER A data
+        if (!productData) {
+          console.warn("No se encontró data en la respuesta");
+          setFormData({
+            name: "",
+            description: "",
+            price: "",
+            stock: "",
+            status: "active",
+            image: null,
+          });
+          return;
+        }
+
+        console.log("Producto cargado (data):", productData);
+
+        setFormData({
+          name: productData.name || "",
+          description: productData.description || "",
+          price: productData.price || "",
+          stock: productData.stock || "",
+          status: productData.status || "active",
+          image: productData.image?.url || null, // <--- extraer URL de la imagen
+        });
+
+        console.log("formData actualizado:", {
+          name: productData.name || "",
+          description: productData.description || "",
+          price: productData.price || "",
+          stock: productData.stock || "",
+          status: productData.status || "active",
+          image: productData.image?.url || null,
+        });
+      } catch (err) {
+        console.error("Error cargando producto:", err);
+      } finally {
+        setFetching(false);
+        console.log("fetching set a false");
+      }
+    };
+
+    fetchProduct();
+  }, [productId]);
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
@@ -94,18 +99,18 @@ export default function ProductDetailsForm({ isOpen, onClose, onSuccess, product
     console.log("Enviando formData al actualizar:", formData);
     setLoading(true);
     try {
-        const productData = {
-            ...formData,
-        }
-        const updated = await updateProduct(productId, productData);
-        console.log("Producto actualizado (respuesta backend):", updated);
-        onSuccess(); // recarga tabla
-        onClose();
+      const productData = {
+        ...formData,
+      };
+      const updated = await updateProduct(productId, productData);
+      console.log("Producto actualizado (respuesta backend):", updated);
+      onSuccess(); // recarga tabla
+      onClose();
     } catch (err) {
-        console.error("Error actualizando producto:", err);
-        alert("Ocurrió un error al actualizar, revisa la consola.");
+      console.error("Error actualizando producto:", err);
+      alert("Ocurrió un error al actualizar, revisa la consola.");
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
   };
 
@@ -123,7 +128,7 @@ export default function ProductDetailsForm({ isOpen, onClose, onSuccess, product
             {mode === "edit" ? "Editar Producto" : "Ver Producto"}
           </h2>
           <button
-            className="text-gray-500 hover:text-gray-800 text-xl transition"
+            className="text-gray-500 hover:text-gray-800 text-xl transition cursor-pointer hover:scale-125"
             onClick={() => {
               console.log("Cerrando modal");
               onClose();
@@ -252,7 +257,7 @@ export default function ProductDetailsForm({ isOpen, onClose, onSuccess, product
               <div className="flex justify-end space-x-4 pt-4">
                 <button
                   type="button"
-                  className="px-6 py-3 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 transition font-medium"
+                  className="px-6 py-3 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 transition font-medium cursor-pointer"
                   onClick={onClose}
                 >
                   Cancelar
@@ -260,7 +265,7 @@ export default function ProductDetailsForm({ isOpen, onClose, onSuccess, product
 
                 <button
                   type="submit"
-                  className="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition font-semibold shadow-md"
+                  className="px-6 py-3 bg-[#3041A0] text-white rounded-lg hover:bg-[#4250a1] transition font-semibold shadow-md cursor-pointer"
                 >
                   Guardar
                 </button>
