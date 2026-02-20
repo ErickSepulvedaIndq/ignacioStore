@@ -33,7 +33,7 @@ export default function Header() {
               />
             </svg>
           </button>
-          <h1 className="font-bold text-xl md:text-2xl italic ml-2">IGNACIO STORE</h1>
+          <h1 className="font-bold text-xl md:text-2xl italic ml-2">INDQNACIO STORE</h1>
         </div>
 
         {/* el buscador estara fijo en moviles mas facil*/}

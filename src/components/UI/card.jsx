@@ -11,9 +11,14 @@ export default function Card({ productName, price, img, productId, stock}) {
   .filter(item => item.id === productId)
   .reduce((acc, item) => acc + item.quantity, 0);
 
+  const normalizedStock = typeof stock === "number" ? stock : Number(stock);
+  const availableStock = Number.isFinite(normalizedStock)
+    ? Math.max(0, normalizedStock - currentInCart)
+    : Infinity;
+
 
   const handleQuantityChange = (value) => {
-    if (value < 1 || value > stock) {
+    if (value < 1 || value > availableStock) {
       return;
     }
     setQuantity(value);
@@ -21,11 +26,7 @@ export default function Card({ productName, price, img, productId, stock}) {
 
   const handleAddToCart = () => {
 
-    const currentInCart = cartItems
-      .filter(item => item.id === productId)
-      .reduce((acc, item) => acc + item.quantity, 0);
-
-    if (currentInCart + quantity > stock) {
+    if (quantity > availableStock) {
       alert("No puedes agregar más productos de los disponibles en stock");
       return;
     }
@@ -67,7 +68,11 @@ export default function Card({ productName, price, img, productId, stock}) {
               src={Plus}
               alt="Minus"
               className="h-7 hover:rounded-full hover:scale-125 cursor-pointer transition-all duration-200"
-              onClick={() => handleQuantityChange(quantity + 1)}
+              onClick={() => {
+                if (quantity >= availableStock) return;
+                handleQuantityChange(quantity + 1);
+              }}
+              style={{ opacity: quantity >= availableStock ? 0.5 : 1 }}
             />
           </div>
           <div
@@ -83,7 +88,7 @@ export default function Card({ productName, price, img, productId, stock}) {
                 Agregar al carrito
               </button>
 
-              <button className="w-full bg-[#FFCA1A] p-2 text-white rounded-lg cursor-pointer hover:bg-[#E5B816]">
+              <button className="w-full bg-[#FFA41C] p-2 text-white rounded-lg cursor-pointer hover:bg-[#FF8F00]">
                 Comprar
               </button>
             </div>

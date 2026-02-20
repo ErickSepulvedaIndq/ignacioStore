@@ -27,30 +27,38 @@ export const CartProvider = ({ children }) => {
   }, [cartItems]);
 
   const addToCart = (product, quantity = 1, stock) => {
-    setCartItems(prev => {
-      const existingItem = prev.find(item => item.id === product.id);
+    setCartItems((prev) => {
+      const existingItem = prev.find((item) => item.id === product.id);
+      const effectiveStock =
+        typeof stock === "number"
+          ? stock
+          : typeof existingItem?.stock === "number"
+            ? existingItem.stock
+            : typeof product?.stock === "number"
+              ? product.stock
+              : Number(stock);
 
       if (existingItem) {
         const newQty = existingItem.quantity + quantity;
 
-        if (newQty > stock) {
+        if (Number.isFinite(effectiveStock) && newQty > effectiveStock) {
           alert("No hay suficiente stock disponible");
           return prev;
         }
 
-        return prev.map(item =>
+        return prev.map((item) =>
           item.id === product.id
             ? { ...item, quantity: newQty }
             : item
         );
       }
 
-      if (quantity > stock) {
+      if (Number.isFinite(effectiveStock) && quantity > effectiveStock) {
         alert("No hay suficiente stock disponible");
         return prev;
       }
 
-      return [...prev, { ...product, quantity, stock }];
+      return [...prev, { ...product, quantity, stock: effectiveStock }];
     });
   };
 

@@ -1,6 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 
 export default function SideNav() {
   const { user, isAdmin, isSideNavOpen, closeSideNav, logout } = useAuth();
@@ -9,6 +10,25 @@ export default function SideNav() {
   const role = user?.role || localStorage.getItem("role");
 
   const isActive = (path) => location.pathname === path;
+
+  const handleLogout = () => {
+    Swal.fire({
+      title: "¿Estás seguro?",
+      text: "¿Quieres cerrar sesión?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3041A0",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Sí, cerrar sesión",
+      cancelButtonText: "Cancelar"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        logout();
+        navigate("/login");
+      }
+    });
+  };
+
 
   // esto es para los users unicamente osea basico
   const userMenuItems = [
@@ -58,7 +78,7 @@ export default function SideNav() {
         <div className="flex flex-col h-full">
           <div className="bg-[#25327D] p-6 flex justify-between items-center">
             <div>
-              <h2 className="font-bold text-xl">IGNACIO STORE</h2>
+              <h2 className="font-bold text-xl">INDQNACIO STORE</h2>
               {user && (
                 <p className="text-sm text-gray-300 mt-1">
                   {user.username}
@@ -133,11 +153,7 @@ export default function SideNav() {
           {/* por alguna razon el logout falla */}
           <div className="border-t border-[#25327D] p-4">
             <button
-              onClick={() => {
-                logout();
-                closeSideNav();
-                navigate("/login");
-              }}
+              onClick={handleLogout}
               className="w-full bg-red-600 hover:bg-red-700 text-white py-3 rounded-lg transition font-semibold flex items-center justify-center gap-2 cursor-pointer"
             >
               <i className="pi pi-sign-out"></i>

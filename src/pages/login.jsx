@@ -21,14 +21,14 @@ export default function Login() {
   };
 
   return (
-    <>
+    <div className="h-screen overflow-hidden flex flex-col">
       <LoginHeader />
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="flex-1 flex items-center justify-center">
       
       <div className="bg-white w-[380px] rounded-2xl shadow-xl p-10">
 
         <h1 className="text-3xl font-extrabold text-center text-[#3041A0]">
-          INQNACIO STORE
+          INDQNACIO STORE
         </h1>
 
         <p className="text-center text-gray-500 mt-2 mb-8">
@@ -94,10 +94,10 @@ export default function Login() {
         </Formik>
 
         <p className="text-center text-xs text-gray-400 mt-8">
-          © {new Date().getFullYear()} Inqnacio Store
+          © {new Date().getFullYear()} Indqnacio Store
         </p>
       </div>
     </div>
-    </>
+    </div>
   );
 }

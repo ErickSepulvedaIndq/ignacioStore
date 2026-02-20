@@ -52,7 +52,6 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem("username", payload.username);
       localStorage.setItem("userId", payload.userId);
       localStorage.setItem("role", payload.role);
-      localStorage.setItem("id", payload.userId);
 
       setUser({
         userId: payload.userId,
@@ -72,6 +71,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('username');
     localStorage.removeItem('userId');
     localStorage.removeItem('role');
+    localStorage.removeItem('id');
     setUser(null);
   };
 

@@ -63,6 +63,7 @@ export default function Product() {
                     productName={product.name}
                     price={product.price}
                     img={product.image?.url}
+                    stock={product.stock}
                 />
             ))}
 

@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "http://localhost:5000/api/products",
+  baseURL: import.meta.env.VITE_API_URL,
 });
 
 // Interceptor para enviar JWT automáticamente
@@ -17,7 +17,7 @@ API.interceptors.request.use((config) => {
 
 //Obtener todos los productos
 export const getAllProducts = async () => {
-  const response = await API.get("/", {
+  const response = await API.get("/products", {
     params: {  }
   });
   console.log(response.data);
@@ -26,13 +26,13 @@ export const getAllProducts = async () => {
 
 // Obtener producto por ID
 export const getProductById = async (id) => {
-  const response = await API.get(`/${id}`);
+  const response = await API.get(`/products/${id}`);
   return response.data;
 };
 
 //Buscar producto por nombre
 export const getProductByName = async (name) => {
-  const response = await API.get(`/name/${name}`);
+  const response = await API.get(`/products/name/${name}`);
   return response.data;
 };
 
@@ -51,7 +51,7 @@ export const createProduct = async (productData) => {
     formData.append("image", productData.image);
   }
 
-  const response = await API.post("/", formData);
+  const response = await API.post("/products", formData);
   return response.data;
 };
 
@@ -70,19 +70,19 @@ export const updateProduct = async (id, productData) => {
     formData.append("image", productData.image);
   }
 
-  const response = await API.put(`/${id}`, formData);
+  const response = await API.put(`/products/${id}`, formData);
   return response.data;
 };
 
 // Eliminar producto
 export const deleteProduct = async (id, deletedBy) => {
-  const response = await API.delete(`/${id}`, {
+  const response = await API.delete(`/products/${id}`, {
     data: { deletedBy },
   });
   return response.data;
 };
 
 export const buyProduct = async (products) => {
-  const response = await API.post("/buy", { products })
+  const response = await API.post("/products/buy", { products })
   return response.data
 }
