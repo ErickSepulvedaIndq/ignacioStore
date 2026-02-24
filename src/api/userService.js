@@ -27,6 +27,17 @@ export const getAllUsers = async (page = 1, limit = 10) => {
   }
 };
 
+//Necesario para Dropdown de usuarios en purchaseHistory
+export const getAllUsersNames = async () => {
+  try {
+    const response = await API_USERS.get("/names");
+    return response.data.data;
+  } catch (error) {
+    console.error("Error getAllUsersNames:", error);
+    throw error;
+  }
+};
+
 // Obtener usuario por ID
 export const getUserById = async (id) => {
   try {
