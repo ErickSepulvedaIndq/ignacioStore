@@ -15,7 +15,7 @@ export default function Header() {
   const { pathname } = useLocation();
   const cartCount = getCartCount();
   // variables para la visibilidad de elementos en el header
-  const hideSearchInPaths = ["/purchases", "/admin/debtors"];
+  const hideSearchInPaths = ["/purchases", "/admin/debtors", "/admin/purchaseHistory"];
   const hideSearchInPages = hideSearchInPaths.includes(pathname);
   const showCartInPages = pathname === "/products";
 

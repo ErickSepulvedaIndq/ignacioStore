@@ -49,6 +49,11 @@ export default function SideNav() {
       icon: "pi pi-box",
     },
     {
+      path: "/admin/purchaseHistory",
+      label: "Historial de Compras",
+      icon: "pi pi-book",
+    },
+    {
       path: "/admin/debtors",
       label: "Pendientes de Pago",
       icon: "pi pi-exclamation-triangle",
