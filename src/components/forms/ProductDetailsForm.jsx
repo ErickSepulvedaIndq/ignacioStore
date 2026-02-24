@@ -25,20 +25,16 @@ export default function ProductDetailsForm({
   // Traer datos del producto
   useEffect(() => {
     if (!productId) {
-      console.log("No hay productId, no se cargará nada");
       return;
     }
 
     const fetchProduct = async () => {
-      console.log("Fetching producto con ID:", productId);
       setFetching(true);
       try {
         const response = await getProductById(productId);
-        console.log("Respuesta de la API:", response);
 
-        const productData = response?.data; // <--- ACCEDER A data
+        const productData = response?.data;
         if (!productData) {
-          console.warn("No se encontró data en la respuesta");
           setFormData({
             name: "",
             description: "",
@@ -50,18 +46,8 @@ export default function ProductDetailsForm({
           return;
         }
 
-        console.log("Producto cargado (data):", productData);
 
         setFormData({
-          name: productData.name || "",
-          description: productData.description || "",
-          price: productData.price || "",
-          stock: productData.stock || "",
-          status: productData.status || "active",
-          image: productData.image?.url || null, // <--- extraer URL de la imagen
-        });
-
-        console.log("formData actualizado:", {
           name: productData.name || "",
           description: productData.description || "",
           price: productData.price || "",
@@ -70,10 +56,8 @@ export default function ProductDetailsForm({
           image: productData.image?.url || null,
         });
       } catch (err) {
-        console.error("Error cargando producto:", err);
       } finally {
         setFetching(false);
-        console.log("fetching set a false");
       }
     };
 
@@ -82,7 +66,6 @@ export default function ProductDetailsForm({
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
-    console.log("handleChange:", { name, value, files });
     setFormData((prev) => ({
       ...prev,
       [name]: files ? files[0] : value,
@@ -92,22 +75,18 @@ export default function ProductDetailsForm({
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (mode === "view") {
-      console.log("Modo view, no se envía nada");
       return;
     }
 
-    console.log("Enviando formData al actualizar:", formData);
     setLoading(true);
     try {
       const productData = {
         ...formData,
       };
       const updated = await updateProduct(productId, productData);
-      console.log("Producto actualizado (respuesta backend):", updated);
       onSuccess(); // recarga tabla
       onClose();
     } catch (err) {
-      console.error("Error actualizando producto:", err);
       alert("Ocurrió un error al actualizar, revisa la consola.");
     } finally {
       setLoading(false);
@@ -115,7 +94,6 @@ export default function ProductDetailsForm({
   };
 
   if (!isOpen) {
-    console.log("Modal cerrado");
     return null;
   }
 

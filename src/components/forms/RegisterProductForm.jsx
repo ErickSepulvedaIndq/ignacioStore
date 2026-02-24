@@ -6,7 +6,6 @@ export default function RegisterProductForm({ isOpen, onClose, onSuccess }) {
   const { user } = useAuth();
 
   useEffect(() => {
-    console.log("Usuario actual:", user);
   }, [user]);
   const [formData, setFormData] = useState({
     name: "",
@@ -43,7 +42,6 @@ export default function RegisterProductForm({ isOpen, onClose, onSuccess }) {
     e.preventDefault();
 
     if (!user) {
-      console.error("No hay usuario autenticado");
       return;
     }
     setLoading(true);
@@ -54,14 +52,12 @@ export default function RegisterProductForm({ isOpen, onClose, onSuccess }) {
         createdBy: user.userId,
       };
 
-      console.log("Datos a enviar:", productData);
 
       await createProduct(productData);
       onSuccess();
       resetForm();
       onClose();
     } catch (err) {
-      console.error("Error creando producto:", err);
     } finally {
       setLoading(false);
     }

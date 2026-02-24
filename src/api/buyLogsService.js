@@ -31,7 +31,6 @@ export const createBuyLog = async (data) => {
         });
         return res.data;
     } catch (error) {
-        console.error("Error createBuyLog:", error);
         throw error;
     }
 };

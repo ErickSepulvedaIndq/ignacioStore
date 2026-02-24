@@ -40,7 +40,6 @@ export default function Debtor() {
       setTotalPages(response.data?.totalPages || 1);
       setError(null);
     } catch (err) {
-      console.error("Error al cargar pendientes:", err);
       setError("No se pudieron cargar los pendientes de pago");
       setPendingPayments([]);
       setTotalPages(1);
@@ -115,7 +114,6 @@ export default function Debtor() {
                 showConfirmButton: false
             });
         } catch (err) {
-            console.error("Error cobrando venta:", err);
             Swal.fire({
                 icon: "error",
                 title: "Error",

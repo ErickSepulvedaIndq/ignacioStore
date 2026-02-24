@@ -48,7 +48,6 @@ export default function ProductManagement() {
       confirmButtonText: "Sí, eliminar",
       cancelButtonText: "Cancelar",
       onConfirm: async () => {
-        console.log("Eliminando producto con ID:", id);
         await deleteProduct(id);
         fetchProducts(currentPage);
         Swal.fire({
@@ -69,7 +68,6 @@ export default function ProductManagement() {
       setTotalPages(response?.totalPages || 1);
       setCurrentPage(response?.page || 1);
     } catch (error) {
-      console.error("Error cargando productos:", error);
       setProductos([]);
       setTotalPages(1);
     } finally {
@@ -91,7 +89,6 @@ export default function ProductManagement() {
     });
   }, [productos, normalizedSearch]);
 
-  console.log("Productos cargados:", productos);
 
   // cambia la pagina y sube al inicio
   const handlePageChange = (page) => {

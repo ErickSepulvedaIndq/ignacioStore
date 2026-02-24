@@ -11,6 +11,7 @@ import Product from './pages/product.jsx'
 import Debtor from './pages/debtor.jsx'
 import Report from './pages/report.jsx'
 import Login from './pages/login.jsx'
+import ChangePassword from './pages/changePassword.jsx'
 
 import { StrictMode } from 'react'
 import 'primeicons/primeicons.css'
@@ -31,6 +32,7 @@ createRoot(document.getElementById("root")).render(
                   <Route index element={<Navigate to="/products" replace />} />
                   <Route path="products" element={<Product />} />
                   <Route path="purchases" element={<Purchase />} />
+                  <Route path="changePassword" element={<ChangePassword />} />
                   <Route path="admin/users" element={<UserManagement />} />
                   <Route path="admin/products" element={<ProductManagement />} />
                   <Route path="admin/debtors" element={<Debtor />} />

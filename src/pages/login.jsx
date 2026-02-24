@@ -84,7 +84,7 @@ export default function Login() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full bg-[#3041A0] text-white py-2.5 rounded-lg font-semibold tracking-wide hover:bg-[#25348a] transition active:scale-[.98]"
+                className="w-full bg-[#3041A0] text-white py-2.5 rounded-lg font-semibold tracking-wide hover:bg-[#25348a] transition active:scale-[.98] cursor-pointer"
               >
                 Iniciar Sesión
               </button>

@@ -40,7 +40,6 @@ export default function RegisterUserForm({ isOpen, onClose, onSuccess }) {
     setLoading(true);
 
     try {
-      console.log("Datos usuario a enviar:", formData);
 
       await createUser(formData);
 
@@ -48,7 +47,6 @@ export default function RegisterUserForm({ isOpen, onClose, onSuccess }) {
       resetForm();
       onClose();
     } catch (error) {
-      console.error("Error creando usuario:", error);
     } finally {
       setLoading(false);
     }

@@ -22,7 +22,6 @@ export const getAllUsers = async (page = 1, limit = 10) => {
     });
     return response.data.data; // docs, totalPages, page, etc.
   } catch (error) {
-    console.error("Error getAllUsers:", error);
     throw error;
   }
 };
@@ -33,7 +32,6 @@ export const getUserById = async (id) => {
     const response = await API_USERS.get(`/${id}`);
     return response.data.data;
   } catch (error) {
-    console.error("Error getUserById:", error);
     throw error;
   }
 };
@@ -44,7 +42,6 @@ export const createUser = async (userData) => {
     const response = await API_USERS.post("/", userData);
     return response.data;
   } catch (error) {
-    console.error("Error createUser:", error);
     throw error;
   }
 };
@@ -55,7 +52,6 @@ export const updateUser = async (id, userData) => {
     const response = await API_USERS.put(`/${id}`, userData);
     return response.data;
   } catch (error) {
-    console.error("Error updateUser:", error);
     throw error;
   }
 };
@@ -66,7 +62,6 @@ export const updateUserDebt = async (id, amount) => {
     const response = await API_USERS.put(`/${id}/add-debt`, { amount });
     return response.data;
   } catch (error) {
-    console.error("Error updateUserDebt:", error);
     throw error;
   }
 };
@@ -77,7 +72,6 @@ export const subtractUserDebtController = async (id, amount, subtractedBy) => {
     const response = await API_USERS.put(`/${id}/subtract-debt`, { amount, subtractedBy });
     return response.data;
   } catch (error) {
-    console.error("Error subtractUserDebt:", error);
     throw error;
   }
 };
@@ -88,7 +82,6 @@ export const deleteUser = async (id) => {
     const response = await API_USERS.delete(`/${id}`);
     return response.data;
   } catch (error) {
-    console.error("Error deleteUser:", error);
     throw error;
   }
 };
