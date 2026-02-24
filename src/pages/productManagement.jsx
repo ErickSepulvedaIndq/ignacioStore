@@ -62,7 +62,7 @@ export default function ProductManagement() {
   const fetchProducts = async (page = 1) => {
     try {
       setLoading(true);
-      const response = await getAllProducts(page, pageSize);
+      const response = await getAllProducts(page, pageSize, true);
 
       const data = response?.docs || [];
       setProductos(data);

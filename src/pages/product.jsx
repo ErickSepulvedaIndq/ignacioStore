@@ -1,43 +1,58 @@
 import { useSearch } from '../context/SearchContext';
 import Card from '../components/UI/card';
-import { useMemo, useState, useEffect } from 'react';
-import { getAllProducts } from '../services/productService';
+import { useState, useEffect, useCallback } from 'react';
+import { getAllProducts, getProductByName } from '../services/productService';
 import Loading from '../components/UI/Loading';
+import Paginator from '../components/UI/Paginator';
 
 export default function Product() {
     // TODO: Fetch productos desde API
     const [productos, setProductos] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const pageSize = 10;
 
     const { normalizedSearch } = useSearch();
-    useEffect(() => {
-        const fetchProducts = async () => {
-            try {
-                const response = await getAllProducts();
-                console.log("Productos cargados:", response);
-                setProductos(response.docs || response);
 
+    const fetchProducts = useCallback(async (page = 1, searchTerm = "") => {
+        try {
+            setLoading(true);
+            const response = searchTerm
+                ? await getProductByName(searchTerm, page, pageSize)
+                : await getAllProducts(page, pageSize);
 
-            } catch (err) {
-                setError("Error al cargar productos");
-                console.error(err);
-            } finally {
-                setLoading(false);
-            }
-        };
+            const docs = Array.isArray(response) ? response : (response?.docs || []);
+            const responsePage = Array.isArray(response) ? 1 : (response?.page || page);
+            const responseTotalPages = Array.isArray(response) ? 1 : (response?.totalPages || 1);
 
-        fetchProducts();
-    }, []);
-    const filteredProducts = useMemo(() => {
-        if (!normalizedSearch) {
-            return productos;
+            setProductos(docs);
+            setCurrentPage(responsePage);
+            setTotalPages(responseTotalPages);
+            setError(null);
+        } catch (err) {
+            setError("Error al cargar productos");
+            setProductos([]);
+            setTotalPages(1);
+            console.error(err);
+        } finally {
+            setLoading(false);
         }
+    }, []);
 
-        return productos.filter((product) =>
-            `${product.name} ${product.id}`.toLowerCase().includes(normalizedSearch)
-        );
-    }, [productos, normalizedSearch]);
+    useEffect(() => {
+        const timeoutId = setTimeout(() => {
+            fetchProducts(1, normalizedSearch);
+        }, 350);
+
+        return () => clearTimeout(timeoutId);
+    }, [normalizedSearch, fetchProducts]);
+
+    const handlePageChange = (page) => {
+        fetchProducts(page, normalizedSearch);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    };
 
     if (loading) {
         return <Loading/>
@@ -49,24 +64,34 @@ export default function Product() {
 
     return (
         <div className="container mx-auto p-6">
-            <h1 className="text-3xl font-bold mb-6 text-gray-800">Productos</h1>
+            <h1 className="text-3xl font-bold mb-1 text-gray-800">Comprar Productos</h1>
 
-            <div className="flex flex-wrap items-center justify-center">
-            {filteredProducts.map((product) => (
+            <div className="flex flex-wrap items-center justify-center ">
+            {productos.map((product) => (
                 <Card
                     key={product._id}
                     productId={product._id}
                     productName={product.name}
+                    description={product.description}
                     price={product.price}
                     img={product.image?.url}
                     stock={product.stock}
                 />
             ))}
 
-                {filteredProducts.length === 0 && (
+                {productos.length === 0 && (
                     <p className="text-gray-500 py-10">No se encontraron productos, verifique su texto de busqueda</p>
                 )}
             </div>
+
+            {totalPages > 1 && (
+                <Paginator
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={handlePageChange}
+                    loading={loading}
+                />
+            )}
         </div>
     );
 }

@@ -15,6 +15,7 @@ export default function PurchaseHistory() {
   const [purchases, setPurchases] = useState([]);
   const [users, setUsers] = useState([]);
   const [selectedUserId, setSelectedUserId] = useState("");
+  const [grayText, setToGrayText] = useState(false);
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -126,7 +127,6 @@ export default function PurchaseHistory() {
 
   const handlePageChange = (page) => {
     getPurchases(page, fromDate, toDate, selectedUserId);
-    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handelOpenTicket = (purchase) => {
@@ -171,11 +171,16 @@ export default function PurchaseHistory() {
           </label>
           <select
             value={selectedUserId}
-            onChange={(event) => setSelectedUserId(event.target.value)}
-            className={`md:w-1/1 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#3041A0] focus:border-[#3041A0]  text-gray-500 ${selectedUserId === "" ? "text-gray-500" : "text-gray-900"}`}
+            onChange={(event) => {
+              setSelectedUserId(event.target.value);
+              setToGrayText(true);
+            }}
+            className={`md:w-1/1 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#3041A0] focus:border-[#3041A0] ${
+              !grayText && selectedUserId === "" ? "text-gray-500" : "text-gray-900"
+            }`}
             disabled={loadingUsers}
           >
-            <option  value="">Todos los usuarios</option>
+            <option value="">Todos los usuarios</option>
             {users.map((user) => (
               <option className="text-gray-800" key={user.id} value={user.id}>
                 {user.fullName || user.username || "Usuario"}
