@@ -21,7 +21,7 @@ export default function Header() {
 
   return (
     <>
-      <header className="bg-[#3041A0] text-white p-4 md:p-6 flex flex-wrap justify-between items-center gap-2">
+      <header className="fixed left-0 right-0 z-10 bg-[#3041A0] text-white md:p-6 flex flex-wrap justify-between items-center gap-2">
         <div className="flex items-center">
           <button
             onClick={toggleSideNav}

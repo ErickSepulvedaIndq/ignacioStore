@@ -10,7 +10,7 @@ export default function Layout() {
         <div className="min-h-screen bg-gray-50">
             <Header />
             <SideNav />
-            <main className="w-full">
+            <main className="w-full pt-24 md:pt-28">
                 <Outlet />
             </main>
         </div>

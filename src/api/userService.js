@@ -22,6 +22,18 @@ export const getAllUsers = async (page = 1, limit = 10) => {
     });
     return response.data.data; // docs, totalPages, page, etc.
   } catch (error) {
+      console.error("Error getAllUsers:", error);
+    throw error;
+  }
+};
+
+//Necesario para Dropdown de usuarios en purchaseHistory
+export const getAllUsersNames = async () => {
+  try {
+    const response = await API_USERS.get("/names");
+    return response.data.data;
+  } catch (error) {
+    console.error("Error getAllUsersNames:", error);
     throw error;
   }
 };
@@ -32,6 +44,7 @@ export const getUserById = async (id) => {
     const response = await API_USERS.get(`/${id}`);
     return response.data.data;
   } catch (error) {
+    console.error("Error en getUserById:", error);
     throw error;
   }
 };
@@ -42,6 +55,7 @@ export const createUser = async (userData) => {
     const response = await API_USERS.post("/", userData);
     return response.data;
   } catch (error) {
+    console.error("Error en createUser:", error);
     throw error;
   }
 };
@@ -52,6 +66,7 @@ export const updateUser = async (id, userData) => {
     const response = await API_USERS.put(`/${id}`, userData);
     return response.data;
   } catch (error) {
+    console.error("Error en updateUser:", error);
     throw error;
   }
 };
@@ -62,6 +77,7 @@ export const updateUserDebt = async (id, amount) => {
     const response = await API_USERS.put(`/${id}/add-debt`, { amount });
     return response.data;
   } catch (error) {
+    console.error("Error en updateUserDebt:", error);
     throw error;
   }
 };
@@ -72,6 +88,7 @@ export const subtractUserDebtController = async (id, amount, subtractedBy) => {
     const response = await API_USERS.put(`/${id}/subtract-debt`, { amount, subtractedBy });
     return response.data;
   } catch (error) {
+    console.error("Error en subtractUserDebtController:", error);
     throw error;
   }
 };
@@ -82,6 +99,7 @@ export const deleteUser = async (id) => {
     const response = await API_USERS.delete(`/${id}`);
     return response.data;
   } catch (error) {
+    console.error("Error en deleteUser:", error);
     throw error;
   }
 };

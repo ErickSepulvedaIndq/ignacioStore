@@ -7,7 +7,14 @@ import { buyProduct } from "../../services/productService";
 import { Toast, showToast } from "./toast";
 import { showBuyConfirmDialog } from "./buyConfirmDialog";
 
-export default function Card({ productName, price, img, productId, stock }) {
+export default function Card({
+  productName,
+  description,
+  price,
+  img,
+  productId,
+  stock,
+}) {
   const [quantity, setQuantity] = useState(1);
   const { addToCart, cartItems } = useCart();
 
@@ -139,8 +146,10 @@ export default function Card({ productName, price, img, productId, stock }) {
 
   return (
     <>
-      <div className="p-10">
-        <div className="group relative bg-[#0000000D] rounded-lg w-69 hover:scale-105 transition-all duration-300">
+      <div className="p-10 ">
+        <div
+          className={`group relative bg-[#0000000D] rounded-lg w-69 hover:scale-105 transition-all duration-300 ${stock === 0 ? " border-2 border-red-200" : stock > 0 && stock < 10 ? "border-2 border-yellow-100" : ""}`}
+        >
           <div className="flex items-center justify-center py-3 px-1">
             <img
               src={img}
@@ -150,6 +159,9 @@ export default function Card({ productName, price, img, productId, stock }) {
           </div>
           <h2 className="font-bold pb-2 pl-2">{productName}</h2>
           <p className="font-bold pb-2 pl-2 ml-1.5">${price}</p>
+          <p className="hidden group-hover:[display:-webkit-box] text-sm leading-5 font-medium text-gray-600 px-4 pb-2 overflow-hidden [-webkit-line-clamp:3] [-webkit-box-orient:vertical]">
+            {description || "Sin descripción"}
+          </p>
           <div className="flex items-center justify-center gap-10 mt-3 mb-7">
             <img
               src={Minus}
@@ -200,7 +212,9 @@ export default function Card({ productName, price, img, productId, stock }) {
                 Comprar
               </button>
               {isOutOfStock && (
-                <p className="text-red-500 text-center font-semibold">Agotado</p>
+                <p className="text-red-500 text-center font-semibold">
+                  Agotado
+                </p>
               )}
             </div>
           </div>
