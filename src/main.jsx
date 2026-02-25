@@ -17,6 +17,7 @@ import { StrictMode } from 'react'
 import 'primeicons/primeicons.css'
 import './index.css'
 import ProtectedRoute from './components/guards/protectedRoutes.jsx'
+import PurchaseHistory from './pages/purchaseHistory.jsx'
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
@@ -34,6 +35,7 @@ createRoot(document.getElementById("root")).render(
                   <Route path="purchases" element={<Purchase />} />
                   <Route path="changePassword" element={<ChangePassword />} />
                   <Route path="admin/users" element={<UserManagement />} />
+                  <Route path="admin/purchaseHistory" element={<PurchaseHistory />} />
                   <Route path="admin/products" element={<ProductManagement />} />
                   <Route path="admin/debtors" element={<Debtor />} />
                   <Route path="admin/reports" element={<Report />} />

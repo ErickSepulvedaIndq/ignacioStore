@@ -16,9 +16,9 @@ API.interceptors.request.use((config) => {
 /*PRODUCTOS*/
 
 //Obtener todos los productos
-export const getAllProducts = async (page = 1, limit = 10) => {
+export const getAllProducts = async (page = 1, limit = 10, includeBlocked = false) => {
   const response = await API.get("/products/", {
-    params: { page, limit }
+    params: { page, limit, includeBlocked }
   });
   return response.data.data;
 };
@@ -30,9 +30,11 @@ export const getProductById = async (id) => {
 };
 
 //Buscar producto por nombre
-export const getProductByName = async (name) => {
-  const response = await API.get(`/products/name/${name}`);
-  return response.data;
+export const getProductByName = async (name, page = 1, limit = 10) => {
+  const response = await API.get(`/products/search/${name}`, {
+    params: { page, limit },
+  });
+  return response.data.data;
 };
 
 // Crear producto (con imagen opcional)
