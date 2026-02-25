@@ -125,7 +125,6 @@ export default function Card({ productName, price, img, productId, stock }) {
 
       setQuantity(1);
     } catch (error) {
-      console.error(error);
 
       // este mensaje sale si la api responde con error al comprar
       Toast.fire({

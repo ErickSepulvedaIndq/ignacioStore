@@ -15,13 +15,11 @@ export default function Product() {
         const fetchProducts = async () => {
             try {
                 const response = await getAllProducts();
-                console.log("Productos cargados:", response);
                 setProductos(response.docs || response);
 
 
             } catch (err) {
                 setError("Error al cargar productos");
-                console.error(err);
             } finally {
                 setLoading(false);
             }

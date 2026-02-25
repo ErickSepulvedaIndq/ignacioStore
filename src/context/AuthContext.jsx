@@ -43,7 +43,6 @@ export const AuthProvider = ({ children }) => {
   const login = async (userData) => {
     try {
       const response = await authService(userData);
-      console.log(response);
 
       const token = response.data;
 
@@ -61,7 +60,6 @@ export const AuthProvider = ({ children }) => {
 
       return true;
     } catch (error) {
-      console.error(error);
       return false;
     }
   };

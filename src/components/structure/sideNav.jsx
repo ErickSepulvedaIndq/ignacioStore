@@ -34,6 +34,7 @@ export default function SideNav() {
   const userMenuItems = [
     { path: "/products", label: "Productos", icon: "pi pi-shopping-bag" },
     { path: "/purchases", label: "Mis Compras", icon: "pi pi-credit-card" },
+    { path: "/changePassword", label: "Cambiar Contraseña", icon: "pi pi-key" },
   ];
 
   // permisos de admin

@@ -48,9 +48,6 @@ export default function MiniCart() {
       clearCart();
 
     } catch (error) {
-      console.log(error)
-      console.log(error.stack)
-
       Swal.close();
 
       Toast.fire({

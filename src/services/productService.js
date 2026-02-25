@@ -20,7 +20,6 @@ export const getAllProducts = async (page = 1, limit = 10) => {
   const response = await API.get("/products/", {
     params: { page, limit }
   });
-  console.log(response.data);
   return response.data.data;
 };
 

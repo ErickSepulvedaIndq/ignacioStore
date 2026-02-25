@@ -24,7 +24,6 @@ export const ConfirmAction = async ({
             await onConfirm();
             Swal.close();
         } catch (err) {
-            console.error("Error en confirmAction:", err);
             Swal.close();
             Swal.fire({
                 icon: "error",

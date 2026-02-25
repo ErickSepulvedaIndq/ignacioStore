@@ -31,7 +31,7 @@ export default function UserDetailsForm({
     const fetchUser = async () => {
       setFetching(true);
       try {
-        const userData = await getUserById(userId); // <-- ya devuelve el objeto usuario
+        const userData = await getUserById(userId);
         if (!userData) return;
 
         setFormData({
@@ -44,7 +44,6 @@ export default function UserDetailsForm({
           status: userData.status || "active",
         });
       } catch (error) {
-        console.error("Error cargando usuario:", error);
       } finally {
         setFetching(false);
       }
@@ -53,9 +52,6 @@ export default function UserDetailsForm({
     fetchUser();
   }, [userId]);
 
-  /* ===============================
-     Manejar cambios
-  =============================== */
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -90,7 +86,6 @@ export default function UserDetailsForm({
       onSuccess();
       onClose();
     } catch (error) {
-      console.error("Error actualizando usuario:", error);
       alert("Error actualizando usuario, revisa consola.");
     } finally {
       setLoading(false);

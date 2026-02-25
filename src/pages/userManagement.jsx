@@ -30,19 +30,16 @@ export default function UserManagement() {
   const handleEditModal = (userId) => {
     setModalMode("edit");
     setSelectedUserId(userId);
-    console.log("Editar usuario ID:", userId);
     setModalOpen(true);
   };
 
   const handleViewModal = (userId) => {
     setModalMode("view");
     setSelectedUserId(userId);
-    console.log("Ver usuario ID:", userId);
     setModalOpen(true);
   };
 
   const handleDelete = async (userId) => {
-    console.log("Intentando eliminar usuario ID:", userId);
     ConfirmAction({
       title: "Eliminar usuario",
       text: "¿Estás seguro de que deseas eliminar este usuario? Esta acción no se puede deshacer.",
@@ -59,7 +56,6 @@ export default function UserManagement() {
             text: "El usuario ha sido eliminado exitosamente.",
           });
         } catch (error) {
-          console.error("Error eliminando usuario:", error);
           Swal.fire({
             icon: "error",
             title: "Ocurrió un error",
@@ -75,16 +71,12 @@ export default function UserManagement() {
       setLoading(true);
 
       const response = await getAllUsers(page, pageSize);
-      console.log("Respuesta API usuarios:", response);
 
       const data = response?.docs || [];
-      console.log("Usuarios obtenidos:", data);
-
       setUsuarios(data);
       setTotalPages(response?.totalPages || 1);
       setCurrentPage(response?.page || 1);
     } catch (error) {
-      console.error("Error cargando usuarios:", error);
       setUsuarios([]);
       setTotalPages(1);
     } finally {
