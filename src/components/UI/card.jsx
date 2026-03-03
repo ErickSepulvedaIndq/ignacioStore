@@ -55,7 +55,7 @@ export default function Card({
     setQuantity(numValue);
   };
 
-  const handleAddToCart = () => {
+  const handleAddToCart = async () => {
     const safeQuantity = Number(quantity) || 1;
 
     // este mensaje sale si quieres meter mas piezas de las que hay en tienda estando en el carrito
@@ -78,7 +78,7 @@ export default function Card({
       imageUrl: img,
     };
 
-    const wasAdded = addToCart(product, safeQuantity, stock);
+    const wasAdded = await addToCart(product, safeQuantity, stock);
 
     if (!wasAdded) {
       return;

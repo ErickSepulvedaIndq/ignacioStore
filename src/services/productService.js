@@ -1,17 +1,4 @@
-import axios from "axios";
-
-const API = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
-});
-
-// Interceptor para enviar JWT automáticamente
-API.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token");
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
+import { API } from "../api/apiConfig";
 
 /*PRODUCTOS*/
 
@@ -75,7 +62,6 @@ export const updateProduct = async (id, productData) => {
   return response.data;
 };
 
-// Eliminar producto
 export const deleteProduct = async (id, deletedBy) => {
   const response = await API.delete(`/products/${id}`, {
     data: { deletedBy },
@@ -85,5 +71,20 @@ export const deleteProduct = async (id, deletedBy) => {
 
 export const buyProduct = async (products) => {
   const response = await API.post("/products/buy", { products })
+  return response.data
+}
+
+export const getCartProducts = async (id) => {
+  const response = await API.get(`/products/getCartProducts/${id}`)
+  return response.data
+}
+
+export const addToCart = async (productId, quantity, userId) => {
+  const response = await API.post("/products/addToCart", { productId, quantity, userId })
+  return response.data
+}
+
+export const removeFromCart = async (userId, productId, quantity) => {
+  const response = await API.post("/products/deleteFromCart", { userId, productId, quantity })
   return response.data
 }

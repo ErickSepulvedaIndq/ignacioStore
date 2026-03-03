@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { getAllProducts, getProductByName } from '../services/productService';
 import Loading from '../components/UI/Loading';
 import Paginator from '../components/UI/Paginator';
+import { useCart } from '../context/CartContext';
 
 export default function Product() {
     // TODO: Fetch productos desde API
@@ -14,8 +15,23 @@ export default function Product() {
     const [totalPages, setTotalPages] = useState(1);
     const pageSize = 10;
 
+    const { getCartItems: fetchCartFromApi } = useCart();
     const { normalizedSearch } = useSearch();
 
+    useEffect(() => {
+        const loadCart = async () => {
+            const userStr = localStorage.getItem('user');
+            if (userStr) {
+                const user = JSON.parse(userStr);
+                if (user?.userId) {
+                    await fetchCartFromApi(user.userId);
+                }
+            }
+        };
+        loadCart();
+        // El bucle ocurre porque fetchCartFromApi cambia en cada render si no es estable.
+        // O porque el estado global del carrito cambia y provoca re-renders.
+    }, []); // Quitamos fetchCartFromApi de las dependencias para romper el bucle
     const fetchProducts = useCallback(async (page = 1, searchTerm = "") => {
         try {
             setLoading(true);
