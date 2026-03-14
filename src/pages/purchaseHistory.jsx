@@ -46,6 +46,11 @@ export default function PurchaseHistory() {
         Number(log.totalCost) > 0 ? Number(log.totalCost) : productsTotal;
       const user = log.id_user || {};
       const fullName = `${user.firstName || ""} ${user.lastName || ""}`.trim();
+      const normalizedUserName =
+        String(log.userName || "").trim() ||
+        fullName ||
+        user.username ||
+        "Usuario no disponible";
 
       return {
         id: log._id || index,
@@ -57,7 +62,7 @@ export default function PurchaseHistory() {
           quantity: Number(product?.quantity) || 1,
           price: Number(product?.price) || 0,
         })),
-        userName: fullName || user.username || "Usuario",
+        userName: normalizedUserName,
       };
     });
   };

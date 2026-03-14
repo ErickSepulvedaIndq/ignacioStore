@@ -15,19 +15,19 @@ import { API } from "./apiConfig";
 
 export const getAllPurchase = async (page = 1, limit = 10, from = "", to = "") => {
   try {
-    const response = await API.get("/logs/", {
+    const response = await API.get("/purchasedHistory/", {
       params: { page, limit, from, to },
     });
     return response.data.data;
   } catch (error) {
-    console.error("Error getAllPurchaseHistory:", error);
+    console.error("Error getAllPurchasedHistory:", error);
     throw error;
   }
 };
 
 export const getPurchasedByUserId = async (userId, page = 1, limit = 10, from = "", to = "") => {
   try {
-    const response = await API.get(`/logs/user/${userId}`, {
+    const response = await API.get(`/purchasedHistory/user/${userId}`, {
       params: { page, limit, from, to },
     });
     return response.data.data;

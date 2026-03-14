@@ -31,6 +31,7 @@ export const getAllUsers = async (page = 1, limit = 10) => {
 export const getAllUsersNames = async () => {
   try {
     const response = await API_USERS.get("/names");
+    // console.log("Response from getAllNames:", response);
     return response.data.data;
   } catch (error) {
     console.error("Error getAllUsersNames:", error);

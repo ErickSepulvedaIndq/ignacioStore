@@ -18,6 +18,7 @@ export const getBuyLogsByUserId = async (userId, page = 1, limit = 10, from = ""
         const response = await API_BUY_LOGS.get(`/user/${userId}`, {
             params: { page, limit, from, to },
         });
+            console.log("Response from getBuyLogsByUserId:", response);
         return response.data;
   } catch (error) {
     console.error("Error getBuyLogsByUserId:", error);

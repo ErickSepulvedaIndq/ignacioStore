@@ -30,6 +30,7 @@ createRoot(document.getElementById("root")).render(
 
               <Route element={<ProtectedRoute />}>
                 <Route path="/" element={<Layout />}>
+                {/* con esto */}
                   <Route index element={<Navigate to="/products" replace />} />
                   <Route path="products" element={<Product />} />
                   <Route path="purchases" element={<Purchase />} />
