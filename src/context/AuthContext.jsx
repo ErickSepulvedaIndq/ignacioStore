@@ -9,8 +9,11 @@
  * - Ahora al hacer login, se extrae userId del JWT y se guarda en localStorage
  * - El objeto user ahora contiene: { userId, username, role }
 */
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 import { authService } from '../api/authService';
+import { useNavigate } from 'react-router-dom';
+import { jwtDecode } from 'jwt-decode';
+import Swal from 'sweetalert2';
 
 const AuthContext = createContext();
 
@@ -36,9 +39,52 @@ export const useAuth = () => {
 };
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-
+  const [user, setUser] = useState(() => {
+    const savedUser = localStorage.getItem('user');
+    try {
+      return savedUser ? JSON.parse(savedUser) : null;
+    } catch (error) {
+      console.error("Error parsing user from localStorage", error);
+      return null;
+    }
+  });
+  const navigate = useNavigate();
   const [isSideNavOpen, setIsSideNavOpen] = useState(false);
+
+  useEffect(() => {
+    if (user) localStorage.setItem('user', JSON.stringify(user));
+  }, [user]);
+
+  const startTokenTimer = (token) => {
+    try {
+      const decoded = jwtDecode(token);
+      const currentTime = Math.floor(Date.now() / 1000);
+      const timeLeft = (decoded.exp - currentTime) * 1000;
+
+      if (timeLeft <= 0) {
+        logout();
+      } else {
+        const timer = setTimeout(() => {
+          Swal.fire({
+            title: "Sesión expirada",
+            text: "Tu sesión ha expirado.",
+            icon: "info"
+          }).then(() => logout());
+        }, timeLeft);
+
+        return () => clearTimeout(timer);
+      }
+    } catch (error) {
+      logout();
+    }
+  };
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      startTokenTimer(token);
+    }
+  }, [user]);
 
   const login = async (userData) => {
     try {
@@ -65,13 +111,18 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('username');
-    localStorage.removeItem('userId');
-    localStorage.removeItem('role');
-    localStorage.removeItem('id');
-    setUser(null);
+    localStorage.clear()
+    setUser(null)
+    navigate('/login', { replace: true });
   };
+
+  useEffect(() => {
+    const handleSessionExpired = () => {
+      logout();
+    }
+    window.addEventListener('sessionExpired', handleSessionExpired);
+    return () => window.removeEventListener('sessionExpired', handleSessionExpired);
+  }, [navigate])
 
   const isAdmin = () => {
     if(localStorage.getItem('role') === 'admin') {

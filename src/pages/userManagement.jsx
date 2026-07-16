@@ -15,7 +15,7 @@ export default function UserManagement() {
   const [totalPages, setTotalPages] = useState(1);
 
   const [modalOpen, setModalOpen] = useState(false);
-  const [modalMode, setModalMode] = useState("create"); // "create" o "edit"
+  const [modalMode, setModalMode] = useState("create");
   const [selectedUserId, setSelectedUserId] = useState(null);
 
   const pageSize = 10;

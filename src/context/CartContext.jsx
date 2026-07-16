@@ -1,5 +1,6 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState, useEffect, useCallback } from "react";
 import { showToast } from "../components/UI/toast";
+import { addToCart as addToCartApi, getCartProducts, removeFromCart as removeFromCartApi } from "../services/productService";
 
 const CartContext = createContext();
 
@@ -35,7 +36,7 @@ export const CartProvider = ({ children }) => {
     });
   };
 
-  const addToCart = (product, quantity = 1, stock) => {
+  const addToCart = async (product, quantity = 1, stock) => {
     const parsedQuantity = Number(quantity);
     const safeQuantity =
       Number.isFinite(parsedQuantity) && parsedQuantity > 0 ? parsedQuantity : 1;
@@ -52,61 +53,151 @@ export const CartProvider = ({ children }) => {
 
     if (existingItem) {
       const newQty = existingItem.quantity + safeQuantity;
-
-      // aqui revisamos si sumar mas rompe el limite de stock
       if (Number.isFinite(effectiveStock) && newQty > effectiveStock) {
         showStockError();
         return false;
       }
-
-      setCartItems((prev) =>
-        prev.map((item) =>
-          item.id === product.id ? { ...item, quantity: newQty } : item,
-        ),
-      );
-
-      return true;
+    } else {
+      if (Number.isFinite(effectiveStock) && safeQuantity > effectiveStock) {
+        showStockError();
+        return false;
+      }
     }
 
-    // aqui revisamos cuando el producto es nuevo en carrito
-    if (Number.isFinite(effectiveStock) && safeQuantity > effectiveStock) {
-      showStockError();
+    try {
+      const user = JSON.parse(localStorage.getItem('user'));
+      if (user?.userId) {
+        // Llamada al backend
+        await addToCartApi(product.id, safeQuantity, user.userId);
+        
+        // Sincronizar estado local (opcionalmente podrías llamar a getCartItems aquí 
+        // para estar 100% seguro de la sincronización con el backend)
+        if (existingItem) {
+          setCartItems((prev) =>
+            prev.map((item) =>
+              item.id === product.id ? { ...item, quantity: item.quantity + safeQuantity } : item,
+            ),
+          );
+        } else {
+          setCartItems((prev) => [
+            ...prev,
+            { ...product, quantity: safeQuantity, stock: effectiveStock },
+          ]);
+        }
+        return true;
+      } else {
+        console.error("No user ID found for addToCart");
+        return false;
+      }
+    } catch (error) {
+      console.error("Error adding to cart:", error);
+      showToast({
+        icon: "error",
+        title: "Error al agregar al carrito",
+        position: "top",
+        timer: 1800,
+      });
       return false;
     }
-
-    setCartItems((prev) => [
-      ...prev,
-      { ...product, quantity: safeQuantity, stock: effectiveStock },
-    ]);
-
-    return true;
   };
 
-  const removeFromCart = (productId) => {
-    setCartItems((prev) => prev.filter((item) => item.id !== productId));
+  const getCartItems = useCallback(async (userId) => {
+    try {
+      const response = await getCartProducts(userId);
+      if (response && Array.isArray(response.data)) {
+        const formattedItems = response.data.map(item => {
+          const p = item.product_id;
+          return {
+            id: p._id,
+            name: p.name,
+            price: p.price,
+            quantity: item.quantity,
+            stock: p.stock,
+            img: p.image?.url
+          };
+        });
+        setCartItems(formattedItems);
+        console.log("Cart items loaded:", formattedItems);
+      }
+      return response;
+    } catch (error) {
+      console.error("Error fetching cart items:", error);
+      return [];
+    }
+  }, []);
+
+  const removeFromCart = async (productId) => {
+    try {
+      const userId = localStorage.getItem('userId');
+      if (!userId) return;
+      const user = { userId };
+      
+      if (!user?.userId) {
+        console.error("No userId found for removeFromCart");
+        return;
+      }
+
+      const itemToRemove = cartItems.find(item => item.id === productId);
+      if (!itemToRemove) return;
+
+      console.log("Removing from cart:", user.userId, productId, itemToRemove.quantity);
+      await removeFromCartApi(user.userId, productId, itemToRemove.quantity);
+      
+      setCartItems((prev) => prev.filter((item) => item.id !== productId));
+      
+      showToast({
+        icon: "success",
+        title: "Producto eliminado del carrito",
+        position: "top",
+        timer: 1500,
+      });
+    } catch (error) {
+      console.error("Error removing from cart:", error);
+      showToast({
+        icon: "error",
+        title: "Error al eliminar producto",
+        position: "top",
+        timer: 1800,
+      });
+    }
   };
-// maneja cuando en el carrito cambiamos la cantidad de productos
-  const updateQuantity = (productId, quantity) => {
+
+  const updateQuantity = async (productId, quantity) => {
     const itemInCart = cartItems.find((item) => item.id === productId);
     if (!itemInCart) return;
 
-    // aqui valida cuando subes cantidad desde el mini carrito
     if (quantity > itemInCart.stock) {
       showStockError();
       return;
     }
 
-    setCartItems((prev) =>
-      prev
-        .map((item) => {
-          if (item.id !== productId) return item;
+    try {
+      const user = JSON.parse(localStorage.getItem('user'));
+      if (!user?.userId) return;
 
-          if (quantity <= 0) return null;
+      if (quantity <= 0) {
+        await removeFromCart(productId);
+        return;
+      }
 
-          return { ...item, quantity };
-        })
-        .filter(Boolean),
-    );
+      const diff = quantity - itemInCart.quantity;
+      
+      if (diff > 0) {
+        await addToCartApi(productId, diff, user.userId);
+        setCartItems((prev) =>
+          prev.map((item) => {
+            if (item.id !== productId) return item;
+            return { ...item, quantity };
+          })
+        );
+      } else if (diff < 0) {
+        await removeFromCartApi(user.userId, productId, Math.abs(diff));
+        
+        await getCartItems(user.userId);
+      }
+    } catch (error) {
+      console.error("Error updating quantity:", error);
+    }
   };
 
   const clearCart = () => {
@@ -146,6 +237,7 @@ export const CartProvider = ({ children }) => {
     getCartCount,
     toggleCart,
     closeCart,
+    getCartItems,
   };
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

@@ -1,7 +1,8 @@
 import { useCart } from "../../context/CartContext";
 import Swal from "sweetalert2";
-import { buyProduct } from "../../services/productService";
+import { buyProduct, removeFromCart } from "../../services/productService";
 import { Toast } from "../UI/toast";
+import { useAuth } from "../../context/AuthContext";
 
 export default function MiniCart() {
   const {
@@ -13,6 +14,8 @@ export default function MiniCart() {
     closeCart,
     clearCart
   } = useCart();
+
+  const { user } = useAuth();
 
   const handleConfirmPurchase = async () => {
 
@@ -38,6 +41,10 @@ export default function MiniCart() {
         }))
       );
 
+      for (const item of cartItems) {
+        await removeFromCart(item.id);
+      }
+
       Swal.close();
 
       Toast.fire({
@@ -54,6 +61,7 @@ export default function MiniCart() {
         icon: "error",
         title: "No se pudo completar la compra",
       });
+      console.error("Error al completar la compra:", error);
     }
   };
 

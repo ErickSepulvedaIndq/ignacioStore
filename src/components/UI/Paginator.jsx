@@ -43,7 +43,7 @@ export default function Paginator({
           className={`px-4 py-2 rounded-lg font-semibold transition ${
             currentPage === 1 || loading
               ? "bg-gray-200 text-gray-500 cursor-not-allowed"
-              : "bg-[#3041A0] text-white hover:bg-[#3d55d7]"
+              : "bg-[#3041A0] text-white hover:bg-[#3d55d7] cursor-pointer"
           }`}
         >
           Anterior
@@ -55,7 +55,7 @@ export default function Paginator({
           className={`px-4 py-2 rounded-lg font-semibold transition ${
             currentPage === totalPages || loading
               ? "bg-gray-200 text-gray-500 cursor-not-allowed"
-              : "bg-[#3041A0] text-white hover:bg-[#3d55d7]"
+              : "bg-[#3041A0] text-white hover:bg-[#3d55d7] cursor-pointer"
           }`}
         >
           Siguiente
