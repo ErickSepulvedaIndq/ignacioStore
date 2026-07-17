@@ -14,6 +14,7 @@ import { authService } from '../api/authService';
 import { useNavigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 import Swal from 'sweetalert2';
+import { showToast } from '../components/UI/toast';
 
 const AuthContext = createContext();
 
@@ -89,7 +90,6 @@ export const AuthProvider = ({ children }) => {
   const login = async (userData) => {
     try {
       const response = await authService(userData);
-
       const token = response.data;
 
       localStorage.setItem("token", token);
@@ -106,6 +106,21 @@ export const AuthProvider = ({ children }) => {
 
       return true;
     } catch (error) {
+      if (error.response.status === 404) {
+        showToast({
+          icon: "error",
+          title: "Credenciales incorrectas.",
+          position: "top-right",
+          timer: 1800,
+        });
+      } else {
+        showToast({
+          icon: "error",
+          title: "Ha ocurrido un error inesperado intente más tarde.",
+          position: "top-right",
+          timer: 1800,
+        });
+      }
       return false;
     }
   };
@@ -125,7 +140,7 @@ export const AuthProvider = ({ children }) => {
   }, [navigate])
 
   const isAdmin = () => {
-    if(localStorage.getItem('role') === 'admin') {
+    if (localStorage.getItem('role') === 'admin') {
       return true;
     }
     return false;
