@@ -82,7 +82,7 @@ export default function Product() {
         <div className="mx-auto">
             <h1 className="text-3xl font-bold mb-1 1sticky text-gray-800">Comprar Productos</h1>
 
-            <div className="flex py-4 pb-10 bg-gray-100 rounded gap-5 flex-wrap items-center justify-center h-[77vh]">
+            <div className="flex py-4 pb-10 bg-gray-100 rounded gap-5 flex-wrap items-center justify-center overflow-scroll h-[77vh]">
                 {productos.map((product) => (
                     <Card
                         key={product._id}
