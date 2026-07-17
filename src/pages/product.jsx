@@ -11,7 +11,7 @@ export default function Product() {
     const [productos, setProductos] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [currentPage, setCurrentPage] = useState(1); 
+    const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const pageSize = 10;
 
@@ -71,7 +71,7 @@ export default function Product() {
     };
 
     if (loading) {
-        return <Loading/>
+        return <Loading />
     }
 
     if (error) {
@@ -79,21 +79,21 @@ export default function Product() {
     }
 
     return (
-        <div className="container mx-auto p-6">
-            <h1 className="text-3xl font-bold mb-1 text-gray-800">Comprar Productos</h1>
+        <div className="mx-auto">
+            <h1 className="text-3xl font-bold mb-1 1sticky text-gray-800">Comprar Productos</h1>
 
-            <div className="flex flex-wrap items-center justify-center ">
-            {productos.map((product) => (
-                <Card
-                    key={product._id}
-                    productId={product._id}
-                    productName={product.name}
-                    description={product.description}
-                    price={product.price}
-                    img={product.image?.url}
-                    stock={product.stock}
-                />
-            ))}
+            <div className="flex py-4 pb-10 bg-gray-100 rounded gap-5 flex-wrap items-center justify-center h-[77vh]">
+                {productos.map((product) => (
+                    <Card
+                        key={product._id}
+                        productId={product._id}
+                        productName={product.name}
+                        description={product.description}
+                        price={product.price}
+                        img={product.image?.url}
+                        stock={product.stock}
+                    />
+                ))}
 
                 {productos.length === 0 && (
                     <p className="text-gray-500 py-10">No se encontraron productos, verifique su texto de busqueda</p>

@@ -42,19 +42,6 @@ export default function Card({
     setQuantity(numValue);
   };
 
-  const handleInputValidation = (value) => {
-    if (value === "" || value < 1) {
-      setQuantity(1);
-      return;
-    }
-    const numValue = Number(value);
-    if (numValue > availableStock) {
-      setQuantity(availableStock);
-      return;
-    }
-    setQuantity(numValue);
-  };
-
   const handleAddToCart = async () => {
     const safeQuantity = Number(quantity) || 1;
 
@@ -146,10 +133,11 @@ export default function Card({
 
   return (
     <>
-      <div className="p-10 ">
-        <div
-          className={`group relative bg-[#0000000D] rounded-lg w-69 hover:scale-105 transition-all duration-300 ${stock === 0 ? " border-2 border-red-200" : stock > 0 && stock < 10 ? "border-2 border-yellow-100" : ""}`}
-        >
+      <div
+        className={`group relative bg-white z-10 hover:z-50 shadow rounded-lg hover:rounded-t-lg w-69 hover:scale-105 transition-all hover:duration-100 duration-300 ${!isOutOfStock ? "hover:rounded-b-none" : ''} `}
+      >
+        {/* Datos principales */}
+        <div className="p-2 px-4">
           <div className="flex items-center justify-center py-3 px-1">
             <img
               src={img}
@@ -157,69 +145,66 @@ export default function Card({
               className="h-40 w-50 object-contain"
             />
           </div>
-          <h2 className="font-bold pb-2 pl-2">{productName}</h2>
-          <p className="font-bold pb-2 pl-2 ml-1.5">${price}</p>
-          <p className="hidden group-hover:[display:-webkit-box] text-sm leading-5 font-medium text-gray-600 px-4 pb-2 overflow-hidden [-webkit-line-clamp:3] [-webkit-box-orient:vertical]">
+          {isOutOfStock && (
+            <p className="text-red-500 text-center font-bold">
+              Agotado
+            </p>
+          )}
+          <h2 className="font-bold pb-2">{productName}</h2>
+          <p className="font-bold pb-2">Precio: <strong className="text-green-600">${price}</strong></p>
+          <p className="text-sm leading-5 font-medium text-gray-600 pb-2 overflow-hidden [-webkit-line-clamp:3] [-webkit-box-orient:vertical]">
             {description || "Sin descripción"}
           </p>
-          <div className="flex items-center justify-center gap-10 mt-3 mb-7">
-            <img
-              src={Minus}
-              alt="Plus"
-              className="h-7 hover:rounded-full hover:scale-125 cursor-pointer mr-1.5 transition-all duration-200"
-              onClick={() => handleButtonChange(quantity - 1)}
-              disabled={isOutOfStock}
-            />
-            <input
-              type="number"
-              value={quantity ? (isOutOfStock ? 0 : quantity) : 1}
-              onChange={(e) => setQuantity(e.target.value)}
-              onBlur={(e) => handleInputValidation(e.target.value)}
-              className="w-6 text-center font-bold bg-transparent border-0 focus:outline-none focus:bg-white/20 rounded-md transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-              min="1"
-              max={availableStock}
-            />
-            <img
-              src={Plus}
-              alt="Minus"
-              className="h-7 hover:rounded-full hover:scale-125 cursor-pointer transition-all duration-200"
-              onClick={() => {
-                if (quantity >= availableStock) return;
-                handleButtonChange(quantity + 1);
-              }}
-              style={{ opacity: quantity >= availableStock ? 0.5 : 1 }}
-            />
-          </div>
-          <div
-            className="max-h-0 overflow-hidden
-                group-hover:max-h-40
-                transition-all duration-300 group-hover:pt-4"
-          >
-            <div className="flex flex-col gap-2">
+        </div>
+        <div
+          className={`h-0 absolute flex justify-center items-center shadow rounded-b-lg bg-white w-full overflow-hidden
+                group-hover:h-20
+                transition-all duration-150 ${isOutOfStock ? "hidden" : ""}`}
+        >
+          <div className="flex m-2 flex-row gap-2 justify-between items-center">
+            <div className="flex flex-col justify-center items-center h-full gap-2">
+              <p className="text-gray-500 font-semibold text-[0.9rem]">Cantidad</p>
+              <div className="flex flex-row justify-between items-center">
+                <button
+                  className="cursor-pointer text-lg font-bold h-7 w-7 disabled:text-gray-500 bg-gray-200 hover:bg-gray-300 transition ease-in-out rounded flex justify-center items-center"
+                  onClick={() => handleButtonChange(quantity - 1)}
+                  disabled={isOutOfStock}
+                >-</button>
+                <p
+                  className="w-6 text-center font-bold"
+                >{quantity ? (isOutOfStock ? 0 : quantity) : 1}</p>
+                <button
+                  className="cursor-pointer text-lg font-bold h-7 w-7 disabled:text-gray-500 bg-gray-200 hover:bg-gray-300 transition ease-in-out rounded flex justify-center items-center"
+                  onClick={() => {
+                    if (quantity >= availableStock) return;
+                    handleButtonChange(quantity + 1);
+                  }}
+                  disabled={isOutOfStock}
+                >+</button>
+              </div>
+            </div>
+            <div className="flex flex-col gap-1">
               <button
-                className="w-full bg-[#3041A0] p-2 text-white rounded-lg cursor-pointer hover:bg-[#25327D] disabled:opacity-60 disabled:cursor-not-allowed"
+                className="w-full h-7 text-xs flex flex-row items-center justify-center gap-2 bg-[#3041A0] py-1 px-4 text-white rounded-lg cursor-pointer hover:bg-[#25327D] disabled:cursor-not-allowed"
                 onClick={handleAddToCart}
-                disabled={isOutOfStock}
               >
-                Agregar al carrito
+                <i className="pi pi-shopping-cart text-base" />
+                <span className="font-medium">Agregar al carrito</span>
               </button>
 
               <button
-                className="w-full bg-[#FFA41C] p-2 text-white rounded-lg cursor-pointer hover:bg-[#FF8F00] disabled:opacity-60 disabled:cursor-not-allowed"
+                className="w-full h-7 text-xs flex flex-row items-center justify-center gap-2 bg-yellow-500 py-1 px-4 text-white rounded-lg cursor-pointer hover:bg-yellow-600 disabled:cursor-not-allowed"
                 onClick={handleBuyNow}
-                disabled={isOutOfStock}
               >
-                Comprar
+                <i className="text-base" >$</i>
+                <span className="font-bold">Comprar</span>
               </button>
-              {isOutOfStock && (
-                <p className="text-red-500 text-center font-semibold">
-                  Agotado
-                </p>
-              )}
             </div>
+
           </div>
         </div>
       </div>
+
     </>
   );
 }
