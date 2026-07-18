@@ -117,7 +117,7 @@ export default function Card({
         timer: 1000,
       });
 
-      setQuantity(1);
+      setQuantity(quantity - safeQuantity);
     } catch (error) {
 
       // este mensaje sale si la api responde con error al comprar
