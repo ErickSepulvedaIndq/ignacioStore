@@ -12,7 +12,8 @@ export default function MiniCart() {
     removeFromCart,
     getCartTotal,
     closeCart,
-    clearCart
+    clearCart,
+    reloadProducts
   } = useCart();
 
   const { user } = useAuth();
@@ -53,6 +54,7 @@ export default function MiniCart() {
       });
 
       clearCart();
+      reloadProducts?.();
 
     } catch (error) {
       Swal.close();
@@ -70,18 +72,16 @@ export default function MiniCart() {
     <>
       {/* con esto podremos cerrar el mini carrito al hacer click fuera de el */}
       <div
-        className={`fixed inset-0 bg-black/50 z-40  transition-all duration-300 ${
-          isCartOpen ? "opacity-100" : "opacity-0 pointer-events-none"
-        }`}
+        className={`fixed inset-0 bg-black/50 z-40  transition-all duration-300 ${isCartOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+          }`}
         onClick={closeCart}
       />
 
       {/* el carrito que sale de al derecha */}
       {/* Si le quitas el h-full se hara como un desplegable de tamaño ajustable */}
       <div
-        className={`fixed top-0 right-0 h-full w-90 bg-white shadow-2xl z-50 transform transition-transform duration-400 ease-in-out ${
-          isCartOpen ? "translate-x-0" : "translate-x-full"
-        }`}
+        className={`fixed top-0 right-0 h-full w-90 bg-white shadow-2xl z-50 transform transition-transform duration-400 ease-in-out ${isCartOpen ? "translate-x-0" : "translate-x-full"
+          }`}
       >
         <div className="flex flex-col h-full">
           {/* Header del carrito */}
@@ -173,7 +173,7 @@ export default function MiniCart() {
                 </span>
               </div>
               <button className="w-full bg-[#3041A0] text-white py-3 rounded-lg hover:bg-[#25327D] transition font-bold cursor-pointer"
-              onClick={handleConfirmPurchase}
+                onClick={handleConfirmPurchase}
               >
                 Proceder al Pago
               </button>

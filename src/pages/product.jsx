@@ -32,7 +32,8 @@ export default function Product() {
         // El bucle ocurre porque fetchCartFromApi cambia en cada render si no es estable.
         // O porque el estado global del carrito cambia y provoca re-renders.
     }, []); // Quitamos fetchCartFromApi de las dependencias para romper el bucle
-    const fetchProducts = useCallback(async (page = 1, searchTerm = "") => {
+
+    const getProducts = async (page, searchTerm) => {
         try {
             setLoading(true);
             const response = searchTerm
@@ -55,6 +56,10 @@ export default function Product() {
         } finally {
             setLoading(false);
         }
+    }
+
+    const fetchProducts = useCallback(async (page = 1, searchTerm = "") => {
+        getProducts(page, searchTerm)
     }, []);
 
     useEffect(() => {
@@ -81,7 +86,6 @@ export default function Product() {
     return (
         <div className="mx-auto">
             <h1 className="text-3xl font-bold mb-1 1sticky text-gray-800">Comprar Productos</h1>
-
             <div className="flex py-4 pb-10 bg-gray-100 rounded gap-5 flex-wrap items-center justify-center overflow-scroll h-[77vh]">
                 {productos.map((product) => (
                     <Card
@@ -92,6 +96,7 @@ export default function Product() {
                         price={product.price}
                         img={product.image?.url}
                         stock={product.stock}
+                        reload={() => getProducts(1, "")}
                     />
                 ))}
 
