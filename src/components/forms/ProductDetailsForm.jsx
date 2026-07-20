@@ -107,7 +107,7 @@ export default function ProductDetailsForm({
           <button
             className="text-gray-500 text-xl cursor-pointer hover:scale-110 transition-transform duration-300 hover:text-red-600"
             onClick={() => {
-              console.log("Cerrando modal");
+              // console.log("Cerrando modal");
               onClose();
             }}
           >
