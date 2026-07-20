@@ -6,6 +6,7 @@ import { useCart } from "../../context/CartContext";
 import { buyProduct } from "../../services/productService";
 import { Toast, showToast } from "./toast";
 import { showBuyConfirmDialog } from "./buyConfirmDialog";
+import { useEffect } from "react";
 
 export default function Card({
   productName,
@@ -14,15 +15,25 @@ export default function Card({
   img,
   productId,
   stock,
+  reload
 }) {
   const [quantity, setQuantity] = useState(1);
-  const { addToCart, cartItems } = useCart();
+  const { addToCart, cartItems, setReloadProducts } = useCart();
 
+  // le asignamos al contexto la función para recargar la lista productos en cuanto cargue el componente
+  useEffect(() => {
+    setReloadProducts(() => reload)
+  }, [])
+
+  // variable que filtra y cuenta la cantidad que hay de un mismo producto en el carrito
   const currentInCart = cartItems
     .filter((item) => item.id === productId)
     .reduce((acc, item) => acc + item.quantity, 0);
 
+  // variable que normaliza el stock traído de la bd
   const normalizedStock = typeof stock === "number" ? stock : Number(stock);
+
+  // variable que cambia dinámicamente restando lo actual en el carrito al stock (aquí esta el problema, ya que al hacer la compra y eliminar del carrito al cambiar dinamicamente vuelvo a tener el mismo stock )
   const availableStock = Number.isFinite(normalizedStock)
     ? Math.max(0, normalizedStock - currentInCart)
     : Infinity;
@@ -118,6 +129,7 @@ export default function Card({
       });
 
       setQuantity(1);
+      reload();
     } catch (error) {
 
       // este mensaje sale si la api responde con error al comprar

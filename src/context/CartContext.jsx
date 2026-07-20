@@ -21,6 +21,11 @@ export const CartProvider = ({ children }) => {
 
   const [isCartOpen, setIsCartOpen] = useState(false);
 
+  // Sirve para recargar los productos desde un componente al contexto actual asignándole una function (se le conoce como inversion de control)
+  // desde el componente card se le esta pasando la función reload (la cual recarga la lista), esta función es asignada a reloadProducts permitiendo
+  // usarla desde cualquier parte del código.
+  const [reloadProducts, setReloadProducts] = useState(null);
+
   // Guardar en localStorage cada vez que cambie el carrito
   useEffect(() => {
     localStorage.setItem("cart_INDQ", JSON.stringify(cartItems));
@@ -69,7 +74,7 @@ export const CartProvider = ({ children }) => {
       if (user?.userId) {
         // Llamada al backend
         await addToCartApi(product.id, safeQuantity, user.userId);
-        
+
         // Sincronizar estado local (opcionalmente podrías llamar a getCartItems aquí 
         // para estar 100% seguro de la sincronización con el backend)
         if (existingItem) {
@@ -117,7 +122,7 @@ export const CartProvider = ({ children }) => {
           };
         });
         setCartItems(formattedItems);
-        console.log("Cart items loaded:", formattedItems);
+        // console.log("Cart items loaded:", formattedItems);
       }
       return response;
     } catch (error) {
@@ -131,7 +136,7 @@ export const CartProvider = ({ children }) => {
       const userId = localStorage.getItem('userId');
       if (!userId) return;
       const user = { userId };
-      
+
       if (!user?.userId) {
         console.error("No userId found for removeFromCart");
         return;
@@ -140,11 +145,11 @@ export const CartProvider = ({ children }) => {
       const itemToRemove = cartItems.find(item => item.id === productId);
       if (!itemToRemove) return;
 
-      console.log("Removing from cart:", user.userId, productId, itemToRemove.quantity);
+      // console.log("Removing from cart:", user.userId, productId, itemToRemove.quantity);
       await removeFromCartApi(user.userId, productId, itemToRemove.quantity);
-      
+
       setCartItems((prev) => prev.filter((item) => item.id !== productId));
-      
+
       showToast({
         icon: "success",
         title: "Producto eliminado del carrito",
@@ -181,7 +186,7 @@ export const CartProvider = ({ children }) => {
       }
 
       const diff = quantity - itemInCart.quantity;
-      
+
       if (diff > 0) {
         await addToCartApi(productId, diff, user.userId);
         setCartItems((prev) =>
@@ -192,7 +197,7 @@ export const CartProvider = ({ children }) => {
         );
       } else if (diff < 0) {
         await removeFromCartApi(user.userId, productId, Math.abs(diff));
-        
+
         await getCartItems(user.userId);
       }
     } catch (error) {
@@ -238,6 +243,8 @@ export const CartProvider = ({ children }) => {
     toggleCart,
     closeCart,
     getCartItems,
+    reloadProducts,
+    setReloadProducts
   };
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
