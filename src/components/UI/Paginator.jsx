@@ -40,11 +40,10 @@ export default function Paginator({
         <button
           onClick={handlePreviousPage}
           disabled={currentPage === 1 || loading}
-          className={`px-4 py-2 rounded-lg font-semibold transition ${
-            currentPage === 1 || loading
+          className={`px-4 py-2 rounded-lg font-semibold transition ${currentPage === 1 || loading
               ? "bg-gray-200 text-gray-500 cursor-not-allowed"
               : "bg-[#3041A0] text-white hover:bg-[#3d55d7] cursor-pointer"
-          }`}
+            }`}
         >
           Anterior
         </button>
@@ -52,11 +51,10 @@ export default function Paginator({
         <button
           onClick={handleNextPage}
           disabled={currentPage === totalPages || loading}
-          className={`px-4 py-2 rounded-lg font-semibold transition ${
-            currentPage === totalPages || loading
+          className={`px-4 py-2 rounded-lg font-semibold transition ${currentPage === totalPages || loading
               ? "bg-gray-200 text-gray-500 cursor-not-allowed"
               : "bg-[#3041A0] text-white hover:bg-[#3d55d7] cursor-pointer"
-          }`}
+            }`}
         >
           Siguiente
         </button>

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getProductById, updateProduct } from "../../services/productService";
+import { getProductById, updateProduct } from "../../api/productService";
 import { useAuth } from "../../context/AuthContext";
 
 export default function ProductDetailsForm({

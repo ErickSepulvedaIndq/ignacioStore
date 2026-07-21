@@ -17,37 +17,42 @@ import 'primeicons/primeicons.css'
 import './index.css'
 import ProtectedRoute from './components/guards/protectedRoutes.jsx'
 import PurchaseHistory from './pages/purchaseHistory.jsx'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+
+const queryClient = new QueryClient();
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <BrowserRouter>
-      <AuthProvider>
-        <CartProvider>
-          <SearchProvider>
-            <Routes>
-              <Route path="/" element={<Navigate to="/login" replace />} />
-              <Route path="/login" element={<Login />} />
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <AuthProvider>
+          <CartProvider>
+            <SearchProvider>
+              <Routes>
+                <Route path="/" element={<Navigate to="/login" replace />} />
+                <Route path="/login" element={<Login />} />
 
-              <Route element={<ProtectedRoute />}>
-                <Route path="/" element={<Layout />}>
-                {/* con esto */}
-                  <Route index element={<Navigate to="/products" replace />} />
-                  <Route path="products" element={<Product />} />
-                  <Route path="purchases" element={<Purchase />} />
-                  <Route path="changePassword" element={<ChangePassword />} />
-                  <Route path="admin/users" element={<UserManagement />} />
-                  <Route path="admin/purchaseHistory" element={<PurchaseHistory />} />
-                  <Route path="admin/products" element={<ProductManagement />} />
-                  <Route path="admin/debtors" element={<Debtor />} />
-                  <Route path="admin/reports" element={<Report />} />
+                <Route element={<ProtectedRoute />}>
+                  <Route path="/" element={<Layout />}>
+                    {/* con esto */}
+                    <Route index element={<Navigate to="/products" replace />} />
+                    <Route path="products" element={<Product />} />
+                    <Route path="purchases" element={<Purchase />} />
+                    <Route path="changePassword" element={<ChangePassword />} />
+                    <Route path="admin/users" element={<UserManagement />} />
+                    <Route path="admin/purchaseHistory" element={<PurchaseHistory />} />
+                    <Route path="admin/products" element={<ProductManagement />} />
+                    <Route path="admin/debtors" element={<Debtor />} />
+                    <Route path="admin/reports" element={<Report />} />
+                  </Route>
                 </Route>
-              </Route>
 
-              <Route path="*" element={<Navigate to="/login" replace />} />
-            </Routes>
-          </SearchProvider>
-        </CartProvider>
-      </AuthProvider>
-    </BrowserRouter>
+                <Route path="*" element={<Navigate to="/login" replace />} />
+              </Routes>
+            </SearchProvider>
+          </CartProvider>
+        </AuthProvider>
+      </BrowserRouter>
+    </QueryClientProvider>
   </StrictMode>,
 );

@@ -1,12 +1,11 @@
 import RegisterProductForm from "../components/forms/RegisterProductForm";
-import { getAllProducts } from "../services/productService";
 import { useState, useEffect, useMemo } from "react";
 import { useSearch } from "../context/SearchContext";
 import Paginator from "../components/UI/Paginator";
 import Loading from "../components/UI/Loading";
 import ProductDetailsForm from "../components/forms/ProductDetailsForm";
 import { ConfirmAction } from "../components/UI/ConfirmAction";
-import { deleteProduct } from "../services/productService";
+import { deleteProduct, getAllProducts } from "../api/productService";
 import Swal from "sweetalert2";
 
 export default function ProductManagement() {
@@ -106,9 +105,9 @@ export default function ProductManagement() {
         <h1 className="text-3xl font-bold text-gray-800">
           Administrar Productos
         </h1>
-        <button 
-        className="bg-[#3041A0] hover:bg-[#25327D] text-white px-6 py-2 rounded-lg font-semibold transition cursor-pointer hover:scale-105"
-        onClick={handleCreateModal}                                                                             
+        <button
+          className="bg-[#3041A0] hover:bg-[#25327D] text-white px-6 py-2 rounded-lg font-semibold transition cursor-pointer hover:scale-105"
+          onClick={handleCreateModal}
         >
           + Nuevo Producto
         </button>
@@ -146,20 +145,18 @@ export default function ProductManagement() {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                   <span
-                    className={`${
-                      producto.stock < 10 ? "text-red-600 font-semibold" : ""
-                    }`}
+                    className={`${producto.stock < 10 ? "text-red-600 font-semibold" : ""
+                      }`}
                   >
                     {producto.stock} unidades
                   </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <span
-                    className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                      producto.status === "active"
+                    className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${producto.status === "active"
                         ? "bg-green-100 text-green-800"
                         : "bg-red-100 text-red-800"
-                    }`}
+                      }`}
                   >
                     {producto.status}
                   </span>

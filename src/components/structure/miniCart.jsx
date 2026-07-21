@@ -1,6 +1,6 @@
 import { useCart } from "../../context/CartContext";
 import Swal from "sweetalert2";
-import { buyProduct, removeFromCart } from "../../services/productService";
+import { buyProduct, removeFromCart } from "../../api/productService";
 import { Toast } from "../UI/toast";
 import { useAuth } from "../../context/AuthContext";
 

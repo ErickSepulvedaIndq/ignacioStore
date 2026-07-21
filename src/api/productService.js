@@ -1,4 +1,4 @@
-import { API } from "../api/apiConfig";
+import { API } from "./apiConfig";
 
 /*PRODUCTOS*/
 

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { createProduct } from "../../services/productService";
+import { createProduct } from "../../api/productService";
 import { useAuth } from "../../context/AuthContext";
 
 export default function RegisterProductForm({ isOpen, onClose, onSuccess }) {
@@ -68,7 +68,7 @@ export default function RegisterProductForm({ isOpen, onClose, onSuccess }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
       <div className="bg-gray-100 rounded-2xl shadow-2xl w-full max-w-3xl p-10 relative animate-fade-in">
-        
+
         <div className="flex justify-between items-center mb-8">
           <h2 className="text-2xl font-bold text-[#3041A0]">
             Crear Producto

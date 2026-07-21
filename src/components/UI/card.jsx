@@ -3,7 +3,7 @@ import Plus from "../../assets/plus.png";
 import Minus from "../../assets/minus.png";
 import { useState } from "react";
 import { useCart } from "../../context/CartContext";
-import { buyProduct } from "../../services/productService";
+import { buyProduct } from "../../api/productService";
 import { Toast, showToast } from "./toast";
 import { showBuyConfirmDialog } from "./buyConfirmDialog";
 import { useEffect } from "react";
