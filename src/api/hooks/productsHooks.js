@@ -2,16 +2,14 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { API } from "../apiConfig";
 
 export const productKeys = {
-    all: (page, limit) => ['products', page, limit],
-    cart: ['cartProducts'],
-    detail: (id) => ['products', id],
-    search: (search) => ['products', 'search', search]
+    all: 'products',
+    cart: 'cartProducts',
 }
 
 // Hook para obtener todos los productos
 export const useProducts = (page = 1, limit = 10, includeBlocked = false) => {
     return useQuery({
-        queryKey: productKeys.all(page, limit),
+        queryKey: [productKeys.all, page],
         queryFn: async () => {
             const response = await API.get('/products', {
                 params: { page, limit, includeBlocked }
@@ -24,7 +22,7 @@ export const useProducts = (page = 1, limit = 10, includeBlocked = false) => {
 // Hook para obtener un producto por id
 export const useProduct = (id) => {
     return useQuery({
-        queryKey: productKeys.detail(id),
+        queryKey: [productKeys.all, id],
         queryFn: async () => {
             const response = await API.get(`/products/${id}`);
             return response.data;
@@ -35,7 +33,7 @@ export const useProduct = (id) => {
 // Hook para buscar producto por nombre
 export const useSearchProductByName = (name, page = 1, limit = 10) => {
     return useQuery({
-        queryKey: productKeys.search(name),
+        queryKey: [productKeys.all, name],
         queryFn: async () => {
             const response = await API.get(`/products/search/${name}`, {
                 params: { page, limit },
@@ -46,10 +44,10 @@ export const useSearchProductByName = (name, page = 1, limit = 10) => {
 }
 
 // Hook para crear producto (con imagen opcional)
-export const useCreateProduct = (productData) => {
+export const useCreateProduct = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: async () => {
+        mutationFn: async ({ productData, createdBy }) => {
             const formData = new FormData();
 
             formData.append("name", productData.name);
@@ -57,7 +55,7 @@ export const useCreateProduct = (productData) => {
             formData.append("price", productData.price);
             formData.append("stock", productData.stock);
             formData.append("status", productData.status);
-            formData.append("createdBy", productData.createdBy);
+            formData.append("createdBy", createdBy);
 
             if (productData.image) {
                 formData.append("image", productData.image);
@@ -66,15 +64,15 @@ export const useCreateProduct = (productData) => {
             const response = await API.post("/products", formData);
             return response.data;
         },
-        onSuccess: () => queryClient.invalidateQueries({ queryKey: productKeys.all })
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: [productKeys.all] })
     })
 }
 
 // Hook para actualizar producto (con imagen opcional)
-export const useUpdateProduct = (id, productData) => {
+export const useUpdateProduct = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: async () => {
+        mutationFn: async ({ id, productData }) => {
             const formData = new FormData();
 
             if (productData.name) formData.append("name", productData.name);
@@ -91,21 +89,21 @@ export const useUpdateProduct = (id, productData) => {
             const response = await API.put(`/products/${id}`, formData);
             return response.data;
         },
-        onSuccess: () => queryClient.invalidateQueries({ queryKey: productKeys.all })
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: [productKeys.all] })
     })
 }
 
 // Hook para borrar productor por id
-export const useDeleteProduct = (id, deletedBy) => {
+export const useDeleteProduct = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: async () => {
+        mutationFn: async ({ id, deletedBy }) => {
             const response = await API.delete(`/products/${id}`, {
                 data: { deletedBy },
             });
             return response.data;
         },
-        onSuccess: () => queryClient.invalidateQueries({ queryKey: productKeys.all })
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: [productKeys.all] })
     })
 }
 
@@ -117,7 +115,7 @@ export const useBuyProducts = (products) => {
             const response = await API.post("/products/buy", { products })
             return response.data
         },
-        onSuccess: () => queryClient.invalidateQueries({ queryKey: productKeys.all })
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: [productKeys.all] })
     })
 }
 
@@ -140,7 +138,7 @@ export const useAddProductsToCart = (productId, quantity, userId) => {
             const response = await API.post("/products/addToCart", { productId, quantity, userId })
             return response.data
         },
-        onSuccess: () => queryClient.invalidateQueries({ queryKey: productKeys.cart })
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: [productKeys.cart] })
     })
 }
 
@@ -152,7 +150,7 @@ export const useRemoveProductsFromCart = (userId, productId, quantity) => {
             const response = await API.post("/products/deleteFromCart", { userId, productId, quantity })
             return response.data
         },
-        onSuccess: () => queryClient.invalidateQueries({ queryKey: productKeys.cart })
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: [productKeys.cart] })
     })
 
 }

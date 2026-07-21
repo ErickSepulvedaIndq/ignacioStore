@@ -18,6 +18,7 @@ import './index.css'
 import ProtectedRoute from './components/guards/protectedRoutes.jsx'
 import PurchaseHistory from './pages/purchaseHistory.jsx'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { Toaster } from 'react-hot-toast'
 
 const queryClient = new QueryClient();
 
@@ -28,6 +29,7 @@ createRoot(document.getElementById("root")).render(
         <AuthProvider>
           <CartProvider>
             <SearchProvider>
+              <Toaster position="top-right" />
               <Routes>
                 <Route path="/" element={<Navigate to="/login" replace />} />
                 <Route path="/login" element={<Login />} />
