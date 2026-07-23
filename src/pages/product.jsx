@@ -1,31 +1,13 @@
-import { useSearch } from '../context/SearchContext';
-import Card from '../components/UI/card';
-import { useState, useEffect } from 'react';
+import ProductCard from '../components/UI/ProductCard';
+import { useState } from 'react';
 import Loading from '../components/UI/Loading';
 import Paginator from '../components/UI/Paginator';
-import { useCart } from '../context/CartContext';
 import { useProducts } from '../api/hooks/productsHooks';
 
 export default function Product() {
-    const { getCartItems: fetchCartFromApi } = useCart();
-    const { normalizedSearch } = useSearch();
+    // const { normalizedSearch } = useSearch();
     const [currentPage, setCurrentPage] = useState(1)
     const { data: products, isLoading, isError } = useProducts(currentPage, 10, false);
-
-    console.log("búsqueda normalizada", normalizedSearch)
-
-    useEffect(() => {
-        const loadCart = async () => {
-            const userStr = localStorage.getItem('user');
-            if (userStr) {
-                const user = JSON.parse(userStr);
-                if (user?.userId) {
-                    await fetchCartFromApi(user.userId);
-                }
-            }
-        };
-        loadCart();
-    }, [])
 
     if (isLoading) {
         return <Loading />
@@ -40,15 +22,9 @@ export default function Product() {
             <h1 className="text-3xl font-bold mb-1 1sticky text-gray-800">Comprar Productos</h1>
             <div className="flex py-4 pb-10 bg-gray-100 rounded gap-5 flex-wrap items-center justify-center overflow-scroll h-[77vh]">
                 {products?.docs?.map((product) => (
-                    <Card
+                    <ProductCard
                         key={product._id}
-                        productId={product._id}
-                        productName={product.name}
-                        description={product.description}
-                        price={product.price}
-                        img={product.image?.url}
-                        stock={product.stock}
-                        reload={() => { console.log('Quitar') }}
+                        product={product}
                     />
                 ))}
 

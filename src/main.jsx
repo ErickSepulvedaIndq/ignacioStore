@@ -1,7 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import ProductManagement from './pages/productManagement.jsx'
 import { SearchProvider } from './context/SearchContext.jsx'
-import { CartProvider } from './context/CartContext.jsx'
 import { AuthProvider } from './context/AuthContext.jsx'
 import UserManagement from './pages/userManagement.jsx'
 import Layout from './components/layout/Layout.jsx'
@@ -27,32 +26,30 @@ createRoot(document.getElementById("root")).render(
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <AuthProvider>
-          <CartProvider>
-            <SearchProvider>
-              <Toaster position="top-right" />
-              <Routes>
-                <Route path="/" element={<Navigate to="/login" replace />} />
-                <Route path="/login" element={<Login />} />
+          <SearchProvider>
+            <Toaster position="top-center" />
+            <Routes>
+              <Route path="/" element={<Navigate to="/login" replace />} />
+              <Route path="/login" element={<Login />} />
 
-                <Route element={<ProtectedRoute />}>
-                  <Route path="/" element={<Layout />}>
-                    {/* con esto */}
-                    <Route index element={<Navigate to="/products" replace />} />
-                    <Route path="products" element={<Product />} />
-                    <Route path="purchases" element={<Purchase />} />
-                    <Route path="changePassword" element={<ChangePassword />} />
-                    <Route path="admin/users" element={<UserManagement />} />
-                    <Route path="admin/purchaseHistory" element={<PurchaseHistory />} />
-                    <Route path="admin/products" element={<ProductManagement />} />
-                    <Route path="admin/debtors" element={<Debtor />} />
-                    <Route path="admin/reports" element={<Report />} />
-                  </Route>
+              <Route element={<ProtectedRoute />}>
+                <Route path="/" element={<Layout />}>
+                  {/* con esto */}
+                  <Route index element={<Navigate to="/products" replace />} />
+                  <Route path="products" element={<Product />} />
+                  <Route path="purchases" element={<Purchase />} />
+                  <Route path="changePassword" element={<ChangePassword />} />
+                  <Route path="admin/users" element={<UserManagement />} />
+                  <Route path="admin/purchaseHistory" element={<PurchaseHistory />} />
+                  <Route path="admin/products" element={<ProductManagement />} />
+                  <Route path="admin/debtors" element={<Debtor />} />
+                  <Route path="admin/reports" element={<Report />} />
                 </Route>
+              </Route>
 
-                <Route path="*" element={<Navigate to="/login" replace />} />
-              </Routes>
-            </SearchProvider>
-          </CartProvider>
+              <Route path="*" element={<Navigate to="/login" replace />} />
+            </Routes>
+          </SearchProvider>
         </AuthProvider>
       </BrowserRouter>
     </QueryClientProvider>
