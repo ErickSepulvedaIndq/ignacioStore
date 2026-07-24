@@ -110,7 +110,23 @@ export const useBuyProducts = () => {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: async ({ products }) => {
-            const response = await API.post("/products/buy", { products })
+            // console.log(products)
+            const response = await API.post("/products/buyCart", { products })
+            return response.data
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['products'] })
+            queryClient.invalidateQueries({ queryKey: ['cart'] })
+        }
+    })
+}
+
+// Hook para comprar un solo producto
+export const useBuyProduct = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async ({ productId, quantity }) => {
+            const response = await API.post(`/products/${productId}/buy`, { quantity })
             return response.data
         },
         onSuccess: () => {

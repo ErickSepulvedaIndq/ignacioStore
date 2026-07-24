@@ -1,5 +1,5 @@
 import Swal from "sweetalert2";
-import { useBuyProducts, useGetCartProducts } from "../../api/hooks/productsHooks";
+import { useBuyProducts, useGetCartProducts, useRemoveProductsFromCart } from "../../api/hooks/productsHooks";
 import { useAuth } from "../../context/AuthContext";
 import toast from "react-hot-toast";
 import InputNumberShoppingCart from "../UI/InputNumberShoppingCart";
@@ -9,6 +9,7 @@ const ShoppingCartModal = ({ onClose, isCartOpen, productsNumber }) => {
     const { user } = useAuth();
     const { data: cartProducts } = useGetCartProducts(user?.userId);
     const { mutateAsync: buyProducts } = useBuyProducts();
+    const { mutateAsync: removeFromCart } = useRemoveProductsFromCart()
 
     productsNumber(
         cartProducts?.data?.reduce((count, item) => count + item.quantity, 0)
@@ -22,6 +23,8 @@ const ShoppingCartModal = ({ onClose, isCartOpen, productsNumber }) => {
     }
 
     const handleConfirmPurchase = async () => {
+        if (getCartTotal() === 0) return toast.error('No puede comprar productos agotados, agregue productos para realizar una compra.');
+
         const confirm = await Swal.fire({
             title: "Confirmar compra",
             text: "Realizar la compra?",
@@ -45,7 +48,14 @@ const ShoppingCartModal = ({ onClose, isCartOpen, productsNumber }) => {
                 success: 'Compra hecha!',
                 error: (err) => {
                     console.error(err);
-                    return 'Error al realizar la compra, intente más tarde.'
+                    if (err.response.data.message === 'Supera el stock') {
+                        return (
+                            <div className="flex flex-col">
+                                <p className="font-semibold">Supera la cantidad máxima de stock.</p>
+                                <p>Verifique su carrito de compras.</p>
+                            </div>
+                        )
+                    } else return 'Error al realizar la compra, intente más tarde.'
                 }
             }
         )
@@ -92,7 +102,7 @@ const ShoppingCartModal = ({ onClose, isCartOpen, productsNumber }) => {
                         )}
                     </div>
 
-                    {cartProducts?.data.length > 0 && (
+                    {(cartProducts?.data.length > 0) && (
                         <div className="border-t p-4 bg-gray-50">
                             <div className="flex justify-between items-center mb-4">
                                 <span className="font-bold text-lg text-gray-800">Total:</span>

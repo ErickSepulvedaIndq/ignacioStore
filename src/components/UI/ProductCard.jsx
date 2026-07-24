@@ -2,14 +2,14 @@ import Plus from "../../assets/plus.png";
 import Minus from "../../assets/minus.png";
 import { useState } from "react";
 import { showBuyConfirmDialog } from "./buyConfirmDialog";
-import { useAddProductsToCart, useBuyProducts } from "../../api/hooks/productsHooks";
+import { useAddProductsToCart, useBuyProduct } from "../../api/hooks/productsHooks";
 import toast from "react-hot-toast";
 import { useAuth } from "../../context/AuthContext";
 
 export default function ProductCard({ product }) {
   const isOutOfStock = product?.stock === 0;
   const [quantity, setQuantity] = useState(1);
-  const { mutateAsync: buyProduct } = useBuyProducts();
+  const { mutateAsync: buyProduct } = useBuyProduct();
   const { mutateAsync: addToCart } = useAddProductsToCart();
   const { user } = useAuth();
 
@@ -47,7 +47,7 @@ export default function ProductCard({ product }) {
     if (!confirm.isConfirmed) return;
 
     toast.promise(
-      buyProduct({ products: [{ id: product?._id, quantity: quantity }] }),
+      buyProduct({ productId: product?._id, quantity }),
       {
         loading: 'Comprando...',
         success: 'Compra realizada exitosamente!',
