@@ -21,6 +21,14 @@ export default function ProductCard({ product }) {
         success: 'Productos agregados!',
         error: (err) => {
           console.error(err);
+          if (err.response.data.message === "Supera el stock") {
+            return (
+              <div className="flex flex-col">
+                <p className="font-semibold">Supera la cantidad máxima de stock.</p>
+                <p>Verifique su carrito de compras.</p>
+              </div>
+            )
+          }
           return 'Error al agregar productos al carrito, intente más tarde.'
         }
       }
@@ -65,15 +73,43 @@ export default function ProductCard({ product }) {
               className="h-40 w-50 object-contain"
             />
           </div>
-          {isOutOfStock && (
-            <p className="text-red-500 text-center font-bold">
-              Agotado
-            </p>
-          )}
+
+          <div className="absolute top-0 overflow-hidden right-0 w-full h-30">
+            <div className={`absolute top-7 shadow-custom-xl p-1 -right-8 bg-purple-700 rotate-45 flex justify-center w-35 ${isOutOfStock ? "block" : "hidden"}`}>
+              <p className={`text-white text-center text-xs font-bold `}>
+                Agotado
+              </p>
+            </div>
+
+            <div className={`absolute top-7 p-1 shadow-custom-xl -right-8 bg-red-500 rotate-45 flex justify-center w-35 ${product?.stock === 1 ? "block" : "hidden"}`}>
+              <p className={`text-white text-center text-xs font-bold `}>
+                ¡Última unidad!
+              </p>
+            </div>
+
+            <div className={`absolute top-7 p-1 shadow-custom-xl -right-8 bg-orange-500 rotate-45 flex justify-center w-35 ${product?.stock > 1 && product?.stock <= 5 ? "block" : "hidden"}`}>
+              <p className={`text-white text-center text-xs font-bold`}>
+                {`¡Solo quedan ${product?.stock}!`}
+              </p>
+            </div>
+          </div>
+
           <h2 className="font-bold pb-2">{product?.name}</h2>
           <p className="font-bold pb-2">Precio: <strong className="text-green-600">${product?.price}</strong></p>
-          <p className="text-sm leading-5 font-medium text-gray-600 pb-2 overflow-hidden [-webkit-line-clamp:3] [-webkit-box-orient:vertical]">
-            {product?.description || "Sin descripción"}
+
+
+          <p
+            title={product?.description === ' ' ? "Sin descripción" : product?.description}
+            className={`text-sm font-medium cursor-pointer text-gray-600 mb-2 
+              wrap-break-word line-clamp-2 overflow-hidden transition-all h-10`}
+          >
+            {product?.description === ' ' ? "Sin descripción" : product?.description}
+          </p>
+
+
+          {/* Mensaje de unidades */}
+          <p className={`font-semibold text-gray-600 `}>
+            {`${product?.stock} ${product?.stock === 1 ? "disponible." : "disponibles."}`}
           </p>
         </div>
         <div
@@ -121,7 +157,6 @@ export default function ProductCard({ product }) {
                 <span className="font-bold">Comprar</span>
               </button>
             </div>
-
           </div>
         </div>
       </div>

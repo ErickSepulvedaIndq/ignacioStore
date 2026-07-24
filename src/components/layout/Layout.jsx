@@ -5,7 +5,9 @@
 import { Outlet } from 'react-router-dom';
 import Header from '../UI/header';
 import SideNav from '../structure/sideNav';
+import { useStockSync } from '../../api/hooks/useStockSync';
 export default function Layout() {
+    useStockSync();
     return (
         <div className="min-h-screen bg-gray-50">
             <Header />
