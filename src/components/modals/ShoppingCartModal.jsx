@@ -1,5 +1,5 @@
 import Swal from "sweetalert2";
-import { useBuyProducts, useGetCartProducts, useRemoveProductsFromCart } from "../../api/hooks/productsHooks";
+import { useBuyProducts, useGetCartProducts } from "../../api/hooks/productsHooks";
 import { useAuth } from "../../context/AuthContext";
 import toast from "react-hot-toast";
 import InputNumberShoppingCart from "../UI/InputNumberShoppingCart";
@@ -9,7 +9,6 @@ const ShoppingCartModal = ({ onClose, isCartOpen, productsNumber }) => {
     const { user } = useAuth();
     const { data: cartProducts } = useGetCartProducts(user?.userId);
     const { mutateAsync: buyProducts } = useBuyProducts();
-    const { mutateAsync: removeFromCart } = useRemoveProductsFromCart()
 
     productsNumber(
         cartProducts?.data?.reduce((count, item) => count + item.quantity, 0)
