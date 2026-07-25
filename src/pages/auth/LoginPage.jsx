@@ -1,11 +1,11 @@
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import * as Yup from "yup";
 import { Formik, Form, Field, ErrorMessage } from "formik";
-import LoginHeader from "../components/UI/loginHeader";
+import LoginHeader from "../../components/UI/loginHeader";
 import { useState } from "react";
 
-export default function Login() {
+export default function LoginPage() {
   const { login } = useAuth();
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false)

@@ -1,13 +1,12 @@
 import { useState } from "react";
-import Paginator from "../components/UI/Paginator";
-import Loading from "../components/UI/Loading";
-import ProductFormModal from "../components/forms/ProductFormModal";
-import { ConfirmAction } from "../components/UI/ConfirmAction";
-import Swal from "sweetalert2";
-import { useDeleteProduct, useProducts } from "../api/hooks/productsHooks";
+import { ConfirmAction } from "../../components/UI/ConfirmAction";
+import { useDeleteProduct, useProducts } from "../../api/hooks/productsHooks";
 import toast from "react-hot-toast";
+import Paginator from "../../components/UI/Paginator";
+import Loading from "../../components/UI/Loading";
+import ProductFormModal from "../../components/forms/ProductFormModal";
 
-export default function ProductManagement() {
+export default function ProductsManagementPage() {
   const [currentPage, setCurrentPage] = useState(1);
   // const { normalizedSearch } = useSearch();
   const { data: products, isLoading } = useProducts(currentPage, 10, false);

@@ -1,5 +1,3 @@
-import Plus from "../../assets/plus.png";
-import Minus from "../../assets/minus.png";
 import { useState } from "react";
 import { showBuyConfirmDialog } from "./buyConfirmDialog";
 import { useAddProductsToCart, useBuyProduct } from "../../api/hooks/productsHooks";

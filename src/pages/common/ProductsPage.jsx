@@ -1,10 +1,10 @@
-import ProductCard from '../components/UI/ProductCard';
 import { useState } from 'react';
-import Loading from '../components/UI/Loading';
-import Paginator from '../components/UI/Paginator';
-import { useProducts } from '../api/hooks/productsHooks';
+import Loading from '../../components/UI/Loading';
+import Paginator from '../../components/UI/Paginator';
+import { useProducts } from '../../api/hooks/productsHooks';
+import ProductCard from '../../components/UI/ProductCard';
 
-export default function Product() {
+export default function ProductsPage() {
     // const { normalizedSearch } = useSearch();
     const [currentPage, setCurrentPage] = useState(1)
     const { data: products, isLoading, isError } = useProducts(currentPage, 10, false);

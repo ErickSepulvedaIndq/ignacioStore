@@ -1,8 +1,6 @@
 import { useAuth } from "../../context/AuthContext";
 import { useSearch } from "../../context/SearchContext";
 import { useLocation } from "react-router-dom";
-import Carrito from "../../assets/carrito.png";
-import Lupa from "../../assets/lupa.png";
 import ShoppingCartModal from "../modals/ShoppingCartModal";
 import { useState } from "react";
 
@@ -54,16 +52,12 @@ export default function Header() {
               value={searchTerm}
               onChange={(event) => setSearchTerm(event.target.value)}
             />
-            <img
-              src={Lupa}
-              alt="Lupa"
-              className="h-7 md:h-9 hover:scale-110 transition-transform cursor-pointer"
-            />
+            <i className="pi pi-search text-xl hover:scale-110 transition-transform cursor-pointer" />
           </div>
         )}
         <div title="Carrito de compras" className="relative w-fit hover:scale-105 transition ease-in-out">
           {productsNumber > 0 && (
-            <span className="absolute -top-2 -right-3 bg-red-500 w-fit h-fit text-white text-xs p-[3px] z-50 rounded-full">
+            <span className="absolute -top-2 -right-3 bg-red-500 w-fit h-fit text-white text-xs p-0.75 z-50 rounded-full">
               {productsNumber}
             </span>
           )}

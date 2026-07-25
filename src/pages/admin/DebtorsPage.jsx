@@ -1,15 +1,15 @@
 import { useState, useEffect } from "react";
-import DateRangeFilter from "../components/forms/DateRangeFilter";
-import Paginator from "../components/UI/Paginator";
-import Loading from "../components/UI/Loading";
 import Swal from "sweetalert2";
 import {
-    getPendingBuyLogs,
-    markBuyLogAsPaid,
-} from "../api/buyLogsService";
-import { subtractUserDebtController } from "../api/userService";
+  getPendingBuyLogs,
+  markBuyLogAsPaid,
+} from "../../api/buyLogsService"
+import { subtractUserDebtController } from "../../api/userService";
+import DateRangeFilter from "../../components/forms/DateRangeFilter";
+import Paginator from "../../components/UI/Paginator";
+import Loading from "../../components/UI/Loading";
 
-export default function Debtor() {
+export default function DebtorsPage() {
   const [pendingPayments, setPendingPayments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -28,7 +28,7 @@ export default function Debtor() {
 
       const normalizedLogs = logs.map((log, index) => ({
         id: log._id || index,
-        id_user: log.id_user?._id || log.id_user, 
+        id_user: log.id_user?._id || log.id_user,
         userName: log.userName || "Usuario",
         purchaseDate: log.createdAt,
         purchaseAmount: Number(log.purchaseAmount || 0),
@@ -67,62 +67,62 @@ export default function Debtor() {
     fetchPendingPayments(1, "", "");
   };
 
-    const handleCollectPayment = async (buyLogId, payment) => {
-        // validar que payment existe
-        if (!payment) {
-            Swal.fire({
-                icon: "error",
-                title: "Error",
-                text: "No se pudo obtener los datos de la compra"
-            });
-            return;
-        }
+  const handleCollectPayment = async (buyLogId, payment) => {
+    // validar que payment existe
+    if (!payment) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "No se pudo obtener los datos de la compra"
+      });
+      return;
+    }
 
-        // confirmacion antes de cobrar
-        const result = await Swal.fire({
-            title: "¿Seguro que quieres cobrar esta compra?",
-            text: `Cobrar $${payment.purchaseAmount.toFixed(2)} a ${payment.userName}`,
-            icon: "question",
-            showCancelButton: true,
-            confirmButtonColor: "#3041A0",
-            cancelButtonColor: "#d33",
-            confirmButtonText: "Confirmar",
-            cancelButtonText: "Cancelar"
-        });
+    // confirmacion antes de cobrar
+    const result = await Swal.fire({
+      title: "¿Seguro que quieres cobrar esta compra?",
+      text: `Cobrar $${payment.purchaseAmount.toFixed(2)} a ${payment.userName}`,
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonColor: "#3041A0",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Confirmar",
+      cancelButtonText: "Cancelar"
+    });
 
-        if (!result.isConfirmed) return;
+    if (!result.isConfirmed) return;
 
-        try {
-            setPayingId(buyLogId);
-            
-            // obtener ID del usuario autenticado para el log
-            const userId = localStorage.getItem("userId");
-            
-            // marcar como pagado
-            await markBuyLogAsPaid(buyLogId);
-            
-            // restar deuda del usuario
-            await subtractUserDebtController(payment.id_user || userId, payment.purchaseAmount, userId);
-            
-            // refrescar tabla
-            await fetchPendingPayments(currentPage, fromDate, toDate);
-            
-            Swal.fire({
-                icon: "success",
-                title: "Compra cobrada exitosamente",
-                timer: 900,
-                showConfirmButton: false
-            });
-        } catch (err) {
-            Swal.fire({
-                icon: "error",
-                title: "Error",
-                text: "No se pudo cobrar la venta seleccionada"
-            });
-        } finally {
-            setPayingId(null);
-        }
-    };
+    try {
+      setPayingId(buyLogId);
+
+      // obtener ID del usuario autenticado para el log
+      const userId = localStorage.getItem("userId");
+
+      // marcar como pagado
+      await markBuyLogAsPaid(buyLogId);
+
+      // restar deuda del usuario
+      await subtractUserDebtController(payment.id_user || userId, payment.purchaseAmount, userId);
+
+      // refrescar tabla
+      await fetchPendingPayments(currentPage, fromDate, toDate);
+
+      Swal.fire({
+        icon: "success",
+        title: "Compra cobrada exitosamente",
+        timer: 900,
+        showConfirmButton: false
+      });
+    } catch (err) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "No se pudo cobrar la venta seleccionada"
+      });
+    } finally {
+      setPayingId(null);
+    }
+  };
 
   if (error) {
     return (

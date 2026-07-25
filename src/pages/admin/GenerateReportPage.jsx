@@ -1,10 +1,10 @@
 import * as Yup from 'yup';
 import { Form, Formik, Field, ErrorMessage } from 'formik';
-import { generateReport } from '../api/generateReport';
 import { useState } from 'react';
-import { Toast } from '../components/UI/toast';
+import { generateReport } from '../../api/generateReport';
+import { Toast } from '../../components/UI/toast';
 
-export default function Report() {
+export default function GenerateReportPage() {
     const [isLoading, setIsLoading] = useState(false);
     const reportSchema = Yup.object({
         month: Yup.string().required("Mes es obligatorio"),

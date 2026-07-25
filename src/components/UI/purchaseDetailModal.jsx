@@ -32,19 +32,18 @@ export default function PurchaseDetailModal({ isOpen, purchase, onClose }) {
 						<p className="text-base font-semibold text-gray-900">
 							{formattedDate}
 						</p>
-					</div>			
-                        <div>
+					</div>
+					<div>
 						<p className="text-sm text-gray-500 mt-1 mb-2">Estado</p>
 						<span
-							className={`inline-block px-3 py-1 text-sm font-semibold rounded-full mb-3 ${
-								purchase.status === "Pagado"
+							className={`inline-block px-3 py-1 text-sm font-semibold rounded-full mb-3 ${purchase.status === "Pagado"
 									? "bg-green-100 text-green-800"
 									: "bg-yellow-100 text-yellow-800"
-							}`}
+								}`}
 						>
 							{purchase.status}
 						</span>
-					</div>                
+					</div>
 
 					<div>
 						<p className="text-sm text-gray-500 mb-2">Productos</p>
@@ -71,7 +70,7 @@ export default function PurchaseDetailModal({ isOpen, purchase, onClose }) {
 						</div>
 					</div>
 				</div>
-                
+
 
 				<button
 					onClick={onClose}
