@@ -5,7 +5,7 @@ import { API } from "../apiConfig";
 // Hook para obtener todas las compras por el id del usuario
 export const useBuyLogs = (userId, page = 1, limit = 10, from = "", to = "") => {
     return useQuery({
-        queryKey: ['buyLogs'],
+        queryKey: ['buyLogs', userId, page, limit, from, to],
         queryFn: async () => {
             const response = await API.get(`/buyLogs/user/${userId}`, {
                 params: { page, limit, from, to },

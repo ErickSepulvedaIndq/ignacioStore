@@ -1,19 +1,15 @@
-// props rapidas por si luego se me olvida
-// fromDate toDate valores actuales
-// onFromDateChange onToDateChange setters
-// onApply onClear acciones
+import { useState } from "react";
+
 export default function DateRangeFilter({
-  fromDate,
-  toDate,
-  onFromDateChange,
-  onToDateChange,
   onApply,
-  onClear,
   fromLabel = "desde",
   toLabel = "hasta",
   applyText = "Aplicar filtro",
   clearText = "Limpiar filtro",
 }) {
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
+
   return (
     <div className="bg-white rounded-lg shadow p-4 mb-6 border border-gray-100">
       <label className="block text-lg font-semibold text-gray-900 mb-3">
@@ -27,7 +23,7 @@ export default function DateRangeFilter({
           <input
             type="date"
             value={fromDate}
-            onChange={(event) => onFromDateChange(event.target.value)}
+            onChange={(event) => setFromDate(event.target.value)}
             className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#3041A0] focus:border-[#3041A0]"
           />
         </div>
@@ -39,7 +35,7 @@ export default function DateRangeFilter({
           <input
             type="date"
             value={toDate}
-            onChange={(event) => onToDateChange(event.target.value)}
+            onChange={(event) => setToDate(event.target.value)}
             className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#3041A0] focus:border-[#3041A0]"
           />
         </div>
@@ -47,13 +43,17 @@ export default function DateRangeFilter({
 
       <div className="flex flex-wrap gap-3 mt-4">
         <button
-          onClick={onApply}
+          onClick={() => onApply(fromDate, toDate)}
           className="bg-[#3041A0] text-white px-4 py-2 rounded-lg font-semibold hover:bg-[#25348a] transition cursor-pointer"
         >
           {applyText}
         </button>
         <button
-          onClick={onClear}
+          onClick={() => {
+            setFromDate('');
+            setToDate('');
+            onApply('', '')
+          }}
           className="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg font-semibold hover:bg-gray-300 transition cursor-pointer"
         >
           {clearText}

@@ -1,22 +1,19 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import PurchaseDetailModal from "../../components/UI/purchaseDetailModal";
 import DateRangeFilter from "../../components/forms/DateRangeFilter";
-import { formatBuyLogsForTable } from "../../utils/buyLogsFormatter";
-import { getBuyLogsByUserId } from "../../api/buyLogsService";
 import Paginator from "../../components/UI/Paginator";
 import Loading from "../../components/UI/Loading";
+import { useBuyLogs } from "../../api/hooks/useBuyLogsHooks";
+import { useAuth } from "../../context/AuthContext";
 
 export default function MyPurchasesPage() {
   const [selectedPurchase, setSelectedPurchase] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [purchases, setPurchases] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
-  const pageSize = 10;
+  const [page, setPage] = useState(1);
+  const { user } = useAuth();
+  const { data: buyLogs, isLoading, isError } = useBuyLogs(user.userId, page, fromDate, toDate);
 
   const formatDateLong = (value) => {
     return new Date(value).toLocaleDateString("es-MX", {
@@ -26,84 +23,17 @@ export default function MyPurchasesPage() {
     });
   };
 
-  const fetchUserPurchases = async (page = 1, from = "", to = "") => {
-    const userId = localStorage.getItem("userId");
-
-    if (!userId) {
-      setLoading(false);
-      return;
-    }
-
-    try {
-      setLoading(true);
-      const response = await getBuyLogsByUserId(
-        userId,
-        page,
-        pageSize,
-        from,
-        to,
-      );
-
-      // ahora la API regresa metadata de paginacion y docs
-      const buyLogs = response.data?.docs || [];
-      const formattedPurchases = formatBuyLogsForTable(buyLogs);
-
-      setPurchases(formattedPurchases);
-      setCurrentPage(response.data?.page || page);
-      setTotalPages(response.data?.totalPages || 1);
-      setError(null);
-    } catch (err) {
-      setError("No se pudieron cargar las compras" + err);
-      setPurchases([]);
-      setTotalPages(1);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchUserPurchases(1, "", "");
-  }, []);
-
-  const paginatedPurchases = purchases;
-
   const handleViewDetails = (purchase) => {
     setSelectedPurchase(purchase);
     setShowModal(true);
   };
 
-  const handleCloseModal = () => {
-    setShowModal(false);
-    setSelectedPurchase(null);
-  };
-
-  const handlePageChange = (page) => {
-    fetchUserPurchases(page, fromDate, toDate);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
-  const handleApplyDateFilter = () => {
-    fetchUserPurchases(1, fromDate, toDate);
-  };
-
-  const handleClearDateFilter = () => {
-    setFromDate("");
-    setToDate("");
-    fetchUserPurchases(1, "", "");
-  };
-
-  if (error) {
+  if (isError) {
     return (
       <div className="container mx-auto p-4">
         <h1 className="text-3xl font-bold mb-6 text-gray-800">Mis Compras</h1>
         <div className="bg-red-100 rounded-lg p-8 text-center">
-          <p className="text-red-600">{error}</p>
-          <button
-            onClick={() => fetchUserPurchases(1, fromDate, toDate)}
-            className="mt-4 bg-[#3041A0] text-white px-4 py-2 rounded hover:bg-[#25348a] transition"
-          >
-            Reintentar
-          </button>
+          <p className="text-red-600">Error al cargar los datos, intente más tarde.</p>
         </div>
       </div>
     );
@@ -114,17 +44,15 @@ export default function MyPurchasesPage() {
       <h1 className="text-3xl font-bold mb-6 text-gray-800">Mis Compras</h1>
 
       <DateRangeFilter
-        fromDate={fromDate}
-        toDate={toDate}
-        onFromDateChange={setFromDate}
-        onToDateChange={setToDate}
-        onApply={handleApplyDateFilter}
-        onClear={handleClearDateFilter}
+        onApply={(from, to) => {
+          setFromDate(from);
+          setToDate(to);
+        }}
       />
 
-      {loading ? (
+      {isLoading ? (
         <Loading />
-      ) : purchases.length === 0 ? (
+      ) : buyLogs?.data?.length === 0 ? (
         <div className="bg-gray-100 rounded-lg p-8 text-center">
           <p className="text-gray-500">No se encontraron compras.</p>
         </div>
@@ -152,13 +80,13 @@ export default function MyPurchasesPage() {
               </thead>
               {/* cuerpo de la tabla */}
               <tbody className="bg-white divide-y divide-gray-200">
-                {paginatedPurchases.map((purchase) => (
-                  <tr key={purchase.id} className="hover:bg-gray-50">
+                {buyLogs?.data?.docs?.map((purchase) => (
+                  <tr key={purchase?._id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {formatDateLong(purchase.date)}
+                      {formatDateLong(purchase?.createdAt)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">
-                      ${purchase.total.toFixed(2)}
+                      ${purchase.totalCost.toFixed(2)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span
@@ -167,7 +95,7 @@ export default function MyPurchasesPage() {
                           : "bg-yellow-100 text-yellow-800"
                           }`}
                       >
-                        {purchase.status}
+                        {purchase?.isPaid === false ? "Pendiente" : "Pagado"}
                       </span>
                     </td>
 
@@ -187,19 +115,22 @@ export default function MyPurchasesPage() {
         </div>
       )}
 
-      {purchases.length > 0 && (
+      {buyLogs?.data?.docs?.length > 0 && (
         <Paginator
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={handlePageChange}
-          loading={loading}
+          currentPage={page}
+          totalPages={buyLogs?.data?.limit}
+          onPageChange={(p) => setPage(p)}
+          loading={isLoading}
         />
       )}
 
       <PurchaseDetailModal
         isOpen={showModal}
         purchase={selectedPurchase}
-        onClose={handleCloseModal}
+        onClose={() => {
+          setShowModal(false);
+          setSelectedPurchase(null);
+        }}
       />
     </div>
   );

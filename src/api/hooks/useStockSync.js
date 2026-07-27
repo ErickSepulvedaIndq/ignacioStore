@@ -14,6 +14,7 @@ export function useStockSync() {
             console.log('Actualizando mediate socket')
             queryClient.invalidateQueries(['products'])
             queryClient.invalidateQueries(['cart'])
+            queryClient.invalidateQueries(['buyLogs'])
         }
 
         socket.on('products:updated', handleStockUpdate);
