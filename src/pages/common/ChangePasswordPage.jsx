@@ -1,28 +1,25 @@
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import { updateUser } from "../../api/userService";
-import { Toast } from "../../components/UI/toast";
+import { useUpdateUser } from "../../api/hooks/usersHooks";
+import { useAuth } from '../../context/AuthContext'
+import toast from "react-hot-toast";
 
 export default function ChangePasswordPage() {
-    const userId = localStorage.getItem("userId");
-    const handleUpdatePassword = async (values) => {
-        try {
-            await updateUser(userId, { password: values.password });
-            Toast.fire({
-                icon: "success",
-                title: "Contraseña actualizada correctamente",
-                position: "top",
-                timer: 1200,
-            });
-        } catch (error) {
-            console.error("Error al actualizar la contraseña:", error);
-            Toast.fire({
-                icon: "error",
-                title: "Error al actualizar la contraseña",
-                position: "top",
-                timer: 1200,
-            });
-        }
+    const { user } = useAuth();
+    const { mutateAsync: updateUser } = useUpdateUser();
+
+    const handleUpdatePassword = (values) => {
+        toast.promise(
+            updateUser({ userId: user.userId, userData: { password: values.password } }),
+            {
+                loading: "Actualizando datos...",
+                success: "Datos actualizados correctamente!",
+                error: (e) => {
+                    console.error(e);
+                    return "Error al actualizar los datos, intente más tarde."
+                }
+            }
+        )
     };
 
     const schema = Yup.object({

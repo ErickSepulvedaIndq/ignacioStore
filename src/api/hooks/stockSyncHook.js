@@ -11,7 +11,6 @@ export function useStockSync() {
 
     useEffect(() => {
         function handleStockUpdate() {
-            console.log('Actualizando mediate socket')
             queryClient.invalidateQueries(['products'])
             queryClient.invalidateQueries(['cart'])
             queryClient.invalidateQueries(['buyLogs'])

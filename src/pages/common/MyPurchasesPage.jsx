@@ -3,7 +3,7 @@ import PurchaseDetailModal from "../../components/UI/purchaseDetailModal";
 import DateRangeFilter from "../../components/forms/DateRangeFilter";
 import Paginator from "../../components/UI/Paginator";
 import Loading from "../../components/UI/Loading";
-import { useBuyLogs } from "../../api/hooks/useBuyLogsHooks";
+import { useBuyLogs } from "../../api/hooks/buyLogsHooks";
 import { useAuth } from "../../context/AuthContext";
 
 export default function MyPurchasesPage() {

@@ -5,7 +5,7 @@
 import { Outlet } from 'react-router-dom';
 import Header from '../UI/header';
 import SideNav from '../structure/sideNav';
-import { useStockSync } from '../../api/hooks/useStockSync';
+import { useStockSync } from '../../api/hooks/stockSyncHook';
 export default function Layout() {
     useStockSync();
     return (

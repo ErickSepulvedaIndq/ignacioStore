@@ -3,7 +3,7 @@ import Swal from "sweetalert2";
 import DateRangeFilter from "../../components/forms/DateRangeFilter";
 import Paginator from "../../components/UI/Paginator";
 import Loading from "../../components/UI/Loading";
-import { useMarkBuyLogAsPaid, usePendingBuyLogs } from "../../api/hooks/useBuyLogsHooks";
+import { useMarkBuyLogAsPaid, usePendingBuyLogs } from "../../api/hooks/buyLogsHooks";
 import toast from "react-hot-toast";
 
 export default function DebtorsPage() {
