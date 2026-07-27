@@ -1,71 +1,18 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Swal from "sweetalert2";
-import {
-  getPendingBuyLogs,
-  markBuyLogAsPaid,
-} from "../../api/buyLogsService"
-import { subtractUserDebtController } from "../../api/userService";
 import DateRangeFilter from "../../components/forms/DateRangeFilter";
 import Paginator from "../../components/UI/Paginator";
 import Loading from "../../components/UI/Loading";
+import { useMarkBuyLogAsPaid, usePendingBuyLogs } from "../../api/hooks/useBuyLogsHooks";
+import toast from "react-hot-toast";
 
 export default function DebtorsPage() {
-  const [pendingPayments, setPendingPayments] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
+  const [payingId, setPayingId] = useState(null);
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
-  const [payingId, setPayingId] = useState(null);
-  const pageSize = 10;
-
-  const fetchPendingPayments = async (page = 1, from = "", to = "") => {
-    try {
-      setLoading(true);
-      const response = await getPendingBuyLogs(page, pageSize, from, to);
-      const logs = response.data?.docs || [];
-
-      const normalizedLogs = logs.map((log, index) => ({
-        id: log._id || index,
-        id_user: log.id_user?._id || log.id_user,
-        userName: log.userName || "Usuario",
-        purchaseDate: log.createdAt,
-        purchaseAmount: Number(log.purchaseAmount || 0),
-        totalDebt: Number(log.totalDebt || 0),
-      }));
-
-      setPendingPayments(normalizedLogs);
-      setCurrentPage(response.data?.page || page);
-      setTotalPages(response.data?.totalPages || 1);
-      setError(null);
-    } catch (err) {
-      setError("No se pudieron cargar los pendientes de pago");
-      setPendingPayments([]);
-      setTotalPages(1);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchPendingPayments(1, "", "");
-  }, []);
-
-  const handlePageChange = (page) => {
-    fetchPendingPayments(page, fromDate, toDate);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
-  const handleApplyDateFilter = () => {
-    fetchPendingPayments(1, fromDate, toDate);
-  };
-
-  const handleClearDateFilter = () => {
-    setFromDate("");
-    setToDate("");
-    fetchPendingPayments(1, "", "");
-  };
+  const [page, setPage] = useState(1)
+  const { data: pendingBuyLogs, isError, isLoading } = usePendingBuyLogs(page, 10, fromDate, toDate);
+  const { mutateAsync: markAsPaid } = useMarkBuyLogAsPaid()
 
   const handleCollectPayment = async (buyLogId, payment) => {
     // validar que payment existe
@@ -78,7 +25,7 @@ export default function DebtorsPage() {
       return;
     }
 
-    // confirmacion antes de cobrar
+    // confirmación antes de cobrar
     const result = await Swal.fire({
       title: "¿Seguro que quieres cobrar esta compra?",
       text: `Cobrar $${payment.purchaseAmount.toFixed(2)} a ${payment.userName}`,
@@ -92,52 +39,30 @@ export default function DebtorsPage() {
 
     if (!result.isConfirmed) return;
 
-    try {
-      setPayingId(buyLogId);
+    // si pasa los filtros, marcamos como pagado
+    toast.promise(
+      markAsPaid({ userId: payment?.id_user?._id, buyLogId, amount: payment.purchaseAmount }),
+      {
+        isLoading: 'Cobrando...',
+        success: 'Listo!',
+        error: (e) => {
+          console.error(e);
+          return "Error al cobrar, intente más tarde."
+        }
+      }
+    )
 
-      // obtener ID del usuario autenticado para el log
-      const userId = localStorage.getItem("userId");
-
-      // marcar como pagado
-      await markBuyLogAsPaid(buyLogId);
-
-      // restar deuda del usuario
-      await subtractUserDebtController(payment.id_user || userId, payment.purchaseAmount, userId);
-
-      // refrescar tabla
-      await fetchPendingPayments(currentPage, fromDate, toDate);
-
-      Swal.fire({
-        icon: "success",
-        title: "Compra cobrada exitosamente",
-        timer: 900,
-        showConfirmButton: false
-      });
-    } catch (err) {
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: "No se pudo cobrar la venta seleccionada"
-      });
-    } finally {
-      setPayingId(null);
-    }
+    setPayingId(null);
   };
 
-  if (error) {
+  if (isError) {
     return (
       <div className="container mx-auto p-6">
         <h1 className="text-3xl font-bold mb-6 text-gray-800">
           Pendientes de Pago
         </h1>
         <div className="bg-red-100 rounded-lg p-8 text-center">
-          <p className="text-red-600">{error}</p>
-          <button
-            onClick={() => fetchPendingPayments(1, fromDate, toDate)}
-            className="mt-4 bg-[#3041A0] text-white px-4 py-2 rounded hover:bg-[#25348a] transition"
-          >
-            Reintentar
-          </button>
+          <p className="text-red-600">Error al obtener los datos, intente más tarde</p>
         </div>
       </div>
     );
@@ -150,17 +75,15 @@ export default function DebtorsPage() {
       </h1>
 
       <DateRangeFilter
-        fromDate={fromDate}
-        toDate={toDate}
-        onFromDateChange={setFromDate}
-        onToDateChange={setToDate}
-        onApply={handleApplyDateFilter}
-        onClear={handleClearDateFilter}
+        onApply={(from, to) => {
+          setFromDate(from);
+          setToDate(to);
+        }}
       />
 
-      {loading ? (
+      {isLoading ? (
         <Loading />
-      ) : pendingPayments.length === 0 ? (
+      ) : pendingBuyLogs?.data?.docs.length === 0 ? (
         <div className="bg-green-100 rounded-lg p-8 text-center">
           <p className="text-green-800 font-semibold">
             No se encontraron usuarios pendientes de pago.
@@ -189,27 +112,27 @@ export default function DebtorsPage() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {pendingPayments.map((payment) => (
-                <tr key={payment.id} className="hover:bg-gray-50">
+              {pendingBuyLogs?.data?.docs.map((payment) => (
+                <tr key={payment?._id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {payment.userName}
+                    {payment?.userName}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {new Date(payment.purchaseDate).toLocaleDateString("es-MX")}
+                    {new Date(payment?.createdAt).toLocaleDateString("es-MX")}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    ${payment.purchaseAmount.toFixed(2)}
+                    ${payment?.purchaseAmount.toFixed(2)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">
-                    ${payment.totalDebt.toFixed(2)}
+                    ${payment?.totalDebt.toFixed(2)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <button
-                      onClick={() => handleCollectPayment(payment.id, payment)}
-                      disabled={payingId === payment.id}
+                      onClick={() => handleCollectPayment(payment?._id, payment)}
+                      disabled={payingId === payment?._id}
                       className="bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white px-4 py-1 rounded mr-2 transition cursor-pointer"
                     >
-                      {payingId === payment.id ? "Cobrando..." : "Cobrar"}
+                      {payingId === payment._id ? "Cobrando..." : "Cobrar"}
                     </button>
                   </td>
                 </tr>
@@ -219,12 +142,12 @@ export default function DebtorsPage() {
         </div>
       )}
 
-      {pendingPayments.length > 0 && (
+      {pendingBuyLogs?.data?.docs.length > 0 && (
         <Paginator
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={handlePageChange}
-          loading={loading}
+          currentPage={page}
+          totalPages={pendingBuyLogs?.data?.totalPages}
+          onPageChange={(p) => setPage(p)}
+          loading={isLoading}
         />
       )}
     </div>

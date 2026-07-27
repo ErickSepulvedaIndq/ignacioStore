@@ -32,7 +32,7 @@ export const useCreateBuyLog = () => {
 // Hook para obtener los deudores
 export const usePendingBuyLogs = (page = 1, limit = 10, from = "", to = "") => {
     return useQuery({
-        queryKey: ['buyLogs'],
+        queryKey: ['buyLogs', page, limit, from, to],
         queryFn: async () => {
             const response = await API.get('/buyLogs/debtors',
                 { params: { page, limit, from, to, } }
@@ -46,8 +46,8 @@ export const usePendingBuyLogs = (page = 1, limit = 10, from = "", to = "") => {
 export const useMarkBuyLogAsPaid = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: async ({ buyLogId }) => {
-            const response = await API.patch(`/buyLogs/${buyLogId}/pay`);
+        mutationFn: async ({ userId, buyLogId, amount }) => {
+            const response = await API.patch(`/buyLogs/${buyLogId}/pay`, { amount: amount, userId: userId });
             return response.data;
         },
         onSuccess: () => {

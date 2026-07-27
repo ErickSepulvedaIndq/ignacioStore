@@ -87,7 +87,7 @@ const ShoppingCartModal = ({ onClose, isCartOpen, productsNumber }) => {
 
                     {/* Contenido del carrito */}
                     <div className="flex-1 overflow-x-auto p-4">
-                        {cartProducts?.data.length === 0 ? (
+                        {cartProducts?.data?.length === 0 ? (
                             <div className="flex flex-col items-center justify-center h-full text-gray-400">
                                 <p className="text-lg">Tu carrito está vacío</p>
                                 <p className="text-sm mt-2">¡Agrega productos para comenzar!</p>
