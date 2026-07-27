@@ -1,14 +1,14 @@
 import { useState, useEffect, useMemo } from "react";
-import { useSearch } from "../context/SearchContext";
-import Paginator from "../components/UI/Paginator";
-import Loading from "../components/UI/Loading";
-import RegisterUserForm from "../components/forms/RegisterUser";
-import UserDetailsForm from "../components/forms/UserDetailsForm";
-import { ConfirmAction } from "../components/UI/ConfirmAction";
+import { useSearch } from "../../context/SearchContext";
+import Paginator from "../../components/UI/Paginator";
+import Loading from "../../components/UI/Loading";
+import RegisterUserForm from "../../components/forms/RegisterUser";
+import UserDetailsForm from "../../components/forms/UserDetailsForm";
+import { ConfirmAction } from "../../components/UI/ConfirmAction";
 import Swal from "sweetalert2";
-import { getAllUsers, deleteUser } from "../api/userService";
+import { getAllUsers, deleteUser } from "../../api/userService";
 
-export default function UserManagement() {
+export default function UserManagementPage() {
   const [usuarios, setUsuarios] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
@@ -165,11 +165,10 @@ export default function UserManagement() {
 
                 <td className="px-6 py-4 text-sm">
                   <span
-                    className={`px-2 py-1 rounded-full text-xs ${
-                      usuario.role === "admin"
-                        ? "bg-yellow-100 text-yellow-800"
-                        : "bg-blue-100 text-blue-800"
-                    }`}
+                    className={`px-2 py-1 rounded-full text-xs ${usuario.role === "admin"
+                      ? "bg-yellow-100 text-yellow-800"
+                      : "bg-blue-100 text-blue-800"
+                      }`}
                   >
                     {usuario.role}
                   </span>
@@ -177,11 +176,10 @@ export default function UserManagement() {
 
                 <td className="px-6 py-4 text-sm">
                   <span
-                    className={`${
-                      usuario.debt > 0
-                        ? "text-red-600 font-semibold"
-                        : "text-green-600 font-semibold"
-                    }`}
+                    className={`${usuario.debt > 0
+                      ? "text-red-600 font-semibold"
+                      : "text-green-600 font-semibold"
+                      }`}
                   >
                     ${usuario.debt.toFixed(2)}
                   </span>
@@ -189,11 +187,10 @@ export default function UserManagement() {
 
                 <td className="px-6 py-4">
                   <span
-                    className={`px-2 py-1 inline-flex text-xs font-semibold rounded-full ${
-                      usuario.status === "active"
-                        ? "bg-green-100 text-green-800"
-                        : "bg-red-100 text-red-800"
-                    }`}
+                    className={`px-2 py-1 inline-flex text-xs font-semibold rounded-full ${usuario.status === "active"
+                      ? "bg-green-100 text-green-800"
+                      : "bg-red-100 text-red-800"
+                      }`}
                   >
                     {usuario.status}
                   </span>

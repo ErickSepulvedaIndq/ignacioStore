@@ -1,9 +1,9 @@
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import { updateUser } from "../api/userService";
-import { Toast } from "../components/UI/toast";
+import { updateUser } from "../../api/userService";
+import { Toast } from "../../components/UI/toast";
 
-export default function ChangePassword() {
+export default function ChangePasswordPage() {
     const userId = localStorage.getItem("userId");
     const handleUpdatePassword = async (values) => {
         try {
@@ -27,7 +27,7 @@ export default function ChangePassword() {
 
     const schema = Yup.object({
         password: Yup.string().required("Obligatorio"),
-        confirmPassword: Yup.string().required("Obligatorio") .oneOf([Yup.ref("password")], "Las contraseñas no coinciden")
+        confirmPassword: Yup.string().required("Obligatorio").oneOf([Yup.ref("password")], "Las contraseñas no coinciden")
     });
 
     return (
@@ -62,7 +62,7 @@ export default function ChangePassword() {
                                     peer-focus:text-indigo-600">
                                     Nueva contraseña
                                 </label>
-                                <ErrorMessage name="password" component="p" className="text-red-500 text-sm mt-1"/>
+                                <ErrorMessage name="password" component="p" className="text-red-500 text-sm mt-1" />
                             </div>
                             <div className="relative">
                                 <Field
@@ -80,7 +80,7 @@ export default function ChangePassword() {
                                     peer-focus:text-indigo-600">
                                     Confirmar contraseña
                                 </label>
-                                <ErrorMessage name="confirmPassword" component="p" className="text-red-500 text-sm mt-1"/>
+                                <ErrorMessage name="confirmPassword" component="p" className="text-red-500 text-sm mt-1" />
                             </div>
 
                             <button className="w-full bg-[#3041A0] hover:bg-[#25348a] text-white py-3 rounded-xl font-semibold transition cursor-pointer">

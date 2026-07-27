@@ -1,12 +1,12 @@
-import PurchaseDetailModal from "../components/UI/purchaseDetailModal";
-import DateRangeFilter from "../components/forms/DateRangeFilter";
-import { formatBuyLogsForTable } from "../utils/buyLogsFormatter";
-import { getBuyLogsByUserId } from "../api/buyLogsService";
-import Paginator from "../components/UI/Paginator";
-import Loading from "../components/UI/Loading";
 import { useState, useEffect } from "react";
+import PurchaseDetailModal from "../../components/UI/purchaseDetailModal";
+import DateRangeFilter from "../../components/forms/DateRangeFilter";
+import { formatBuyLogsForTable } from "../../utils/buyLogsFormatter";
+import { getBuyLogsByUserId } from "../../api/buyLogsService";
+import Paginator from "../../components/UI/Paginator";
+import Loading from "../../components/UI/Loading";
 
-export default function Purchase() {
+export default function MyPurchasesPage() {
   const [selectedPurchase, setSelectedPurchase] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -53,7 +53,7 @@ export default function Purchase() {
       setTotalPages(response.data?.totalPages || 1);
       setError(null);
     } catch (err) {
-      setError("No se pudieron cargar las compras"+err);
+      setError("No se pudieron cargar las compras" + err);
       setPurchases([]);
       setTotalPages(1);
     } finally {
@@ -162,11 +162,10 @@ export default function Purchase() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span
-                        className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                          purchase.status === "Pagado"
-                            ? "bg-green-100 text-green-800"
-                            : "bg-yellow-100 text-yellow-800"
-                        }`}
+                        className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${purchase.status === "Pagado"
+                          ? "bg-green-100 text-green-800"
+                          : "bg-yellow-100 text-yellow-800"
+                          }`}
                       >
                         {purchase.status}
                       </span>
