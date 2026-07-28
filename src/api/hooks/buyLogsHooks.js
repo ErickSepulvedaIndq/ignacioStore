@@ -56,3 +56,12 @@ export const useMarkBuyLogAsPaid = () => {
     })
 }
 
+export const useGenerateReport = () => {
+    return useMutation({
+        mutationFn: async ({ month, year }) => {
+            const response = await API.get(`/buylogs/reports/monthly/${month}/${year}`, { responseType: "blob" });
+            return response;
+        }
+    })
+}
+
