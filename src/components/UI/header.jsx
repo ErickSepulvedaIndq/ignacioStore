@@ -1,23 +1,22 @@
-import { useCart } from "../../context/CartContext";
 import { useAuth } from "../../context/AuthContext";
 import { useSearch } from "../../context/SearchContext";
 import { useLocation } from "react-router-dom";
-import Carrito from "../../assets/carrito.png";
-import MiniCart from "../structure/miniCart";
-import Lupa from "../../assets/lupa.png";
+import ShoppingCartModal from "../modals/ShoppingCartModal";
+import { useState } from "react";
 
 export default function Header() {
-  //con el search context podemos acceder al valor del input de busqueda desde cualquier componente
   const { searchTerm, setSearchTerm } = useSearch();
-  // con el cart context podemos acceder a la cantidad de productos en el carrito y a la funcion para abrir el carrito
-  const { getCartCount, toggleCart } = useCart();
   const { toggleSideNav } = useAuth();
   const { pathname } = useLocation();
-  const cartCount = getCartCount();
-  // variables para la visibilidad de elementos en el header
   const hideSearchInPaths = ["/purchases", "/admin/debtors", "/admin/purchaseHistory", "/changePassword"];
   const hideSearchInPages = hideSearchInPaths.includes(pathname);
-  const showCartInPages = pathname === "/products";
+
+  const [openCart, setOpenCart] = useState(false);
+  const [productsNumber, setProductsNumber] = useState(null);
+
+  const handleCartProductsNumber = (number) => {
+    setProductsNumber(number);
+  }
 
   return (
     <>
@@ -53,33 +52,20 @@ export default function Header() {
               value={searchTerm}
               onChange={(event) => setSearchTerm(event.target.value)}
             />
-            <img
-              src={Lupa}
-              alt="Lupa"
-              className="h-7 md:h-9 hover:scale-110 transition-transform cursor-pointer"
-            />
+            <i className="pi pi-search text-xl hover:scale-110 transition-transform cursor-pointer" />
           </div>
         )}
-        {/* este es el carriot cuidado por que se apachurra si mueves mucho el valor del input*/}
-        {showCartInPages && (
-          <div className="relative w-fit">
-            <img
-              src={Carrito}
-              alt="Carrito"
-              className="h-8 md:h-10 hover:scale-110 transition-transform cursor-pointer"
-              onClick={toggleCart}
-            />
-            {cartCount > 0 && (
-              <span className="absolute -top-2 -right-3 bg-red-500 text-white text-xs px-2.5 md:px-3.5 py-0.5 rounded-full">
-                {cartCount}
-              </span>
-            )}
-          </div>
-        )}
+        <div title="Carrito de compras" className="relative w-fit hover:scale-105 transition ease-in-out">
+          {productsNumber > 0 && (
+            <span className="absolute -top-2 -right-3 bg-red-500 w-fit h-fit text-white text-xs p-0.75 z-50 rounded-full">
+              {productsNumber}
+            </span>
+          )}
+          <i onClick={() => setOpenCart(true)} className="pi pi-shopping-cart cursor-pointer text-3xl "></i>
+        </div>
       </header>
 
-      {/* Renderizar el MiniCart aquí para que esté disponible globalmente */}
-      <MiniCart />
+      <ShoppingCartModal onClose={() => setOpenCart(false)} isCartOpen={openCart} productsNumber={handleCartProductsNumber} />
     </>
   );
 }

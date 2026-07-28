@@ -8,7 +8,7 @@
 export default function PurchaseDetailModal({ isOpen, purchase, onClose }) {
 	if (!isOpen || !purchase) return null;
 
-	const formattedDate = new Date(purchase.date).toLocaleDateString("es-MX", {
+	const formattedDate = new Date(purchase?.createdAt).toLocaleDateString("es-MX", {
 		day: "numeric",
 		month: "long",
 		year: "numeric",
@@ -32,19 +32,18 @@ export default function PurchaseDetailModal({ isOpen, purchase, onClose }) {
 						<p className="text-base font-semibold text-gray-900">
 							{formattedDate}
 						</p>
-					</div>			
-                        <div>
+					</div>
+					<div>
 						<p className="text-sm text-gray-500 mt-1 mb-2">Estado</p>
 						<span
-							className={`inline-block px-3 py-1 text-sm font-semibold rounded-full mb-3 ${
-								purchase.status === "Pagado"
-									? "bg-green-100 text-green-800"
-									: "bg-yellow-100 text-yellow-800"
-							}`}
+							className={`inline-block px-3 py-1 text-sm font-semibold rounded-full mb-3 ${purchase.status === "Pagado"
+								? "bg-green-100 text-green-800"
+								: "bg-yellow-100 text-yellow-800"
+								}`}
 						>
-							{purchase.status}
+							{purchase.isPaid === false ? "Pendiente" : "Pagado"}
 						</span>
-					</div>                
+					</div>
 
 					<div>
 						<p className="text-sm text-gray-500 mb-2">Productos</p>
@@ -66,12 +65,12 @@ export default function PurchaseDetailModal({ isOpen, purchase, onClose }) {
 						<div className="flex justify-between items-center">
 							<span className="text-lg font-bold text-gray-800">Total</span>
 							<span className="text-2xl font-bold text-[#3041A0]">
-								${purchase.total.toFixed(2)}
+								${purchase.totalCost.toFixed(2)}
 							</span>
 						</div>
 					</div>
 				</div>
-                
+
 
 				<button
 					onClick={onClose}

@@ -1,11 +1,12 @@
 import * as Yup from 'yup';
 import { Form, Formik, Field, ErrorMessage } from 'formik';
-import { generateReport } from '../api/generateReport';
-import { useState } from 'react';
-import { Toast } from '../components/UI/toast';
+import { useGenerateReport } from '../../api/hooks/buyLogsHooks';
+import toast from 'react-hot-toast';
 
-export default function Report() {
-    const [isLoading, setIsLoading] = useState(false);
+export default function GenerateReportPage() {
+    // const [isLoading, setIsLoading,] = useState(false);
+    const { mutateAsync: generateReport, isLoading } = useGenerateReport();
+
     const reportSchema = Yup.object({
         month: Yup.string().required("Mes es obligatorio"),
         year: Yup.string().required("Año es obligatorio")
@@ -15,9 +16,9 @@ export default function Report() {
     const years = Array.from({ length: 2050 - 2026 + 1 }, (_, i) => String(2026 + i));
 
     const handleGenerateReport = async (values) => {
+        console.log(values)
         try {
-            setIsLoading(true);
-            const response = await generateReport(values.month, values.year);
+            const response = await generateReport({ month: values.month, year: values.year });
 
             const contentType = response.headers?.["content-type"] || "";
             if (contentType.includes("application/json")) {
@@ -34,17 +35,10 @@ export default function Report() {
             link.click();
             link.remove();
             window.URL.revokeObjectURL(url);
-            Toast.fire({
-                icon: "success",
-                title: "Reporte generado exitosamente"
-            })
+            toast.success("Reporte generado exitosamente!")
         } catch (error) {
-            Toast.fire({
-                icon: "error",
-                title: "No se pudo generar el reporte"
-            })
-        } finally {
-            setIsLoading(false);
+            console.error(error);
+            toast.error("Error al generar reporte, inténtelo más tarde.");
         }
     }
 
@@ -52,7 +46,7 @@ export default function Report() {
         <div className="min-h-[calc(100vh-80px)] px-4 py-10">
             <div className="max-w-3xl mx-auto">
                 <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
-                    <div className="bg-gradient-to-r from-[#3041A0] to-[#25348a] p-6 text-white">
+                    <div className="bg-linear-to-r from-[#3041A0] to-[#25348a] p-6 text-white">
                         <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight italic">Reportes</h1>
                         <p className="text-white/90 mt-1 text-sm md:text-base">
                             Selecciona un mes y un año para generar el reporte

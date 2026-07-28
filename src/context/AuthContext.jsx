@@ -2,19 +2,13 @@
 * este contexto maneja la autenticación del usuario, su información y el estado de la barra lateral
 * por ahora, el login es simulado y siempre retorna un usuario admin para facilitar el desarrollo
 * por que falta la parte del back, asi que quedara asi un tiempo
-
- * Cambios:
- * - Se agregó userId al objeto user y localStorage
- *   El userId es necesario para obtener las compras específicas del usuario en la página "Mis Compras"
- * - Ahora al hacer login, se extrae userId del JWT y se guarda en localStorage
- * - El objeto user ahora contiene: { userId, username, role }
 */
 import { createContext, useContext, useEffect, useState } from 'react';
-import { authService } from '../api/authService';
 import { useNavigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 import Swal from 'sweetalert2';
 import { showToast } from '../components/UI/toast';
+import { useAuthLogin } from '../api/hooks/authHooks';
 
 const AuthContext = createContext();
 
@@ -40,6 +34,8 @@ export const useAuth = () => {
 };
 
 export const AuthProvider = ({ children }) => {
+  const { mutateAsync: authLogin } = useAuthLogin();
+
   const [user, setUser] = useState(() => {
     const savedUser = localStorage.getItem('user');
     try {
@@ -55,6 +51,12 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     if (user) localStorage.setItem('user', JSON.stringify(user));
   }, [user]);
+
+  const logout = () => {
+    localStorage.clear()
+    setUser(null)
+    navigate('/login', { replace: true });
+  };
 
   const startTokenTimer = (token) => {
     try {
@@ -76,6 +78,7 @@ export const AuthProvider = ({ children }) => {
         return () => clearTimeout(timer);
       }
     } catch (error) {
+      console.error(error)
       logout();
     }
   };
@@ -89,7 +92,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (userData) => {
     try {
-      const response = await authService(userData);
+      const response = await authLogin({ data: userData });
       const token = response.data;
 
       localStorage.setItem("token", token);
@@ -125,11 +128,6 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const logout = () => {
-    localStorage.clear()
-    setUser(null)
-    navigate('/login', { replace: true });
-  };
 
   useEffect(() => {
     const handleSessionExpired = () => {
