@@ -60,7 +60,7 @@ export default function ProductCard({ product }) {
   return (
     <>
       <div
-        className={`group relative bg-white z-10 hover:z-50 shadow rounded-lg hover:rounded-t-lg w-69 hover:scale-105 transition-all hover:duration-100 duration-300 ${!isOutOfStock ? "hover:rounded-b-none" : ''} `}
+        className={`group relative bg-white z-10 hover:z-50 shadow-custom-xs rounded-lg hover:rounded-t-lg w-full max-h-90 hover:scale-105 transition-all hover:duration-100 duration-300 ${!isOutOfStock ? "hover:rounded-b-none" : ''} `}
       >
         {/* Datos principales */}
         <div className="p-2 px-4">
@@ -140,7 +140,7 @@ export default function ProductCard({ product }) {
             </div>
             <div className="flex flex-col gap-1">
               <button
-                className="w-full h-7 text-xs flex flex-row items-center justify-center gap-2 bg-[#3041A0] py-1 px-4 text-white rounded-lg cursor-pointer hover:bg-[#25327D] disabled:cursor-not-allowed"
+                className="w-full h-7 text-xs flex flex-row items-center justify-center gap-2 bg-blue-800 py-1 px-4 text-white rounded-lg cursor-pointer hover:bg-blue-900 disabled:cursor-not-allowed"
                 onClick={handleAddToCart}
               >
                 <i className="pi pi-shopping-cart text-base" />

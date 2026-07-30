@@ -2,7 +2,7 @@ import Swal from "sweetalert2";
 import { useBuyProducts, useGetCartProducts } from "../../api/hooks/productsHooks";
 import { useAuth } from "../../context/AuthContext";
 import toast from "react-hot-toast";
-import InputNumberShoppingCart from "../UI/InputNumberShoppingCart";
+// import InputNumberShoppingCart from "../UI/InputNumberShoppingCart";
 import CartProductCard from "../UI/CartProductCard";
 
 const ShoppingCartModal = ({ onClose, isCartOpen, productsNumber }) => {
@@ -63,26 +63,26 @@ const ShoppingCartModal = ({ onClose, isCartOpen, productsNumber }) => {
     return (
         <>
             <div
-                className={`fixed inset-0 bg-black/50 z-40  transition-all duration-300 ${isCartOpen ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+                className={`fixed inset-0 backdrop-blur-[1px]
+                     bg-black/50 z-55 transition-all duration-300 ${isCartOpen ? "opacity-100" : "opacity-0 pointer-events-none"}`}
                 onClick={onClose}
             />
             <div
-                className={`fixed top-0 right-0 h-full w-90 bg-white shadow-2xl z-50 transform 
-                    transition-transform duration-400 ease-in-out ${isCartOpen ? "translate-x-0" : "translate-x-full"}`}
+                className={`fixed top-0 right-0 h-full py-4 w-90 z-60 transform 
+                    transition-all duration-200 ease-in-out ${isCartOpen ? "translate-x-0" : "translate-x-full"}`}
             >
-                <div className="flex flex-col h-full">
+                <div className="flex group flex-col h-full bg-white rounded-lg shadow-custom-xl">
                     {/* Header del carrito */}
-                    <div className="bg-[#3041A0] text-white p-4 flex justify-between items-center shadow">
-                        <h2 className="flex items-center gap-2 font-bold text-xl text-shadow-lg">
-                            <i className="pi pi-shopping-cart text-2xl"></i>
-                            Carrito de Compras
-                        </h2>
+                    <div className="bg-blue-900 overflow-hidden relative h-16 md:h-21 rounded-t-lg text-white p-4 flex justify-between items-center shadow">
                         <button
                             onClick={onClose}
-                            className="text-2xl cursor-pointer transition-all duration-200 ease-in-out hover:scale-145 hover:text-red-400 active:scale-100"
-                        >
-                            ×
-                        </button>
+                            className={`absolute pi pi-angle-right text-black rounded-full bg-white pl-3 pr-1 py-2 cursor-pointer transition-all 
+                                ease-in-out -left-3 md:-left-8 md:group-hover:-left-3`}
+                        ></button>
+                        <h2 className="flex text-center w-full items-center justify-center gap-2 font-bold text-2xl text-shadow-lg">
+                            <i className="pi pi-shopping-cart text-3xl"></i>
+                            Carrito de Compras
+                        </h2>
                     </div>
 
                     {/* Contenido del carrito */}
@@ -95,7 +95,7 @@ const ShoppingCartModal = ({ onClose, isCartOpen, productsNumber }) => {
                         ) : (
                             <div className="space-y-4">
                                 {cartProducts?.data.map((item) => (
-                                    <CartProductCard product={item} />
+                                    <CartProductCard key={item._id} product={item} />
                                 ))}
                             </div>
                         )}

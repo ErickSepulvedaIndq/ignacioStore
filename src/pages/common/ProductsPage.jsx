@@ -5,7 +5,7 @@ import { useProducts } from '../../api/hooks/productsHooks';
 import ProductCard from '../../components/UI/ProductCard';
 
 export default function ProductsPage() {
-    // const { normalizedSearch } = useSearch();
+
     const [currentPage, setCurrentPage] = useState(1)
     const { data: products, isLoading, isError } = useProducts(currentPage, 10, false);
 
@@ -18,14 +18,24 @@ export default function ProductsPage() {
     }
 
     return (
-        <div className="mx-auto">
-            <h1 className="text-3xl font-bold mb-1 1sticky text-gray-800">Comprar Productos</h1>
-            <div className="flex py-4 pb-10 bg-gray-100 rounded gap-5 flex-wrap items-center justify-center overflow-scroll h-[77vh]">
+        <div className="flex flex-1 flex-col gap-4">
+
+            {/* Filtros para los productos */}
+            <div className='h-20 w-full p-2 rounded-xl shadow-custom'>
+                <h1 className='text-gray-500 font-bold ml-1 mb-2'>Filtros</h1>
+                <div className='w-full relative'>
+                    <input type="text" placeholder='Buscar...' className='inset-shadow-custom bg-gray-100 w-full rounded-lg pl-8 pr-2 py-1' />
+                    <i className='absolute text-gray-500 pi pi-search left-2 top-2'></i>
+                </div>
+            </div>
+
+            <div className="grid p-4 bg-white shadow-custom flex-1 overflow-scroll rounded-xl gap-4 grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
                 {products?.docs?.map((product) => (
                     <ProductCard
                         key={product._id}
                         product={product}
                     />
+                    // <div key={product._id} className='bg-amber-300 w-full h-50'> hola</div>
                 ))}
 
                 {products?.docs?.length === 0 && (
