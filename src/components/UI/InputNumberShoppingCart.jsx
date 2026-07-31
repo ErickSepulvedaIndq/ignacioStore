@@ -39,7 +39,7 @@ const InputNumberShoppingCart = ({ currentQuantity, stock, onChange }) => {
             min="1"
             max={stock}
 
-            className="inset-shadow-custom rounded px-3 py-2 w-16 cursor-pointer"
+            className="inset-shadow-custom rounded px-3 text-black py-2 w-16 cursor-pointer"
         />
     )
 

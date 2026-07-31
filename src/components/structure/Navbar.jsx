@@ -1,6 +1,10 @@
 import { useState } from "react";
 import { useLocation } from "react-router-dom";
 import ShoppingCartModal from "../modals/ShoppingCartModal";
+import { useEffect } from "react";
+import CartFlow from "cartflow";
+import popSound from "../../assets/sounds/pop.mp3";
+
 
 export default function Navbar() {
   const [isOpenCart, setIsOpenCart] = useState(false);
@@ -10,6 +14,21 @@ export default function Navbar() {
   const handleCartProductsNumber = (number) => {
     setProductsNumber(number);
   }
+
+  useEffect(() => {
+    setTimeout(() => {
+      new CartFlow({
+        cartSelector: "#cart-icon",
+        buttonSelector: ".add-to-cart-btn",
+        itemSelector: ".product-item",
+        imageSelector: "img",
+        animationDuration: 700,
+        easing: "cubic-bezier(0.55, 0, 1, 0.45)",
+        shakeEffect: true,
+        soundEffect: popSound,
+      });
+    }, 1000)
+  }, []);
 
   const getTitulo = () => {
     const titles = {
@@ -30,13 +49,14 @@ export default function Navbar() {
 
       {/* Titulo de la pagina actual */}
       <div className="flex flex-row gap-3 items-center">
-        <i className={`${getTitulo().icon} text-2xl md:text-3xl text-shadow-lg`}></i>
+        <i className={`${getTitulo().icon} text-3xl text-shadow-lg`}></i>
         <h1 className={`text-2xl md:text-3xl font-bold text-shadow-lg`} >{getTitulo().label}</h1>
       </div>
 
       {/* Botón carrito de compras */}
       <button
-        className={`pi pi-shopping-cart relative text-xl rounded-full bg-amber-50 shadow-custom-xl 
+        id="cart-icon"
+        className={` pi pi-shopping-cart relative text-xl rounded-full bg-amber-50 shadow-custom-xl 
           p-2 text-blue-500 hover:scale-110 cursor-pointer transition ease-in-out  active:scale-100`}
         title="Ver carrito de compras."
         onClick={() => setIsOpenCart(true)}

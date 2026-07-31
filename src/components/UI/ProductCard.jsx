@@ -3,13 +3,31 @@ import { showBuyConfirmDialog } from "./buyConfirmDialog";
 import { useAddProductsToCart, useBuyProduct } from "../../api/hooks/productsHooks";
 import toast from "react-hot-toast";
 import { useAuth } from "../../context/AuthContext";
+import { useRef } from "react";
+import { useEffect } from "react";
 
 export default function ProductCard({ product }) {
   const isOutOfStock = product?.stock === 0;
   const [quantity, setQuantity] = useState(1);
+  const [isFocus, setIsFocus] = useState(false);
   const { mutateAsync: buyProduct } = useBuyProduct();
   const { mutateAsync: addToCart } = useAddProductsToCart();
   const { user } = useAuth();
+  const cardRef = useRef(null);
+
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (cardRef.current && !cardRef.current.contains(event.target)) {
+        setIsFocus(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const handleAddToCart = async () => {
     toast.promise(
@@ -60,17 +78,21 @@ export default function ProductCard({ product }) {
   return (
     <>
       <div
-        className={`group relative bg-white z-10 hover:z-50 shadow-custom-xs rounded-lg hover:rounded-t-lg w-full max-h-90 hover:scale-105 transition-all hover:duration-100 duration-300 ${!isOutOfStock ? "hover:rounded-b-none" : ''} `}
+        ref={cardRef}
+        onClick={() => setIsFocus(!isFocus)}
+        className={`product-item relative group bg-white z-10 ${isFocus ? isOutOfStock ? "scale-100" : "z-55 scale-105 md:scale-100 rounded-b" : "z-10"} hover:z-50 shadow-custom-xs rounded-lg rounded-b hover:rounded-b w-full max-h-90  hover:scale-105 transition-all hover:duration-100 duration-300 ${!isOutOfStock ? "hover:rounded-b-none" : ''} `}
       >
         {/* Datos principales */}
-        <div className="p-2 px-4">
+        <div className="p-2 px-4 ">
           <div className="flex items-center justify-center py-3 px-1">
             <img
               src={product?.image?.url}
               alt={product?.name}
-              className="h-40 w-50 object-contain"
+              className="img h-40 w-50 object-contain"
             />
           </div>
+
+          <button className={`absolute pi pi-thumbtack top-2 left-2 md:hidden! -rotate-45 ${isFocus ? "text-blue-500" : "text-gray-300"} ${isOutOfStock ? "hidden!" : "block"}`}></button>
 
           <div className="absolute top-0 overflow-hidden right-0 w-full h-30">
             <div className={`absolute top-7 shadow-custom-xl p-1 -right-8 bg-purple-700 rotate-45 flex justify-center w-35 ${isOutOfStock ? "block" : "hidden"}`}>
@@ -112,7 +134,7 @@ export default function ProductCard({ product }) {
         </div>
         <div
           className={`h-0 absolute flex justify-center items-center shadow rounded-b-lg bg-white w-full overflow-hidden
-                group-hover:h-20
+                ${isFocus ? "h-20 md:h-0" : "h-0"} group-hover:h-20
                 transition-all duration-150 ${isOutOfStock ? "hidden" : ""}`}
         >
           <div className="flex m-2 flex-row gap-2 justify-between items-center">
@@ -121,18 +143,20 @@ export default function ProductCard({ product }) {
               <div className="flex flex-row justify-between items-center">
                 <button
                   className="cursor-pointer text-lg font-bold h-7 w-7 disabled:text-gray-500 bg-gray-200 hover:bg-gray-300 transition ease-in-out rounded flex justify-center items-center"
-                  onClick={() => {
-                    setQuantity(quantity === 1 ? quantity : quantity - 1)
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setQuantity(quantity === 1 ? quantity : quantity - 1);
                   }}
                   disabled={isOutOfStock}
                 >-</button>
-                <p
-                  className="w-6 text-center font-bold"
-                >{quantity ? (isOutOfStock ? 0 : quantity) : 1}</p>
+                <p className="w-6 text-center font-bold">
+                  {quantity ? (isOutOfStock ? 0 : quantity) : 1}
+                </p>
                 <button
                   className="cursor-pointer text-lg font-bold h-7 w-7 disabled:text-gray-500 bg-gray-200 hover:bg-gray-300 transition ease-in-out rounded flex justify-center items-center"
-                  onClick={() => {
-                    setQuantity(quantity === product?.stock ? quantity : quantity + 1)
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setQuantity(quantity === product?.stock ? quantity : quantity + 1);
                   }}
                   disabled={isOutOfStock}
                 >+</button>
@@ -140,11 +164,11 @@ export default function ProductCard({ product }) {
             </div>
             <div className="flex flex-col gap-1">
               <button
-                className="w-full h-7 text-xs flex flex-row items-center justify-center gap-2 bg-blue-800 py-1 px-4 text-white rounded-lg cursor-pointer hover:bg-blue-900 disabled:cursor-not-allowed"
+                className="add-to-cart-btn w-full h-7 text-xs flex flex-row items-center justify-center gap-2 2xl:gap-1 bg-blue-800 py-1 px-4 2xl:px-1  text-white rounded-lg cursor-pointer hover:bg-blue-900 disabled:cursor-not-allowed"
                 onClick={handleAddToCart}
               >
                 <i className="pi pi-shopping-cart text-base" />
-                <span className="font-medium">Agregar al carrito</span>
+                <span className="font-medium hidden xl:block ">Agregar al carrito</span>
               </button>
 
               <button
@@ -152,7 +176,7 @@ export default function ProductCard({ product }) {
                 onClick={handleBuyNow}
               >
                 <i className="text-base" >$</i>
-                <span className="font-bold">Comprar</span>
+                <span className="font-bold hidden xl:block ">Comprar</span>
               </button>
             </div>
           </div>

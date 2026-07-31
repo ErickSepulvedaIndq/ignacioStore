@@ -21,11 +21,11 @@ export default function ProductsPage() {
         <div className="flex flex-1 flex-col gap-4">
 
             {/* Filtros para los productos */}
-            <div className='h-20 w-full p-2 rounded-xl shadow-custom'>
+            <div className=' w-full p-2 rounded-xl shadow-custom'>
                 <h1 className='text-gray-500 font-bold ml-1 mb-2'>Filtros</h1>
                 <div className='w-full relative'>
-                    <input type="text" placeholder='Buscar...' className='inset-shadow-custom bg-gray-100 w-full rounded-lg pl-8 pr-2 py-1' />
-                    <i className='absolute text-gray-500 pi pi-search left-2 top-2'></i>
+                    <input type="text" placeholder='Buscar...' className='inset-shadow-custom bg-gray-100 w-full rounded-lg pl-8 pr-2 py-2' />
+                    <i className='absolute text-gray-500 pi pi-search left-2 top-3'></i>
                 </div>
             </div>
 

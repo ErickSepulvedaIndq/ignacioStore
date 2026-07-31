@@ -2,7 +2,6 @@ import Swal from "sweetalert2";
 import { useBuyProducts, useGetCartProducts } from "../../api/hooks/productsHooks";
 import { useAuth } from "../../context/AuthContext";
 import toast from "react-hot-toast";
-// import InputNumberShoppingCart from "../UI/InputNumberShoppingCart";
 import CartProductCard from "../UI/CartProductCard";
 
 const ShoppingCartModal = ({ onClose, isCartOpen, productsNumber }) => {
@@ -63,8 +62,8 @@ const ShoppingCartModal = ({ onClose, isCartOpen, productsNumber }) => {
     return (
         <>
             <div
-                className={`fixed inset-0 backdrop-blur-[1px]
-                     bg-black/50 z-55 transition-all duration-300 ${isCartOpen ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+                className={`fixed inset-0
+                     bg-black/50 z-55 transition-all duration-200 ${isCartOpen ? "opacity-100" : "opacity-0 pointer-events-none"}`}
                 onClick={onClose}
             />
             <div
@@ -102,7 +101,7 @@ const ShoppingCartModal = ({ onClose, isCartOpen, productsNumber }) => {
                     </div>
 
                     {(cartProducts?.data.length > 0) && (
-                        <div className="border-t p-4 bg-gray-50">
+                        <div className="border-t p-4 bg-gray-100 rounded-b-lg">
                             <div className="flex justify-between items-center mb-4">
                                 <span className="font-bold text-lg text-gray-800">Total:</span>
                                 <span className="font-bold text-xl text-[#3041A0]">

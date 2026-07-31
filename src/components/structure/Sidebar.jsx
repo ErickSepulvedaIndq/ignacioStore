@@ -67,7 +67,7 @@ const Sidebar = () => {
                 ${isActive ? "bg-white font-bold text-blue-800" : "font-semibold text-white hover:scale-105 transition ease-in-out"}`}
             >
                 <i className={`${icon} text-lg`}></i>
-                <span className="text-sm md:text-base">{label}</span>
+                <span className="text-base">{label}</span>
             </NavLink>
         )
     }
@@ -96,8 +96,8 @@ const Sidebar = () => {
 
     return (
         <>
-            <div className={`group flex flex-col justify-between absolute md:static md:h-auto h-full z-50 ${isOpen ? "w-60 md:w-70 overflow-x-hidden" : "w-0 md:w-20 "} 
-                        transition-all ease-in-out duration-300  
+            <div className={`group flex flex-col justify-between absolute md:static md:h-auto h-full z-50 ${isOpen ? "w-70 overflow-x-hidden" : "w-0 md:w-20 "} 
+                        transition-all ease-in-out duration-200  
                             bg-blue-900 border-r border-slate-500 rounded`}>
 
                 <div>
@@ -124,7 +124,7 @@ const Sidebar = () => {
                         </div>
 
                         <div className="text-white overflow-hidden whitespace-nowrap w-full h-full flex flex-row gap-2 items-center">
-                            <div className={`${isOpen ? "w-6 md:w-10" : "md:w-1"} md:shrink-0 h-full transition-all duration-300`}></div>
+                            <div className={`${isOpen ? "w-6 md:w-10" : "md:w-1"} md:shrink-0 h-full transition-all duration-200`}></div>
 
                             <img
                                 className="h-11 md-11 md:h-13 md:shrink-0 md:w-13 bg-white rounded-full p-1"
@@ -133,7 +133,7 @@ const Sidebar = () => {
                             />
 
                             <div
-                                className={`flex flex-col overflow-hidden transition-all duration-300 ${isOpen ? "max-w-40 opacity-100" : "max-w-0 opacity-0"
+                                className={`flex flex-col overflow-hidden transition-all duration-200 ${isOpen ? "max-w-40 opacity-100" : "max-w-0 opacity-0"
                                     }`}
                             >
                                 <h1 className="font-bold text-lg md:text-xl italic text-shadow-lg">INDQNACIO</h1>
@@ -201,7 +201,7 @@ const Sidebar = () => {
                     </div>
                 </div>
             </div >
-            <div className={`bg-black/35 backdrop-blur-[1px] absolute w-full h-full z-40 transition-all duration-500 md:opacity-0 md:pointer-events-none ${isOpen ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+            <div className={`bg-black/50 absolute w-full h-full z-40 transition-all duration-500 md:opacity-0 md:pointer-events-none ${isOpen ? "opacity-100" : "opacity-0 pointer-events-none"}`}
                 onClick={() => setIsOpen(false)}
             ></div>
         </>

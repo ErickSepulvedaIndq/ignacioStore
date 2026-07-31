@@ -15,7 +15,7 @@ export default function DateRangeFilter({
   const { data: userNames, isLoading: isLoadingUsersNames } = useUsersNames();
 
   return (
-    <div className="bg-white rounded-lg shadow p-4 mb-6 border border-gray-100 flex flex-col gap-4">
+    <div className="bg-white rounded-lg shadow p-4 border border-gray-100 flex flex-col gap-4">
 
       {/* Apartado para buscar por usuario */}
       <div className={`${userFilter ? "block" : "hidden"} flex flex-col gap-2`}>
@@ -27,7 +27,7 @@ export default function DateRangeFilter({
           onChange={(event) => {
             setUserId(event.target.value);
           }}
-          className={`md:w-1/1 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#3041A0] focus:border-[#3041A0] cursor-pointer`}
+          className={`md:w-1/1 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-900 focus:border-blue-900 cursor-pointer`}
           disabled={isLoadingUsersNames}
         >
           <option value="">Todos los usuarios</option>
@@ -44,8 +44,9 @@ export default function DateRangeFilter({
         <label className="block text-lg font-semibold text-gray-900">
           Buscar por fecha
         </label>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
+        <div className="flex flex-row gap-4">
+
+          <div className="w-full">
             <label className="block text-sm font-semibold text-gray-600 mb-2 ml-1.5">
               {fromLabel}
             </label>
@@ -53,11 +54,11 @@ export default function DateRangeFilter({
               type="date"
               value={fromDate}
               onChange={(event) => setFromDate(event.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#3041A0] focus:border-[#3041A0]"
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-900 focus:border-blue-900"
             />
           </div>
 
-          <div>
+          <div className="w-full">
             <label className="block text-sm font-semibold text-gray-600 mb-2 ml-1.5">
               {toLabel}
             </label>
@@ -65,7 +66,7 @@ export default function DateRangeFilter({
               type="date"
               value={toDate}
               onChange={(event) => setToDate(event.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#3041A0] focus:border-[#3041A0]"
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-900 focus:border-blue-900"
             />
           </div>
         </div>
@@ -73,7 +74,7 @@ export default function DateRangeFilter({
         <div className="flex flex-wrap gap-3 mt-4">
           <button
             onClick={() => onApply(fromDate, toDate, userId)}
-            className="bg-[#3041A0] text-white px-4 py-2 rounded-lg font-semibold hover:bg-[#25348a] transition cursor-pointer"
+            className="bg-blue-900 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-900 transition cursor-pointer"
           >
             {applyText}
           </button>
