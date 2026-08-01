@@ -92,3 +92,35 @@ export const useDeleteUser = () => {
         }
     })
 }
+
+// Hook para actualizar contraseña 
+export const useChangePassword = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async ({ userId, data }) => {
+            const response = await API.patch(`/users/changePassword/${userId}`, data)
+            return response.data;
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries(['users'])
+        }
+    })
+}
+
+// Hook para cambiar la foto de perfil
+export const useChangeProfilePhoto = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async ({ userId, userPhoto }) => {
+            const formData = new FormData();
+            formData.append("userPhoto", userPhoto);
+
+            const response = await API.patch(`/users/${userId}/profile-photo`, formData);
+            return response.data;
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries(['users']);
+        }
+    });
+};

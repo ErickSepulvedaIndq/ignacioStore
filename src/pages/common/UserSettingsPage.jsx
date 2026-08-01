@@ -2,20 +2,36 @@ import { Form, Formik } from "formik";
 import CustomButtonComponent from "../../components/UI/CustomButtonComponent";
 import CustomInputComponent from "../../components/UI/CustomInputComponent";
 import { useAuth } from "../../context/AuthContext";
-import { useUpdateUser, useUser } from "../../api/hooks/usersHooks";
+import { useChangePassword, useChangeProfilePhoto, useUpdateUser, useUser } from "../../api/hooks/usersHooks";
 import LoadingComponent from "../../components/UI/LoadingComponent"
 import ErrorComponent from "../../components/UI/ErrorComponent";
 import toast from "react-hot-toast";
-import * as Yup from 'yup';
 import { useState } from "react";
 import { useRef } from "react";
+import ProfilePhotoComponent from "../../components/UI/ProfilePhotoComponent";
+import UpdateGeneralDataScheme from "../../components/forms/schemes/UpdateGeneralDataScheme";
+import UpdatePasswordScheme from "../../components/forms/schemes/UpdatePasswordScheme";
 
 const UserSettingsPage = () => {
     const { user } = useAuth()
     const { data: userData, isLoading, isError, refetch } = useUser(user.userId)
+    const { mutateAsync: changePassword } = useChangePassword();
     const { mutateAsync: updateUser } = useUpdateUser();
-    const [profilePhoto, setProfilePhoto] = useState();
+    const { mutateAsync: changeProfilePhoto } = useChangeProfilePhoto();
+    const [profilePhotoURl, setProfilePhotoUrl] = useState();
     const fileInputRef = useRef(null);
+
+    const initialValues = {
+        firstName: userData?.firstName || "",
+        lastName: userData?.lastName || "",
+        username: userData?.username || ""
+    }
+
+    const initialPasswordValues = {
+        currentPassword: "",
+        newPassword: "",
+        confirmNewPassword: ""
+    }
 
     const onSubmitHandle = (values) => {
         toast.promise(
@@ -29,58 +45,45 @@ const UserSettingsPage = () => {
                 }
             }
         )
-
     }
 
-    const changePasswordHandle = (values) => { console.log(values) }
+    const changePasswordHandle = (values) => {
+        toast.promise(
+            changePassword({ userId: user.userId, data: values }),
+            {
+                loading: 'Actualizando contraseña...',
+                success: () => {
+                    return 'Contraseña actualizada correctamente!'
+                },
+                error: (error) => {
+                    console.error(error);
+                    if (error.response.data.message === "Credenciales Invalidas") return 'Error: La contraseña no es correcta.'
+                    return 'Error al actualizar contraseña, intente más tarde.'
+                }
+            }
+        )
+    }
 
     const handleFileSelected = (e) => {
         const file = e.target.files[0];
         if (!file) return;
-        setProfilePhoto(file);
-        console.log(profilePhoto)
+
+        toast.promise(
+            changeProfilePhoto({ userId: user.userId, userPhoto: file }),
+            {
+                loading: "Actualizando foto de perfil...",
+                success: () => {
+                    const url = URL.createObjectURL(file);
+                    setProfilePhotoUrl(url);
+                    return "Foto de perfil actualizada!"
+                },
+                error: (e) => {
+                    console.error(e);
+                    return "Error al actualizar la foto de perfil, intente más tarde."
+                }
+            }
+        )
     };
-
-    const UpdateGeneralDataScheme = Yup.object({
-        firstName: Yup.string()
-            .min(2, "El nombre debe tener un mínimo de 2 caracteres.")
-            .required("El nombre es requerido."),
-        lastName: Yup.string()
-            .min(2, "El apellido debe tener un mínimo de 2 caracteres.")
-            .required("El apellido es requerido."),
-        username: Yup.string()
-            .min(2, "El apellido debe tener un mínimo de 2 caracteres.")
-            .required("El nombre de usuario es requerido."),
-    });
-
-    const initialValues = {
-        firstName: userData?.firstName || "",
-        lastName: userData?.lastName || "",
-        username: userData?.username || ""
-    }
-
-
-    const passwordRules = /^(?=.*[a-zA-Z])(?=.*\d)[A-Za-z\d]{6,}$/;
-
-    const UpdatePasswordScheme = Yup.object({
-        currentPassword: Yup.string()
-            .required("La contraseña actual es requerida."),
-        newPassword: Yup.string()
-            .matches(
-                passwordRules,
-                'Debe contener al menos una letra, un número y tener 6 caracteres o más'
-            )
-            .required("La nueva contraseña es requerida."),
-        confirmNewPassword: Yup.string()
-            .oneOf([Yup.ref('newPassword')], 'Las contraseñas no coinciden')
-            .required("Es necesario confirmar la nueva contraseña."),
-    })
-
-    const initialPasswordValues = {
-        currentPassword: "",
-        newPassword: "",
-        confirmNewPassword: ""
-    }
 
     return (
         <div className="w-full h-full overflow-auto p-3 md:p-6 lg:p-15 xl:p-20 flex flex-col gap-6 md:gap-8">
@@ -92,10 +95,8 @@ const UserSettingsPage = () => {
                     <div className="flex flex-col md:flex-row gap-2 md:gap-8 ">
                         <div className="w-full lg:max-w-100">
                             <h1 className="font-bold text-gray-500 pl-1">Foto de perfil:</h1>
-                            <div className=" flex-col inset-shadow-custom p-6 rounded-lg flex justify-center items-center gap-3">
-                                <div className="rounded-full flex justify-center items-center border-5 border-blue-900 bg-gray-300 h-20 w-20">
-                                    <i className="pi pi-user text-blue-900 text-5xl"></i>
-                                </div>
+                            <div className=" flex-col inset-shadow-custom p-6 rounded-lg flex justify-center items-center gap-3 md:gap-2">
+                                <ProfilePhotoComponent image={profilePhotoURl} size={'h-30 w-30'} iconStyle={'text-7xl'} />
                                 <input
                                     type="file"
                                     accept="image/*"
@@ -103,7 +104,7 @@ const UserSettingsPage = () => {
                                     onChange={handleFileSelected}
                                     className="hidden"
                                 />
-                                <CustomButtonComponent onClick={() => fileInputRef.current.click()} type={"button"} buttonStyles={"md:mt-6"}>
+                                <CustomButtonComponent onClick={() => fileInputRef.current.click()} type={"button"} >
                                     <i className="pi pi-image"></i>
                                     <p>Cambiar foto de perfil</p>
                                 </CustomButtonComponent>
@@ -117,7 +118,6 @@ const UserSettingsPage = () => {
                         >
                             {({ values, isSubmitting, isValid }) => (
                                 <Form className="w-full flex flex-col gap-4">
-
                                     <div className="flex flex-row md:flex-col gap-2 md:gap-4">
                                         <CustomInputComponent
                                             label={'Nombre'}
@@ -145,7 +145,6 @@ const UserSettingsPage = () => {
                                             <i className="pi pi-save"></i>
                                             <p>Guardar</p>
                                         </CustomButtonComponent>
-
                                     </div>
                                 </Form>
                             )}
@@ -179,6 +178,7 @@ const UserSettingsPage = () => {
                                 placeholder={"********"}
                                 value={values.newPassword}
                             />
+
                             <CustomInputComponent
                                 label={'Confirmar nueva contraseña'}
                                 name={'confirmNewPassword'}
@@ -186,6 +186,7 @@ const UserSettingsPage = () => {
                                 placeholder={"********"}
                                 value={values.confirmNewPassword}
                             />
+
                             <CustomButtonComponent disabled={isSubmitting || !isValid} type={"submit"} buttonStyles={"md:mt-6"}>
                                 <i className="pi pi-save"></i>
                                 <p>Cambiar contraseña</p>

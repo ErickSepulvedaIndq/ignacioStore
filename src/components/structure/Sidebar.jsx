@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { NavLink, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
+import ProfilePhotoComponent from "../UI/ProfilePhotoComponent";
 
 const Sidebar = () => {
     const { user, isAdmin, logout } = useAuth();
@@ -179,14 +180,11 @@ const Sidebar = () => {
 
                 {/* footer */}
                 <div className={`overflow-hidden flex flex-row gap-4 justify-center items-center mb-4`}>
-                    <div className="flex flex-row gap-2 p-4">
-                        <div className={`flex-col p-1 justify-center bg-white rounded  items-center ${isOpen ? "" : "hidden!"}`}>
-                            <h1 className="text-gray-600 uppercase text-center text-[10px] font-bold">Usuario</h1>
-                            <p className="text-sm text-blue-800 font-bold max-w-25 truncate">{user.username}</p>
-                        </div>
-                        <div className="flex flex-col p-1 items-center justify-center bg-white rounded border-blue-900 ">
-                            {/* <h1 className="text-gray-600 uppercase text-xs font-bold">Rol</h1> */}
-                            <h1 className={` rounded p-1 text-xs font-bold text-center w-fit uppercase text-white shadow-custom
+                    <div className="flex flex-row justify-center items-center gap-2 p-4">
+                        <ProfilePhotoComponent size={'h-14 w-14'} />
+                        <div className={`flex flex-col p-1 justify-center items-center gap-1 ${isOpen ? "" : "hidden!"}`}>
+                            <p className="text-xs text-white font-bold max-w-25 truncate">{user.username}</p>
+                            <h1 className={`rounded p-1 text-xs font-bold text-center w-fit uppercase text-white shadow-custom
                             ${isAdmin() ? "bg-yellow-600 " : "bg-blue-600"}`}>
                                 {user.role}
                             </h1>
@@ -195,7 +193,7 @@ const Sidebar = () => {
                             onClick={handleLogout}
                             title="Cerrar session"
                             style={{ fontWeight: 'bold', fontSize: '1.25rem' }}
-                            className={`bg-white pi pi-sign-out hover:scale-110 hover:bg-red-700 text-blue-500 
+                            className={`bg-whitee pi pi-sign-out hover:scale-110 hover:bg-red-700 text-white 
                             hover:text-white py-2 px-3 rounded  transition cursor-pointer ${isOpen ? "" : "hidden!"}`}
                         ></button>
                     </div>
