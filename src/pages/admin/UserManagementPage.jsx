@@ -1,7 +1,7 @@
 import { useState } from "react";
 // import { useSearch } from "../../context/SearchContext";
 import Paginator from "../../components/UI/Paginator";
-import Loading from "../../components/UI/Loading";
+import LoadingComponent from "../../components/UI/LoadingComponent";
 import { useDeleteUser, useUsers } from "../../api/hooks/usersHooks";
 import { ConfirmAction } from "../../components/UI/ConfirmAction";
 import toast from "react-hot-toast";
@@ -48,7 +48,7 @@ export default function UserManagementPage() {
   };
 
   if (isLoading) {
-    return <Loading />;
+    return <LoadingComponent />;
   }
 
   return (

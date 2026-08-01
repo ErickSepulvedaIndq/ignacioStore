@@ -2,7 +2,7 @@ import { useState } from "react";
 import Swal from "sweetalert2";
 import DateRangeFilter from "../../components/forms/DateRangeFilter";
 import Paginator from "../../components/UI/Paginator";
-import Loading from "../../components/UI/Loading";
+import LoadingComponent from "../../components/UI/LoadingComponent";
 import { useMarkBuyLogAsPaid, usePendingBuyLogs } from "../../api/hooks/buyLogsHooks";
 import toast from "react-hot-toast";
 
@@ -82,7 +82,7 @@ export default function DebtorsPage() {
       />
 
       {isLoading ? (
-        <Loading />
+        <LoadingComponent />
       ) : pendingBuyLogs?.data?.docs.length === 0 ? (
         <div className="bg-green-100 rounded-lg p-8 text-center">
           <p className="text-green-800 font-semibold">

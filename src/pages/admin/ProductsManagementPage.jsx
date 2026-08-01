@@ -3,7 +3,7 @@ import { ConfirmAction } from "../../components/UI/ConfirmAction";
 import { useDeleteProduct, useProducts } from "../../api/hooks/productsHooks";
 import toast from "react-hot-toast";
 import Paginator from "../../components/UI/Paginator";
-import Loading from "../../components/UI/Loading";
+import LoadingComponent from "../../components/UI/LoadingComponent";
 import ProductFormModal from "../../components/forms/ProductFormModal";
 
 export default function ProductsManagementPage() {
@@ -46,7 +46,7 @@ export default function ProductsManagementPage() {
   };
 
   if (isLoading) {
-    return <Loading />;
+    return <LoadingComponent />;
   }
 
   return (

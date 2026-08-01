@@ -34,7 +34,7 @@ export default function Navbar() {
     const titles = {
       '/products': { label: 'Comprar productos', icon: 'pi pi-shopping-bag' },
       '/purchases': { label: 'Mis compras', icon: 'pi pi-credit-card' },
-      '/changePassword': { label: 'Cambiar contraseña', icon: 'pi pi-key' },
+      '/settings': { label: 'Configuraciones', icon: 'pi pi-cog' },
       '/admin/users': { label: 'Administrar usuarios', icon: 'pi pi-users' },
       '/admin/products': { label: 'Administrar productos', icon: 'pi pi-box' },
       '/admin/purchaseHistory': { label: 'Historial de pagos', icon: 'pi pi-book' },

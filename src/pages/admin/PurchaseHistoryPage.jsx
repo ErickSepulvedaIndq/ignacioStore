@@ -1,7 +1,7 @@
 import { useState } from "react";
 import DateRangeFilter from "../../components/forms/DateRangeFilter";
 import Paginator from "../../components/UI/Paginator";
-import Loading from "../../components/UI/Loading";
+import LoadingComponent from "../../components/UI/LoadingComponent";
 import PurchaseDetailModal from "../../components/UI/purchaseDetailModal";
 import { usePurchasesByUser, usePurchases } from "../../api/hooks/purchasesHooks";
 
@@ -74,7 +74,7 @@ export default function PurchaseHistoryPage() {
       <DateRangeFilter userFilter={true} onApply={handleFilter} />
 
       {isLoading ? (
-        <Loading />
+        <LoadingComponent />
       ) : !purchases?.docs?.length ? (
         <div className="bg-gray-100 rounded-lg p-8 text-center">
           <p className="text-red-500">No se encontraron compras con esos filtros.</p>
