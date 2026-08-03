@@ -46,7 +46,7 @@ export const AuthProvider = ({ children }) => {
     }
   });
   const navigate = useNavigate();
-  const [isSideNavOpen, setIsSideNavOpen] = useState(false);
+
 
   useEffect(() => {
     if (user) localStorage.setItem('user', JSON.stringify(user));
@@ -148,23 +148,12 @@ export const AuthProvider = ({ children }) => {
     return user !== null;
   };
 
-  const toggleSideNav = () => {
-    setIsSideNavOpen((prev) => !prev);
-  };
-
-  const closeSideNav = () => {
-    setIsSideNavOpen(false);
-  };
-
   const value = {
     user,
-    isSideNavOpen,
     login,
     logout,
     isAdmin,
     isAuthenticated,
-    toggleSideNav,
-    closeSideNav,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

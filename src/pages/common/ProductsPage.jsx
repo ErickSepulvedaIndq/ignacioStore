@@ -4,10 +4,12 @@ import Paginator from '../../components/UI/Paginator';
 import { useProducts } from '../../api/hooks/productsHooks';
 import ProductCard from '../../components/UI/ProductCard';
 import ErrorComponent from '../../components/UI/ErrorComponent';
+import InputSearchBarComponent from '../../components/UI/inputs/InputSearchBarComponent';
 
 export default function ProductsPage() {
     const [currentPage, setCurrentPage] = useState(1)
     const { data: products, isLoading, isError, refetch } = useProducts(currentPage, 10, false);
+    const [, setSearch] = useState('');
 
     return (
         <div className="flex flex-1 flex-col gap-4">
@@ -15,10 +17,7 @@ export default function ProductsPage() {
             {/* Filtros para los productos */}
             <div className=' w-full p-2 rounded-xl shadow-custom'>
                 <h1 className='text-gray-500 font-bold ml-1 mb-2'>Filtros</h1>
-                <div className='w-full relative'>
-                    <input type="text" placeholder='Buscar...' className='inset-shadow-custom bg-gray-100 w-full rounded-lg pl-8 pr-2 py-2' />
-                    <i className='absolute text-gray-500 pi pi-search left-2 top-3'></i>
-                </div>
+                <InputSearchBarComponent onChange={(v) => setSearch(v)} />
             </div>
 
             {isLoading ? <LoadingComponent /> : isError ? <ErrorComponent refetch={refetch} /> : (

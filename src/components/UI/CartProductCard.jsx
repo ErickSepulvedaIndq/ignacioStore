@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import InputNumberShoppingCart from "./InputNumberShoppingCart";
+import InputNumberShoppingCart from "../UI/inputs/InputNumberShoppingCart";
 import { useAddProductsToCart, useRemoveProductsFromCart } from "../../api/hooks/productsHooks";
 import { useAuth } from "../../context/AuthContext";
 

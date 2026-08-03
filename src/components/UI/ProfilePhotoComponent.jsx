@@ -1,12 +1,6 @@
-import { useUser } from "../../api/hooks/usersHooks";
-import { useAuth } from "../../context/AuthContext";
 
-const ProfilePhotoComponent = ({ size, iconStyle }) => {
-    const { user } = useAuth()
-    const { data: userData } = useUser(user.userId)
 
-    const image = userData?.profilePhoto?.url;
-
+const ProfilePhotoComponent = ({ size, iconStyle, image }) => {
     return (
         <>
             <div className={`${image ? "hidden!" : "flex!"} rounded-full justify-center items-center border-5 border-blue-900 bg-gray-300 ${size}`}>

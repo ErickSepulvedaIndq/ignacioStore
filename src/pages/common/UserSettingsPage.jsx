@@ -1,6 +1,6 @@
 import { Form, Formik } from "formik";
 import CustomButtonComponent from "../../components/UI/CustomButtonComponent";
-import CustomInputComponent from "../../components/UI/CustomInputComponent";
+import CustomInputComponent from "../../components/UI/inputs/CustomInputComponent";
 import { useAuth } from "../../context/AuthContext";
 import { useChangePassword, useChangeProfilePhoto, useUpdateUser, useUser } from "../../api/hooks/usersHooks";
 import LoadingComponent from "../../components/UI/LoadingComponent"
@@ -20,6 +20,8 @@ const UserSettingsPage = () => {
     const { mutateAsync: changeProfilePhoto } = useChangeProfilePhoto();
     const [profilePhotoURl, setProfilePhotoUrl] = useState();
     const fileInputRef = useRef(null);
+
+    const image = userData?.profilePhoto?.url;
 
     const initialValues = {
         firstName: userData?.firstName || "",
@@ -96,7 +98,7 @@ const UserSettingsPage = () => {
                         <div className="w-full lg:max-w-100">
                             <h1 className="font-bold text-gray-500 pl-1">Foto de perfil:</h1>
                             <div className=" flex-col inset-shadow-custom p-6 rounded-lg flex justify-center items-center gap-3 md:gap-2">
-                                <ProfilePhotoComponent image={profilePhotoURl} size={'h-30 w-30'} iconStyle={'text-7xl'} />
+                                <ProfilePhotoComponent image={profilePhotoURl || image} size={'h-30 w-30'} iconStyle={'text-7xl'} />
                                 <input
                                     type="file"
                                     accept="image/*"
@@ -116,7 +118,7 @@ const UserSettingsPage = () => {
                             validationSchema={UpdateGeneralDataScheme}
                             onSubmit={onSubmitHandle}
                         >
-                            {({ values, isSubmitting, isValid }) => (
+                            {({ values, isValid }) => (
                                 <Form className="w-full flex flex-col gap-4">
                                     <div className="flex flex-row md:flex-col gap-2 md:gap-4">
                                         <CustomInputComponent
@@ -141,7 +143,7 @@ const UserSettingsPage = () => {
                                             value={values.username}
                                         />
 
-                                        <CustomButtonComponent disabled={isSubmitting || !isValid} type={"submit"} buttonStyles={"md:mt-6"}>
+                                        <CustomButtonComponent disabled={!isValid} type={"submit"} buttonStyles={"md:mt-6"}>
                                             <i className="pi pi-save"></i>
                                             <p>Guardar</p>
                                         </CustomButtonComponent>
@@ -158,7 +160,7 @@ const UserSettingsPage = () => {
                 initialValues={initialPasswordValues}
                 onSubmit={changePasswordHandle}
             >
-                {({ values, isSubmitting, isValid }) => (
+                {({ values, isValid }) => (
                     <Form className="flex flex-col gap-2 shadow-custom p-4 rounded-lg">
                         <h1 className="font-bold text-lg text-gray-800">Cambiar contraseña:</h1>
                         <div className="flex flex-col gap-3 md:gap-4">
@@ -187,7 +189,7 @@ const UserSettingsPage = () => {
                                 value={values.confirmNewPassword}
                             />
 
-                            <CustomButtonComponent disabled={isSubmitting || !isValid} type={"submit"} buttonStyles={"md:mt-6"}>
+                            <CustomButtonComponent disabled={!isValid} type={"submit"} buttonStyles={"md:mt-6"}>
                                 <i className="pi pi-save"></i>
                                 <p>Cambiar contraseña</p>
                             </CustomButtonComponent>
