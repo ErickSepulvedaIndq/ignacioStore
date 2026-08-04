@@ -1,7 +1,7 @@
 import { ErrorMessage, Field } from "formik";
 import { useState } from "react";
 
-const CustomInputComponent = ({ label, name, type, placeholder, styles, value, disabled = false, options = [] }) => {
+const CustomInputComponent = ({ label, name, type, placeholder, styles, value, disabled = false, options = [], rows = 4 }) => {
     const [password, setPassword] = useState('password');
 
     return (
@@ -23,6 +23,18 @@ const CustomInputComponent = ({ label, name, type, placeholder, styles, value, d
                         </option>
                     ))}
                 </Field>
+            ) : type === "textarea" ? (
+                <Field
+                    id={name}
+                    value={value}
+                    name={name}
+                    as="textarea"
+                    rows={rows}
+                    placeholder={placeholder}
+                    className={`w-full bg-gray-100 rounded-lg inset-shadow-custom p-2 font-bold text-gray-600
+                    focus:outline-none focus:ring-2 focus:ring-blue-800 resize-none pr-2 ${styles}`}
+                    disabled={disabled}
+                />
             ) : (
                 <Field
                     id={name}
@@ -31,7 +43,7 @@ const CustomInputComponent = ({ label, name, type, placeholder, styles, value, d
                     type={type === "password" ? password : type}
                     placeholder={placeholder}
                     className={`w-full bg-gray-100 rounded-lg inset-shadow-custom p-2 font-bold text-gray-600
-                    focus:outline-none focus:ring-2 focus:ring-blue-800 ${type === 'password' ? 'pr-12' : "pr-<2"}  ${styles}`}
+                    focus:outline-none focus:ring-2 focus:ring-blue-800 ${type === 'password' ? 'pr-12' : "pr-2"}  ${styles}`}
                     disabled={disabled}
                 />
             )}

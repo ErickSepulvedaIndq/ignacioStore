@@ -40,7 +40,7 @@ const ModalComponent = ({ children, onClose, title, iconStyles, isOpen }) => {
             className={`fixed inset-0 z-50 flex items-center justify-center bg-black/70 transition-opacity duration-200 ease-out ${isVisible ? "opacity-100" : "opacity-0"}`}
             onTransitionEnd={handleTransitionEnd}
         >
-            <div className={`bg-blue-900 shadow-custom-xl rounded-2xl w-fit p-2 relative transition-all duration-300 ease-out ${isVisible ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-90 -translate-y-4"}`}>
+            <div className={`bg-blue-900 shadow-custom-xl rounded-2xl w-fit p-2 relative transition-all duration-200 ease-out ${isVisible ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-90 -translate-y-4"}`}>
 
                 <div className="flex justify-between bg-blue-900 rounded-t-2xl py-3 px-2 items-center">
                     <div className="flex flex-row gap-3 items-center justify-center">

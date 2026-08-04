@@ -1,7 +1,12 @@
 import { useCreateProduct, useUpdateProduct } from "../../api/hooks/productsHooks";
-import { Field, Form, Formik } from "formik";
+import { Form, Formik } from "formik";
 import { useAuth } from "../../context/AuthContext";
 import toast from "react-hot-toast";
+import ModalComponent from "../modals/ModalComponent";
+import ProductImageComponent from "../UI/ProductImageComponent";
+import CustomButtonComponent from "../UI/CustomButtonComponent";
+import { useRef } from "react";
+import CustomInputComponent from "../UI/inputs/CustomInputComponent";
 
 export default function ProductFormModal({
   isOpen,
@@ -11,6 +16,7 @@ export default function ProductFormModal({
 }) {
   const { mutateAsync: updateProduct } = useUpdateProduct();
   const { mutateAsync: createProduct } = useCreateProduct();
+  const fileInputRef = useRef(null);
   const { user } = useAuth();
 
   const formData = {
@@ -22,7 +28,10 @@ export default function ProductFormModal({
     image: product?.image?.url || null,
   }
 
+  console.log(mode)
+
   const handleSubmit = async (values) => {
+    console.log(values)
     if (mode === "create") {
       toast.promise(
         createProduct({ productData: values, createdBy: user.userId }),
@@ -51,155 +60,87 @@ export default function ProductFormModal({
     onClose()
   };
 
-  if (!isOpen) {
-    return null;
-  }
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-      <div className="bg-gray-100 rounded-2xl shadow-2xl w-full max-w-3xl p-10 relative animate-fade-in">
-        <div className="flex justify-between items-center mb-8">
-          <h2 className="text-2xl font-bold text-[#3041A0]">
-            {mode === "edit" ? "Editar Producto" : "Ver Producto"}
-          </h2>
-          <button
-            className="text-gray-500 text-xl cursor-pointer hover:scale-110 transition-transform duration-300 hover:text-red-600"
-            onClick={() => {
-              onClose();
-            }}
-          >
-            ✕
-          </button>
-        </div>
-        <Formik
-          initialValues={formData}
-          onSubmit={handleSubmit}
-        >
-          {({ isSubmitting, values, setFieldValue }) => (
+    <ModalComponent
+      isOpen={isOpen}
+      onClose={onClose}
+      title={mode === "edit" ? "Editar producto" : mode === "view" ? "Ver producto" : "Crear producto"}
+      iconStyles={mode === "edit" ? "pi-pencil" : mode === "view" ? "pi-eye" : "pi-user-plus"}
+    >
 
-            <Form className="space-y-6">
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Nombre
-                </label>
-                <Field
-                  type="text"
-                  name="name"
-                  id="name"
-                  disabled={mode === "view"}
-                  className="w-full rounded-lg border-2 border-gray-300 bg-white px-4 py-3 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition disabled:bg-gray-100"
+      <Formik
+        initialValues={formData}
+        onSubmit={handleSubmit}
+      >
+        {({ isSubmitting, values, setFieldValue }) => (
+          <Form className="space-y-2">
+            <div className="w-full h-full">
+              <h1 className="font-bold text-gray-500 pl-1">Imagen del producto:</h1>
+              <div className="flex-col inset-shadow-custom p-2 rounded-lg flex justify-center items-center gap-3 md:gap-2">
+                <ProductImageComponent
+                  image={typeof values.image === "string" ? values.image : values.image === null ? undefined : URL.createObjectURL(values.image)}
+                  size={'h-30 w-30'}
+                  iconStyle={'text-7xl'}
                 />
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Descripción
-                </label>
-                <Field
-                  id="description"
-                  name="description"
-                  as="textarea"
-                  rows={4}
-                  disabled={mode === "view"}
-                  className="w-full rounded-lg border-2 border-gray-300 bg-white px-4 py-3 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition disabled:bg-gray-100"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Precio
-                  </label>
-                  <Field
-                    type="number"
-                    name="price"
-                    id="price"
-                    required
-                    disabled={mode === "view"}
-                    className="w-full rounded-lg border-2 border-gray-300 bg-white px-4 py-3 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition disabled:bg-gray-100"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Stock
-                  </label>
-                  <Field
-                    type="number"
-                    id="stock"
-                    name="stock"
-                    required
-                    disabled={mode === "view"}
-                    className="w-full rounded-lg border-2 border-gray-300 bg-white px-4 py-3 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition disabled:bg-gray-100"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Estado
-                </label>
-                <Field
-                  id="status"
-                  name="status"
-                  as="select"
-                  disabled={mode === "view"}
-                  className="w-full rounded-lg border-2 border-gray-300 bg-white px-4 py-3 focus:border-indigo-500 focus:ring-2 cursor-pointer focus:ring-indigo-200 transition disabled:bg-gray-100"
-                >
-                  <option value="active">Activo</option>
-                  <option value="blocked">Bloqueado</option>
-                </Field>
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Imagen
-                </label>
-
-                {values.image && (
-                  <img
-                    src={
-                      typeof values.image === "string"
-                        ? values.image
-                        : URL.createObjectURL(values.image)
-                    }
-                    alt="Preview"
-                    className="w-40 h-40 object-cover rounded-lg mb-4 border-2 border-gray-300"
-                  />
-                )}
-
                 <input
                   type="file"
-                  name="image"
-                  onChange={(e) => setFieldValue("image", e.target.files[0])}
-                  disabled={mode === "view"}
-                  className="w-full rounded-lg border-2 border-dashed border-gray-400 bg-white px-4 py-3 cursor-pointer hover:border-indigo-500 transition disabled:cursor-not-allowed disabled:bg-gray-100"
+                  accept="image/*"
+                  ref={fileInputRef}
+                  onChange={(e) => {
+                    setFieldValue("image", e.target.files[0])
+                  }}
+                  className="hidden"
                 />
+                <CustomButtonComponent onClick={() => fileInputRef.current.click()} buttonStyles={mode === 'view' ? "hidden!" : ''} type={"button"} >
+                  <i className="pi pi-image"></i>
+                  <p>{mode === 'edit' ? 'Cambiar imagen' : 'Agregar imagen'}</p>
+                </CustomButtonComponent>
               </div>
+            </div>
 
-              {mode !== "view" && (
-                <div className="flex justify-end space-x-4 pt-4">
-                  <button
-                    type="button"
-                    className="px-6 py-3 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 font-medium cursor-pointer"
-                    onClick={onClose}
-                  >
-                    Cancelar
-                  </button>
+            <CustomInputComponent name={"name"} type={"text"} label={"Nombre"} value={values.name} disabled={mode === "view"} />
 
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="px-6 py-3 bg-[#3041A0] text-white rounded-lg hover:bg-[#2b3b92] font-semibold shadow-md cursor-pointer disabled:bg-gray-500 disabled:cursor-not-allowed"
-                  >
-                    Guardar
-                  </button>
-                </div>
-              )}
-            </Form>
-          )}
-        </Formik>
-      </div>
-    </div>
+            <CustomInputComponent name={"description"} type={"textarea"} label={"Descripción"} value={values.description} disabled={mode === "view"} />
+
+            <div className="grid grid-cols-2 gap-4">
+              <CustomInputComponent name={"price"} type={"number"} label={"Precio"} value={values.price} disabled={mode === "view"} />
+              <CustomInputComponent name={"stock"} type={"number"} label={"Stock"} value={values.stock} disabled={mode === "view"} />
+            </div>
+
+            <CustomInputComponent
+              name={"status"}
+              type={"select"}
+              label={"Estado"}
+              value={values.status}
+              disabled={mode === "view"}
+              options={[
+                { value: "active", label: "Activo" },
+                { value: "blocked", label: "Bloqueado" },
+              ]}
+            />
+
+            {mode !== "view" && (
+              <div className="flex justify-end space-x-4 pt-4">
+                <CustomButtonComponent
+                  type="button"
+                  onClick={onClose}
+                  buttonStyles={'bg-red-500'}
+                >
+                  Cancelar
+                </CustomButtonComponent>
+
+                <CustomButtonComponent
+                  type="submit"
+                  disabled={isSubmitting}
+                >
+                  <i className="pi pi-save"></i>
+                  {isSubmitting ? "Guardando..." : "Guardar"}
+                </CustomButtonComponent>
+              </div>
+            )}
+          </Form>
+        )}
+      </Formik>
+    </ModalComponent>
   );
 }

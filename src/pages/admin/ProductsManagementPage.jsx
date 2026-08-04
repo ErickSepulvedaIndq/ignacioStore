@@ -3,15 +3,18 @@ import { ConfirmAction } from "../../components/UI/ConfirmAction";
 import { useDeleteProduct, useProducts } from "../../api/hooks/productsHooks";
 import toast from "react-hot-toast";
 import Paginator from "../../components/UI/Paginator";
-import LoadingComponent from "../../components/UI/LoadingComponent";
 import ProductFormModal from "../../components/forms/ProductFormModal";
+import InputSearchBarComponent from "../../components/UI/inputs/InputSearchBarComponent";
+import CustomButtonComponent from "../../components/UI/CustomButtonComponent";
+import LoadingComponent from "../../components/UI/LoadingComponent";
+import ErrorComponent from "../../components/UI/ErrorComponent";
+import ProductImageComponent from "../../components/UI/ProductImageComponent";
 
 export default function ProductsManagementPage() {
   const [currentPage, setCurrentPage] = useState(1);
-  // const { normalizedSearch } = useSearch();
-  const { data: products, isLoading } = useProducts(currentPage, 10, false);
+  const { data: products, isLoading, isError, refetch } = useProducts(currentPage, 10, false);
   const { mutateAsync: deleteProduct } = useDeleteProduct();
-
+  const [, setSearch] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState("create");
   const [product, setProduct] = useState(null);
@@ -25,7 +28,7 @@ export default function ProductsManagementPage() {
   const handleDelete = async (id) => {
     ConfirmAction({
       title: "Eliminar producto",
-      text: "¿Estás seguro que deseas eliminar este producto?",
+      text: "¿Está seguro que desea eliminar este producto?",
       icon: "warning",
       confirmButtonText: "Sí, eliminar",
       cancelButtonText: "Cancelar",
@@ -45,112 +48,112 @@ export default function ProductsManagementPage() {
     });
   };
 
-  if (isLoading) {
-    return <LoadingComponent />;
-  }
-
   return (
-    <div className="container mx-auto p-6 pb-0 mb-4">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-gray-800">
-          Administrar Productos
-        </h1>
-        <button
-          className="bg-[#3041A0] hover:bg-[#25327D] text-white px-6 py-2 rounded-lg font-semibold transition cursor-pointer hover:scale-105"
-          onClick={() => handleOpenModal("create")}
-        >
-          + Nuevo Producto
-        </button>
+    <div className="flex flex-col w-full h-full gap-2">
+
+      <div className='w-full p-2 rounded-xl shadow-custom'>
+        <h1 className='text-gray-500 font-bold ml-1 mb-2'>Filtros</h1>
+        <div className="flex flex-row gap-2 h-fit">
+          <InputSearchBarComponent onChange={(v) => setSearch(v)} />
+          <CustomButtonComponent onClick={() => handleOpenModal('create', null)} buttonStyles={'w-55'} >
+            <i className="pi pi-box"></i>
+            <p>Crear producto</p>
+          </CustomButtonComponent>
+        </div>
       </div>
 
-      <div className="bg-white rounded-lg shadow overflow-hidden h-[67vh]">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-[#3041A0] text-white">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
-                Producto
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
-                Precio
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
-                Stock
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
-                Estado
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
-                Acciones
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {products?.docs?.map((product) => (
-              <tr key={product._id} className="hover:bg-gray-50">
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                  {product.name}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  ${product.price.toFixed(2)}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  <span
-                    className={`${product.stock < 10 ? "text-red-600 font-semibold" : ""
-                      }`}
-                  >
-                    {product.stock} unidades
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span
-                    className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${product.status === "active"
-                      ? "bg-green-100 text-green-800"
-                      : "bg-red-100 text-red-800"
-                      }`}
-                  >
-                    {product.status}
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                  <button
-                    className="text-[#3041A0] hover:text-[#25327D] mr-3 hover:scale-110 transition-transform cursor-pointer"
-                    aria-label="Edit product"
-                    title="Edit product"
-                    onClick={() => handleOpenModal("edit", product)}
-                  >
-                    <i className="pi pi-pencil"></i>
-                  </button>
-                  <button
-                    className="text-[#3041A0] hover:text-[#25327D] mr-3 hover:scale-110 transition-transform cursor-pointer"
-                    aria-label="View product"
-                    title="View product"
-                    onClick={() => handleOpenModal("view", product)}
-                  >
-                    <i className="pi pi-eye"></i>
-                  </button>
-                  <button
-                    className="text-red-600 hover:text-red-800 cursor-pointer hover:scale-110 transition-transform"
-                    aria-label="Delete product"
-                    title="Delete product"
-                    onClick={() => handleDelete(product._id)}
-                  >
-                    <i className="pi pi-trash"></i>
-                  </button>
-                </td>
-              </tr>
-            ))}
-            {/* {filteredProducts.length === 0 && (
-              <tr>
-                <td
-                  colSpan={5}
-                  className="px-6 py-8 text-center text-sm text-gray-500"
-                >
-                  No se encontraron productos
-                </td>
-              </tr>
-            )} */}
-          </tbody>
-        </table>
+      <div className="bg-white rounded-lg h-full shadow w-full overflow-hidden">
+        <div className="overflow-auto w-full h-full">
+          {isLoading ? <LoadingComponent /> : isError ? <ErrorComponent refetch={refetch} /> : (
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-blue-900 text-white sticky top-0">
+                <tr>
+                  <th className="px-6 py-3 text-center text-xs font-bold uppercase hidden md:table-cell">
+                    Imagen
+                  </th>
+                  <th className="px-6 py-3 text-center text-xs font-bold uppercase tracking-wider">
+                    Nombre
+                  </th>
+                  <th className="px-6 py-3 text-center text-xs font-bold uppercase tracking-wider">
+                    Precio
+                  </th>
+                  <th className="px-6 py-3 text-center text-xs font-bold uppercase tracking-wider ">
+                    Stock
+                  </th>
+                  <th className="px-6 py-3 text-center text-xs font-bold uppercase tracking-wider hidden md:table-cell">
+                    Estado
+                  </th>
+                  <th className="px-6 py-3 text-center text-xs font-bold uppercase tracking-wider">
+                    Acciones
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {products?.docs?.map((product) => (
+                  <tr key={product._id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 hidden md:flex justify-center items-center">
+                      <ProductImageComponent iconStyle={'text-xl'} size={'h-12 w-12 border-0!'} image={product?.image?.url} />
+                    </td>
+
+                    <td className="px-4 py-4 text-sm font-medium text-gray-900 text-center max-w-25">
+                      {product.name}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-center">
+                      ${product.price.toFixed(2)}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-center ">
+                      <span
+                        className={`${product.stock < 10 ? "text-red-600 font-semibold" : ""
+                          }`}
+                      >
+                        {product.stock} uds.
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-center hidden md:table-cell">
+                      <span
+                        className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${product.status === "active"
+                          ? "bg-green-100 text-green-800"
+                          : "bg-red-100 text-red-800"
+                          }`}
+                      >
+                        {product.status === "active" ? "ACTIVO" : "INACTIVO"}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-center">
+                      <button
+                        className="text-blue-800 mr-3 cursor-pointer hover:scale-140
+                                  transform transition-all duration-200 ease-in-out"
+                        aria-label="View product"
+                        title="Ver producto"
+                        onClick={() => handleOpenModal("view", product)}
+                      >
+                        <i className="pi pi-eye text-base md:text-sm"></i>
+                      </button>
+                      <button
+                        className={`text-blue-800 mr-3 cursor-pointer hover:scale-140
+                                  transform transition-all duration-200 ease-in-out`}
+                        aria-label="Edit product"
+                        title="Editar producto"
+                        onClick={() => handleOpenModal("edit", product)}
+                      >
+                        <i className="pi pi-pencil text-base md:text-sm"></i>
+                      </button>
+                      <button
+                        className={`text-red-600 hover:text-red-800 cursor-pointer hover:scale-140
+                                  transform transition-all duration-200 ease-in-out`}
+                        aria-label="Delete product"
+                        title="Eliminar producto"
+                        onClick={() => handleDelete(product._id)}
+                      >
+                        <i className="pi pi-trash text-base md:text-sm"></i>
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
       </div>
 
       <Paginator
