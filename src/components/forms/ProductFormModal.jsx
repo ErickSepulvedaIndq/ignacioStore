@@ -1,5 +1,5 @@
 import { useCreateProduct, useUpdateProduct } from "../../api/hooks/productsHooks";
-import { Form, Formik } from "formik";
+import { ErrorMessage, Form, Formik } from "formik";
 import { useAuth } from "../../context/AuthContext";
 import toast from "react-hot-toast";
 import ModalComponent from "../modals/ModalComponent";
@@ -7,6 +7,7 @@ import ProductImageComponent from "../UI/ProductImageComponent";
 import CustomButtonComponent from "../UI/CustomButtonComponent";
 import { useRef } from "react";
 import CustomInputComponent from "../UI/inputs/CustomInputComponent";
+import CreateProductScheme from "./schemes/CreateProductScheme";
 
 export default function ProductFormModal({
   isOpen,
@@ -23,12 +24,10 @@ export default function ProductFormModal({
     name: product?.name || "",
     description: product?.description || "",
     price: product?.price || "",
-    stock: product?.stock || "",
+    stock: product?.stock || 0,
     status: product?.status || "active",
     image: product?.image?.url || null,
   }
-
-  console.log(mode)
 
   const handleSubmit = async (values) => {
     console.log(values)
@@ -66,15 +65,17 @@ export default function ProductFormModal({
       onClose={onClose}
       title={mode === "edit" ? "Editar producto" : mode === "view" ? "Ver producto" : "Crear producto"}
       iconStyles={mode === "edit" ? "pi-pencil" : mode === "view" ? "pi-eye" : "pi-user-plus"}
+      childrenStyles={'p-0!'}
     >
 
       <Formik
         initialValues={formData}
         onSubmit={handleSubmit}
+        validationSchema={CreateProductScheme}
       >
-        {({ isSubmitting, values, setFieldValue }) => (
-          <Form className="space-y-2">
-            <div className="w-full h-full">
+        {({ isSubmitting, values, setFieldValue, isValid }) => (
+          <Form className="space-y-2 md:max-w-lg max-w-[calc(100svw-30px)] max-h-[calc(100svh-150px)] overflow-y-auto p-2 pr-3">
+            <div className="w-full h-fit">
               <h1 className="font-bold text-gray-500 pl-1">Imagen del producto:</h1>
               <div className="flex-col inset-shadow-custom p-2 rounded-lg flex justify-center items-center gap-3 md:gap-2">
                 <ProductImageComponent
@@ -91,6 +92,7 @@ export default function ProductFormModal({
                   }}
                   className="hidden"
                 />
+                <ErrorMessage name={["image"]} component="p" className="text-red-500 text-sm mt-1 text-center w-full font-bold" />
                 <CustomButtonComponent onClick={() => fileInputRef.current.click()} buttonStyles={mode === 'view' ? "hidden!" : ''} type={"button"} >
                   <i className="pi pi-image"></i>
                   <p>{mode === 'edit' ? 'Cambiar imagen' : 'Agregar imagen'}</p>
@@ -131,7 +133,7 @@ export default function ProductFormModal({
 
                 <CustomButtonComponent
                   type="submit"
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || !isValid}
                 >
                   <i className="pi pi-save"></i>
                   {isSubmitting ? "Guardando..." : "Guardar"}

@@ -1,19 +1,14 @@
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
-import * as Yup from "yup";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import LoginHeader from "../../components/UI/loginHeader";
 import { useState } from "react";
+import LoginScheme from "../../components/forms/schemes/LoginScheme";
 
 export default function LoginPage() {
   const { login } = useAuth();
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false)
-
-  const loginSchema = Yup.object({
-    username: Yup.string().required("El nombre de usuario es obligatorio"),
-    password: Yup.string().required("La contraseña es obligatoria")
-  });
 
   const handleSubmit = async (values) => {
     const success = await login(values);
@@ -27,7 +22,7 @@ export default function LoginPage() {
       <LoginHeader />
       <div className="flex-1 flex items-center justify-center">
 
-        <div className="bg-white w-[380px] rounded-2xl shadow-xl p-10">
+        <div className="bg-white w-95 rounded-2xl shadow-xl p-10">
 
           <h1 className="text-3xl font-extrabold text-center text-[#3041A0]">
             INDQNACIO STORE
@@ -39,7 +34,7 @@ export default function LoginPage() {
 
           <Formik
             initialValues={{ username: "", password: "" }}
-            validationSchema={loginSchema}
+            validationSchema={LoginScheme}
             onSubmit={handleSubmit}
           >
             {({ isSubmitting, isValid }) => (

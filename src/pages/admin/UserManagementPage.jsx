@@ -6,10 +6,9 @@ import { ConfirmAction } from "../../components/UI/ConfirmAction";
 import toast from "react-hot-toast";
 import UserFormModal from "../../components/forms/UserFormModal";
 import { useAuth } from "../../context/AuthContext"
-import InputSearchBarComponent from "../../components/UI/inputs/InputSearchBarComponent";
-import CustomButtonComponent from "../../components/UI/CustomButtonComponent";
 import ErrorComponent from "../../components/UI/ErrorComponent";
 import ProfilePhotoComponent from "../../components/UI/ProfilePhotoComponent";
+import FiltersComponent from "../../components/forms/FiltersComponent";
 
 export default function UserManagementPage() {
   const [currentPage, setCurrentPage] = useState(1);
@@ -18,7 +17,7 @@ export default function UserManagementPage() {
   const [userSelected, setUserSelected] = useState();
   const { data: users, isLoading, isError, refetch } = useUsers(currentPage, 10);
   const { mutateAsync: deleteUser } = useDeleteUser();
-  const [, setSearch] = useState('');
+
   const { user } = useAuth();
 
   const handleModal = (user, mode) => {
@@ -54,16 +53,17 @@ export default function UserManagementPage() {
     <div className="flex flex-col w-full h-full gap-2">
 
       {/* HEADER */}
-      <div className='w-full p-2 rounded-xl shadow-custom'>
-        <h1 className='text-gray-500 font-bold ml-1 mb-2'>Filtros</h1>
-        <div className="flex flex-row gap-2 h-fit">
-          <InputSearchBarComponent onChange={(v) => setSearch(v)} />
-          <CustomButtonComponent onClick={() => handleModal(null, 'create')} buttonStyles={'w-45'} >
+      <FiltersComponent
+        onApply={() => { }}
+        button={true}
+        buttonContent={
+          <div className="flex flex-row justify-center items-center gap-2 w-35">
             <i className="pi pi-user-plus"></i>
             <p>Crear usuario</p>
-          </CustomButtonComponent>
-        </div>
-      </div>
+          </div>
+        }
+        buttonOnClick={() => handleModal(null, 'create')}
+      />
 
       {/* TABLA */}
       <div className="bg-white rounded-lg h-full shadow w-full overflow-hidden">
@@ -72,7 +72,7 @@ export default function UserManagementPage() {
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-blue-900 text-white sticky top-0">
                 <tr>
-                  <th className="px-6 py-3 text-center text-xs font-bold uppercase hidden md:table-cell">
+                  <th className="px-6 py-3 text-center text-xs font-bold uppercase">
                     Foto
                   </th>
                   <th className="px-6 py-3 text-center text-xs font-bold uppercase">
@@ -84,9 +84,9 @@ export default function UserManagementPage() {
                   <th className="px-6 py-3 text-center text-xs font-bold uppercase">
                     Rol
                   </th>
-                  <th className="px-6 py-3 text-center text-xs font-bold uppercase">
+                  {/* <th className="px-6 py-3 text-center text-xs font-bold uppercase">
                     Deuda
-                  </th>
+                  </th> */}
                   <th className="px-6 py-3 text-center text-xs font-bold uppercase hidden md:table-cell">
                     Estado
                   </th>
@@ -101,7 +101,7 @@ export default function UserManagementPage() {
                   item?._id === user.userId ? null : (
                     <tr key={item?._id} className="hover:bg-gray-50">
 
-                      <td className="px-6 py-4 hidden md:flex justify-center items-center">
+                      <td className="px-6 py-4 flex justify-center items-center">
                         <ProfilePhotoComponent iconStyle={'text-xl'} size={'h-10 w-10 border-2!'} image={item?.profilePhoto?.url} />
                       </td>
 
@@ -115,7 +115,7 @@ export default function UserManagementPage() {
 
                       <td className="px-1 md:px-6 py-4 text-sm text-center">
                         <span
-                          className={`px-2 py-1 rounded-full text-xs ${item?.role === "admin"
+                          className={`px-2 py-1 rounded-full font-semibold text-xs ${item?.role === "admin"
                             ? "bg-yellow-100 text-yellow-800"
                             : "bg-blue-100 text-blue-800"
                             }`}
@@ -124,7 +124,7 @@ export default function UserManagementPage() {
                         </span>
                       </td>
 
-                      <td className="px-6 py-4 text-sm text-center">
+                      {/* <td className="px-6 py-4 text-sm text-center">
                         <span
                           className={`${item?.debt > 0
                             ? "text-red-600 font-semibold"
@@ -133,7 +133,7 @@ export default function UserManagementPage() {
                         >
                           ${item?.debt.toFixed(2)}
                         </span>
-                      </td>
+                      </td> */}
 
                       <td className="px-2 py-4 md:px-6 text-center hidden md:table-cell">
                         <span

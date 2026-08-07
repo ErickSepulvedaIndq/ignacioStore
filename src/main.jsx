@@ -8,6 +8,12 @@ import { Toaster } from 'react-hot-toast'
 import AppRoutes from './AppRoutes.jsx'
 import 'primeicons/primeicons.css'
 import './index.css'
+import { registerLocale, setDefaultLocale } from "react-datepicker";
+import { es } from "date-fns/locale/es";
+
+
+registerLocale("es", es);
+setDefaultLocale("es");
 
 const queryClient = new QueryClient();
 

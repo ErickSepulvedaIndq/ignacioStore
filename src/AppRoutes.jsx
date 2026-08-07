@@ -7,8 +7,6 @@ import MyPurchasesPage from './pages/common/MyPurchasesPage';
 import UserManagementPage from './pages/admin/UserManagementPage';
 import PurchaseHistoryPage from './pages/admin/PurchaseHistoryPage';
 import ProductsManagementPage from './pages/admin/ProductsManagementPage';
-import DebtorsPage from './pages/admin/DebtorsPage';
-import GenerateReportPage from './pages/admin/GenerateReportPage';
 import UserSettingsPage from './pages/common/UserSettingsPage';
 
 function AppRoutes() {
@@ -27,8 +25,6 @@ function AppRoutes() {
                     <Route path="admin/users" element={<UserManagementPage />} />
                     <Route path="admin/purchaseHistory" element={<PurchaseHistoryPage />} />
                     <Route path="admin/products" element={<ProductsManagementPage />} />
-                    <Route path="admin/debtors" element={<DebtorsPage />} />
-                    <Route path="admin/reports" element={<GenerateReportPage />} />
                 </Route>
             </Route>
 

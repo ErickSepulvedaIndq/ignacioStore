@@ -15,7 +15,7 @@ export default function Layout() {
                 <Navbar />
 
                 <div className='bg-blue-900 flex flex-1 h-[calc(100svh-100px)] px-1 pb-1 md:px-4 md:pb-4 pt-0'>
-                    <div className='bg-gray-50 flex flex-1 h-[calc(100svh-83px)] md:h-[calc(100vh-116px)] p-2 rounded-2xl overflow-hidden'>
+                    <div className='bg-gray-50 flex flex-1 w-[calc(100svw-10px)] md:w-auto  h-[calc(100svh-83px)] md:h-[calc(100vh-116px)] p-2 rounded-2xl overflow-hidden'>
                         <Outlet />
                     </div>
                 </div>

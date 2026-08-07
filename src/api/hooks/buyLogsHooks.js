@@ -11,7 +11,8 @@ export const useBuyLogs = (userId, page = 1, limit = 10, from = "", to = "") => 
                 params: { page, limit, from, to },
             })
             return response.data;
-        }
+        },
+        enabled: !!userId,
     })
 }
 
@@ -52,6 +53,22 @@ export const useMarkBuyLogAsPaid = () => {
         },
         onSuccess: () => {
             queryClient.invalidateQueries(['buyLogs'])
+            queryClient.invalidateQueries(['users'])
+        }
+    })
+}
+
+// Hook para marcar deuda total como pagada
+export const useMarkTotalDebtAsPaid = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async ({ userId }) => {
+            const response = await API.patch(`/buyLogs/total/${userId}/pay`);
+            return response.data;
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries(['buyLogs'])
+            queryClient.invalidateQueries(['users'])
         }
     })
 }

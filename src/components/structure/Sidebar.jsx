@@ -46,16 +46,16 @@ const Sidebar = () => {
             label: "Historial de Compras",
             icon: "pi pi-book",
         },
-        {
-            path: "/admin/debtors",
-            label: "Pendientes de Pago",
-            icon: "pi pi-exclamation-triangle",
-        },
-        {
-            path: "/admin/reports",
-            label: "Generar Reporte",
-            icon: "pi pi-file-export",
-        },
+        // {
+        //     path: "/admin/debtors",
+        //     label: "Pendientes de Pago",
+        //     icon: "pi pi-exclamation-triangle",
+        // },
+        // {
+        //     path: "/admin/reports",
+        //     label: "Generar Reporte",
+        //     icon: "pi pi-file-export",
+        // },
     ];
 
     const NavLinkComponent = ({ path, icon, label, onClick, title }) => {

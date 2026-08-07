@@ -4,17 +4,15 @@ import { useDeleteProduct, useProducts } from "../../api/hooks/productsHooks";
 import toast from "react-hot-toast";
 import Paginator from "../../components/UI/Paginator";
 import ProductFormModal from "../../components/forms/ProductFormModal";
-import InputSearchBarComponent from "../../components/UI/inputs/InputSearchBarComponent";
-import CustomButtonComponent from "../../components/UI/CustomButtonComponent";
 import LoadingComponent from "../../components/UI/LoadingComponent";
 import ErrorComponent from "../../components/UI/ErrorComponent";
 import ProductImageComponent from "../../components/UI/ProductImageComponent";
+import FiltersComponent from "../../components/forms/FiltersComponent";
 
 export default function ProductsManagementPage() {
   const [currentPage, setCurrentPage] = useState(1);
-  const { data: products, isLoading, isError, refetch } = useProducts(currentPage, 10, false);
+  const { data: products, isLoading, isError, refetch } = useProducts(currentPage, 10, true);
   const { mutateAsync: deleteProduct } = useDeleteProduct();
-  const [, setSearch] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState("create");
   const [product, setProduct] = useState(null);
@@ -51,16 +49,17 @@ export default function ProductsManagementPage() {
   return (
     <div className="flex flex-col w-full h-full gap-2">
 
-      <div className='w-full p-2 rounded-xl shadow-custom'>
-        <h1 className='text-gray-500 font-bold ml-1 mb-2'>Filtros</h1>
-        <div className="flex flex-row gap-2 h-fit">
-          <InputSearchBarComponent onChange={(v) => setSearch(v)} />
-          <CustomButtonComponent onClick={() => handleOpenModal('create', null)} buttonStyles={'w-55'} >
+      <FiltersComponent
+        onApply={() => { }}
+        button={true}
+        buttonContent={
+          <div className="flex flex-row justify-center items-center gap-2 w-35">
             <i className="pi pi-box"></i>
             <p>Crear producto</p>
-          </CustomButtonComponent>
-        </div>
-      </div>
+          </div>
+        }
+        buttonOnClick={() => handleOpenModal('create', null)}
+      />
 
       <div className="bg-white rounded-lg h-full shadow w-full overflow-hidden">
         <div className="overflow-auto w-full h-full">
@@ -68,7 +67,7 @@ export default function ProductsManagementPage() {
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-blue-900 text-white sticky top-0">
                 <tr>
-                  <th className="px-6 py-3 text-center text-xs font-bold uppercase hidden md:table-cell">
+                  <th className="px-6 py-3 text-center text-xs font-bold uppercase">
                     Imagen
                   </th>
                   <th className="px-6 py-3 text-center text-xs font-bold uppercase tracking-wider">
@@ -80,7 +79,7 @@ export default function ProductsManagementPage() {
                   <th className="px-6 py-3 text-center text-xs font-bold uppercase tracking-wider ">
                     Stock
                   </th>
-                  <th className="px-6 py-3 text-center text-xs font-bold uppercase tracking-wider hidden md:table-cell">
+                  <th className="px-6 py-3 text-center text-xs font-bold uppercase tracking-wider">
                     Estado
                   </th>
                   <th className="px-6 py-3 text-center text-xs font-bold uppercase tracking-wider">
@@ -91,7 +90,7 @@ export default function ProductsManagementPage() {
               <tbody className="bg-white divide-y divide-gray-200">
                 {products?.docs?.map((product) => (
                   <tr key={product._id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 hidden md:flex justify-center items-center">
+                    <td className="px-6 py-4 flex justify-center items-center">
                       <ProductImageComponent iconStyle={'text-xl'} size={'h-12 w-12 border-0!'} image={product?.image?.url} />
                     </td>
 
@@ -109,7 +108,7 @@ export default function ProductsManagementPage() {
                         {product.stock} uds.
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-center hidden md:table-cell">
+                    <td className="px-6 py-4 whitespace-nowrap text-center">
                       <span
                         className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${product.status === "active"
                           ? "bg-green-100 text-green-800"

@@ -67,7 +67,7 @@ const ShoppingCartModal = ({ onClose, isCartOpen, productsNumber }) => {
                 onClick={onClose}
             />
             <div
-                className={`fixed top-0 right-0 h-full py-4 w-90 z-60 transform 
+                className={`fixed top-0 right-0 h-full py-4 w-80 md:w-90 z-60 transform 
                     transition-all duration-200 ease-in-out ${isCartOpen ? "translate-x-0" : "translate-x-full"}`}
             >
                 <div className="flex group flex-col h-full bg-white rounded-lg shadow-custom-xl">

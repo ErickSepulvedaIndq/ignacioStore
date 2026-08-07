@@ -29,11 +29,12 @@ export const useUsersNames = () => {
 // Hook para obtener un usuario por su id
 export const useUser = (userId) => {
     return useQuery({
-        queryKey: ['users'],
+        queryKey: ['users', userId],
         queryFn: async () => {
             const response = await API.get(`/users/${userId}`);
             return response.data.data;
-        }
+        },
+        enabled: !!userId,
     })
 }
 

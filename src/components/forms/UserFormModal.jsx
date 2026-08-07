@@ -7,6 +7,8 @@ import CustomButtonComponent from "../UI/CustomButtonComponent";
 import ProfilePhotoComponent from "../UI/ProfilePhotoComponent";
 import { useRef } from "react";
 import { useState } from "react";
+import UpdateUserScheme from "./schemes/UpdateUserScheme";
+import CreateUserScheme from "./schemes/CreateUserScheme";
 
 export default function UserFormModal({ isOpen, onClose, user, mode = "create" }) {
   const { mutateAsync: createUser } = useCreateUser();
@@ -27,7 +29,7 @@ export default function UserFormModal({ isOpen, onClose, user, mode = "create" }
     username: user?.username || "",
     password: user?.password || "",
     role: user?.role || "user",
-    debt: user?.debt || 0,
+    // debt: user?.debt || 0,
     status: user?.status || "active",
   }
 
@@ -87,14 +89,16 @@ export default function UserFormModal({ isOpen, onClose, user, mode = "create" }
       onClose={onClose}
       title={mode === "edit" ? "Editar usuario" : mode === "view" ? "Ver usuario" : "Crear usuario"}
       iconStyles={mode === "edit" ? "pi-pencil" : mode === "view" ? "pi-eye" : "pi-user-plus"}
+      childrenStyles={"p-0!"}
     >
       <Formik
         initialValues={formData}
         onSubmit={handleSubmit}
+        validationSchema={mode === "edit" ? UpdateUserScheme : CreateUserScheme}
       >
-        {({ isSubmitting, values }) => (
-          <div className="w-full max-w-lg">
-            <Form className="space-y-6">
+        {({ isSubmitting, values, isValid }) => (
+          <div className="md:max-w-lg max-w-[calc(100svw-30px)] max-h-[calc(100svh-150px)] overflow-y-auto p-2 pr-3">
+            <Form className="space-y-4 md:space-y-6">
               <div className='flex flex-col gap-3'>
 
                 <div className="w-full h-full">
@@ -124,10 +128,10 @@ export default function UserFormModal({ isOpen, onClose, user, mode = "create" }
               <CustomInputComponent name={"username"} type={"text"} label={"Nombre de usuario"} value={values.username} disabled={mode === "view"} />
 
               {mode !== "view" && (
-                <CustomInputComponent name={"password"} type={"passwo ) : <LoadingComponent />}rd"} placeholder={'********'} label={mode === "edit" ? "Nueva contraseña (opcional)" : "Contraseña"} value={values.password} />
+                <CustomInputComponent name={"password"} type={"password"} placeholder={'********'} label={mode === "edit" ? "Nueva contraseña (opcional)" : "Contraseña"} value={values.password} />
               )}
 
-              <div className="grid grid-cols-3 gap-6">
+              <div className="grid grid-cols-2 gap-6">
                 <CustomInputComponent
                   name={"status"}
                   type={"select"}
@@ -150,13 +154,13 @@ export default function UserFormModal({ isOpen, onClose, user, mode = "create" }
                     { value: "user", label: "Usuario" },
                   ]}
                 />
-                <CustomInputComponent
+                {/* <CustomInputComponent
                   name={"debt"}
                   type={"number"}
                   label={"Deuda"}
                   value={values.debt}
                   disabled={mode === "view"}
-                />
+                /> */}
               </div>
 
               {mode !== "view" && (
@@ -171,7 +175,7 @@ export default function UserFormModal({ isOpen, onClose, user, mode = "create" }
 
                   <CustomButtonComponent
                     type="submit"
-                    disabled={isSubmitting}
+                    disabled={isSubmitting | !isValid}
                   >
                     <i className="pi pi-save"></i>
                     {isSubmitting ? "Guardando..." : "Guardar"}

@@ -4,21 +4,19 @@ import Paginator from '../../components/UI/Paginator';
 import { useProducts } from '../../api/hooks/productsHooks';
 import ProductCard from '../../components/UI/ProductCard';
 import ErrorComponent from '../../components/UI/ErrorComponent';
-import InputSearchBarComponent from '../../components/UI/inputs/InputSearchBarComponent';
+// import InputSearchBarComponent from '../../components/UI/inputs/InputSearchBarComponent';
+import FiltersComponent from '../../components/forms/FiltersComponent';
 
 export default function ProductsPage() {
     const [currentPage, setCurrentPage] = useState(1)
     const { data: products, isLoading, isError, refetch } = useProducts(currentPage, 10, false);
-    const [, setSearch] = useState('');
+    // const [, setSearch] = useState('');
 
     return (
-        <div className="flex flex-1 flex-col gap-4">
+        <div className="flex flex-1 flex-col gap-2">
 
             {/* Filtros para los productos */}
-            <div className=' w-full p-2 rounded-xl shadow-custom'>
-                <h1 className='text-gray-500 font-bold ml-1 mb-2'>Filtros</h1>
-                <InputSearchBarComponent onChange={(v) => setSearch(v)} />
-            </div>
+            <FiltersComponent onApply={() => { }} />
 
             {isLoading ? <LoadingComponent /> : isError ? <ErrorComponent refetch={refetch} /> : (
                 <div className="grid p-4 bg-white shadow-custom flex-1 overflow-scroll rounded-xl gap-4 grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">

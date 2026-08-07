@@ -37,7 +37,7 @@ export default function Navbar() {
       '/settings': { label: 'Configuraciones', icon: 'pi pi-cog' },
       '/admin/users': { label: 'Administrar usuarios', icon: 'pi pi-users' },
       '/admin/products': { label: 'Administrar productos', icon: 'pi pi-box' },
-      '/admin/purchaseHistory': { label: 'Historial de pagos', icon: 'pi pi-book' },
+      '/admin/purchaseHistory': { label: 'Historial de compras', icon: 'pi pi-book' },
       '/admin/debtors': { label: 'Pendientes de pago', icon: 'pi pi-exclamation-triangle' },
       '/admin/reports': { label: 'Generar reportes', icon: 'pi pi-file-export' }
     };
@@ -49,8 +49,8 @@ export default function Navbar() {
 
       {/* Titulo de la pagina actual */}
       <div className="flex flex-row gap-3 items-center">
-        <i className={`${getTitulo().icon} text-3xl text-shadow-lg`}></i>
-        <h1 className={`text-2xl md:text-3xl font-bold text-shadow-lg`} >{getTitulo().label}</h1>
+        <i className={`${getTitulo().icon} text-2xl md:text-3xl text-shadow-lg`}></i>
+        <h1 className={`text-xl md:text-3xl font-bold text-shadow-lg`} >{getTitulo().label}</h1>
       </div>
 
       {/* Botón carrito de compras */}

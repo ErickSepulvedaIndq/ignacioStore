@@ -1,11 +1,11 @@
 import { useState } from "react";
 import PurchaseDetailModal from "../../components/UI/purchaseDetailModal";
-import DateRangeFilter from "../../components/forms/DateRangeFilter";
 import Paginator from "../../components/UI/Paginator";
 import LoadingComponent from "../../components/UI/LoadingComponent";
 import { useBuyLogs } from "../../api/hooks/buyLogsHooks";
 import { useAuth } from "../../context/AuthContext";
 import ErrorComponent from "../../components/UI/ErrorComponent";
+import FiltersComponent from "../../components/forms/FiltersComponent";
 
 export default function MyPurchasesPage() {
   const [selectedPurchase, setSelectedPurchase] = useState(null);
@@ -39,12 +39,11 @@ export default function MyPurchasesPage() {
 
   return (
     <div className="flex flex-col w-full h-full gap-2">
-      <DateRangeFilter
-        onApply={(from, to) => {
-          setFromDate(from);
-          setToDate(to);
-        }}
-      />
+      <FiltersComponent searchFilter={false} userFilter={false} stateFilter={true} dateRangeFilter={true} onApply={(from, to) => {
+        setFromDate(from);
+        setToDate(to);
+      }} />
+
 
       <div className="bg-white rounded-lg h-full shadow w-full overflow-hidden">
         {/* contenedor para tabla responsive */}
@@ -70,7 +69,6 @@ export default function MyPurchasesPage() {
               </thead>
 
               {/* cuerpo de la tabla */}
-
               <tbody className="bg-white divide-y divide-gray-200">
                 {buyLogs?.data?.docs?.map((purchase) => (
                   <tr key={purchase?._id} className="hover:bg-gray-50 cursor-pointer md:cursor-default md:pointer-fine:pointer-events-none " onClick={() => handleViewDetails(purchase)}>
@@ -85,7 +83,7 @@ export default function MyPurchasesPage() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-center">
                       <span
-                        className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${purchase.status === "Pagado"
+                        className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${purchase.isPaid
                           ? "bg-green-100 text-green-800"
                           : "bg-yellow-100 text-yellow-800"
                           }`}
@@ -94,13 +92,15 @@ export default function MyPurchasesPage() {
                       </span>
                     </td>
 
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium hidden md:flex md:justify-center md:items-center  ">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-center hidden md:table-cell">
                       <button
-                        onClick={() => handleViewDetails(purchase)}
-                        className="bg-blue-800 font-bold hover:bg-blue-900 pointer-fine:pointer-events-auto text-white px-4 py-1 rounded mr-2 transition cursor-pointer flex flex-row gap-1 justify-center items-center"
+                        className="text-blue-800 mr-3 cursor-pointer hover:scale-140
+                                  transform transition-all duration-200 ease-in-out pointer-fine:pointer-events-auto"
+                        aria-label="View product"
+                        title="Ver producto"
+                        onClick={() => handleViewDetails("view", purchase)}
                       >
-                        <i className="pi pi-eye"></i>
-                        Ver
+                        <i className="pi pi-eye text-base md:text-sm"></i>
                       </button>
                     </td>
                   </tr>
