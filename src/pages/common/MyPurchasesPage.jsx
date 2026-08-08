@@ -87,7 +87,13 @@ export default function MyPurchasesPage() {
 
               {/* cuerpo de la tabla */}
               <tbody className="bg-white divide-y divide-gray-200">
-                {buyLogs?.data?.docs?.map((purchase) => (
+                {buyLogs?.data?.docs.length === 0 ? (
+                  <tr>
+                    <td colSpan={4} className="px-6 py-8 text-center text-sm text-gray-500">
+                      Aún no ha hecho compras
+                    </td>
+                  </tr>
+                ) : buyLogs?.data?.docs?.map((purchase) => (
                   <tr key={purchase?._id} className="hover:bg-gray-50 cursor-pointer md:cursor-default md:pointer-fine:pointer-events-none " onClick={() => handleViewDetails(purchase)}>
                     <td className="px-6 py-4 whitespace-nowrap md:block hidden text-sm text-gray-900 text-center">
                       {formatDateLong(purchase?.createdAt)}

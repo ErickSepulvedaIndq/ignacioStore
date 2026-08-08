@@ -54,8 +54,6 @@ const UserPaymentHistoryModal = ({ isOpen, onClose, userId }) => {
             zIndex: 9999,
         });
 
-        //tiramos confetti de prueba
-
         toast.promise(
             markTotalDebtAsPaid({ userId: user?._id }),
             {
@@ -201,7 +199,13 @@ const UserPaymentHistoryModal = ({ isOpen, onClose, userId }) => {
                                         </tr>
                                     </thead>
                                     <tbody className="bg-white divide-y divide-gray-200">
-                                        {buyLogs?.data?.docs.map((payment) => (
+                                        {buyLogs?.data?.docs.length === 0 ? (
+                                            <tr>
+                                                <td colSpan={4} className="px-6 py-8 text-center text-sm text-gray-500">
+                                                    El usuario no ha hecho compras
+                                                </td>
+                                            </tr>
+                                        ) : buyLogs?.data?.docs.map((payment) => (
                                             <tr key={payment?._id} className="hover:bg-gray-50">
 
                                                 <td className="px-6 py-4 text-center text-sm text-gray-900 hidden md:table-cell">
