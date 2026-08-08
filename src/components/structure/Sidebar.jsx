@@ -81,7 +81,8 @@ const Sidebar = () => {
             confirmButtonColor: "#1c398e",
             cancelButtonColor: "#d33",
             confirmButtonText: "Salir",
-            cancelButtonText: "Cancelar"
+            cancelButtonText: "Cancelar",
+            reverseButtons: true,
         }).then((result) => {
             if (result.isConfirmed) {
                 logout();

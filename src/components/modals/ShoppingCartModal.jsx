@@ -30,6 +30,9 @@ const ShoppingCartModal = ({ onClose, isCartOpen, productsNumber }) => {
             showCancelButton: true,
             confirmButtonText: "Confirmar",
             cancelButtonText: "Cancelar",
+            confirmButtonColor: "#1c398e",
+            cancelButtonColor: "#d33",
+            reverseButtons: true,
         });
 
         if (!confirm.isConfirmed) return;

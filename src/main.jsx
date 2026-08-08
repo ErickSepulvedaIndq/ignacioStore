@@ -4,12 +4,12 @@ import { AuthProvider } from './context/AuthContext.jsx'
 import { createRoot } from 'react-dom/client'
 import { StrictMode } from 'react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { Toaster } from 'react-hot-toast'
 import AppRoutes from './AppRoutes.jsx'
 import 'primeicons/primeicons.css'
 import './index.css'
 import { registerLocale, setDefaultLocale } from "react-datepicker";
 import { es } from "date-fns/locale/es";
+import SwipeableToaster from './components/UI/SwipeableToaster.jsx'
 
 
 registerLocale("es", es);
@@ -23,7 +23,7 @@ createRoot(document.getElementById("root")).render(
       <BrowserRouter>
         <AuthProvider>
           <SearchProvider>
-            <Toaster position="top-center" />
+            <SwipeableToaster position="top-center" />
 
             <AppRoutes />
 

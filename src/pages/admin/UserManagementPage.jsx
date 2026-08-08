@@ -9,16 +9,37 @@ import { useAuth } from "../../context/AuthContext"
 import ErrorComponent from "../../components/UI/ErrorComponent";
 import ProfilePhotoComponent from "../../components/UI/ProfilePhotoComponent";
 import FiltersComponent from "../../components/forms/FiltersComponent";
+import { useDebounce } from "../../api/hooks/useDebounce";
 
 export default function UserManagementPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [isModalOpen, setModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState();
   const [userSelected, setUserSelected] = useState();
-  const { data: users, isLoading, isError, refetch } = useUsers(currentPage, 10);
   const { mutateAsync: deleteUser } = useDeleteUser();
+  const [search, setSearch] = useState("")
+  const [state, setState] = useState("")
+  const [role, setRole] = useState("")
+  const debouncedSearch = useDebounce(search, 400)
+
+  const { data: users, isLoading, isError, refetch } = useUsers({
+    page: currentPage,
+    limit: 10,
+    status: state,
+    search: debouncedSearch,
+    role,
+    debt: "all"
+  });
 
   const { user } = useAuth();
+
+  const handleFilter = (state, search, rol) => {
+    setCurrentPage(1);
+    setSearch(search);
+    setState(state);
+    setRole(rol);
+    // console.log(state, search, rol)
+  }
 
   const handleModal = (user, mode) => {
     setModalMode(mode);
@@ -54,7 +75,7 @@ export default function UserManagementPage() {
 
       {/* HEADER */}
       <FiltersComponent
-        onApply={() => { }}
+        onApply={(f, t, u, state, search, rol) => { handleFilter(state, search, rol) }}
         button={true}
         buttonContent={
           <div className="flex flex-row justify-center items-center gap-2 w-35">
@@ -62,6 +83,13 @@ export default function UserManagementPage() {
             <p>Crear usuario</p>
           </div>
         }
+        stateFilter={true}
+        stateOptions={[
+          { value: "all", label: "Todos los estados" },
+          { value: "active", label: "Activo" },
+          { value: "inactive", label: "Inactivo" }
+        ]}
+        rolFilter={true}
         buttonOnClick={() => handleModal(null, 'create')}
       />
 

@@ -4,19 +4,43 @@ import Paginator from '../../components/UI/Paginator';
 import { useProducts } from '../../api/hooks/productsHooks';
 import ProductCard from '../../components/UI/ProductCard';
 import ErrorComponent from '../../components/UI/ErrorComponent';
-// import InputSearchBarComponent from '../../components/UI/inputs/InputSearchBarComponent';
 import FiltersComponent from '../../components/forms/FiltersComponent';
+import { useDebounce } from '../../api/hooks/useDebounce';
 
 export default function ProductsPage() {
     const [currentPage, setCurrentPage] = useState(1)
-    const { data: products, isLoading, isError, refetch } = useProducts(currentPage, 10, false);
-    // const [, setSearch] = useState('');
+    const [search, setSearch] = useState("")
+    const [stockStatus, setStockStatus] = useState("all")
+    const debouncedSearch = useDebounce(search, 400)
+
+    const { data: products, isLoading, isError, refetch } = useProducts({
+        page: currentPage,
+        limit: 10,
+        status: 'active',
+        search: debouncedSearch,
+        stockStatus,
+    });
+
+    const handleFilter = (state, search) => {
+        setCurrentPage(1)
+        setSearch(search)
+        setStockStatus(state)
+    }
 
     return (
         <div className="flex flex-1 flex-col gap-2">
 
             {/* Filtros para los productos */}
-            <FiltersComponent onApply={() => { }} />
+            <FiltersComponent
+                stateFilter={true}
+                stateOptions={[
+                    { value: "all", label: "Todos los estados" },
+                    { value: "available", label: "Disponibles" },
+                    { value: "soldOut", label: "Agotados" },
+                    { value: "last", label: "Ultima" },
+                ]}
+                onApply={(f, t, u, state, search) => { handleFilter(state, search) }}
+            />
 
             {isLoading ? <LoadingComponent /> : isError ? <ErrorComponent refetch={refetch} /> : (
                 <div className="grid p-4 bg-white shadow-custom flex-1 overflow-scroll rounded-xl gap-4 grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">

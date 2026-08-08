@@ -8,14 +8,33 @@ import LoadingComponent from "../../components/UI/LoadingComponent";
 import ErrorComponent from "../../components/UI/ErrorComponent";
 import ProductImageComponent from "../../components/UI/ProductImageComponent";
 import FiltersComponent from "../../components/forms/FiltersComponent";
+import { useDebounce } from "../../api/hooks/useDebounce";
 
 export default function ProductsManagementPage() {
   const [currentPage, setCurrentPage] = useState(1);
-  const { data: products, isLoading, isError, refetch } = useProducts(currentPage, 10, true);
   const { mutateAsync: deleteProduct } = useDeleteProduct();
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState("create");
   const [product, setProduct] = useState(null);
+  const [search, setSearch] = useState("");
+  const [stockStatus, setStockStatus] = useState("all");
+  const [state, setState] = useState("all");
+  const debouncedSearch = useDebounce(search, 400)
+
+  const { data: products, isLoading, isError, refetch } = useProducts({
+    page: currentPage,
+    limit: 10,
+    status: state,
+    search: debouncedSearch,
+    stockStatus,
+  });
+
+  const handleFilter = (state, search, stock) => {
+    setCurrentPage(1);
+    setSearch(search || "");
+    setStockStatus(stock || "all");
+    setState(state || "all");
+  }
 
   const handleOpenModal = (mode, product) => {
     setModalOpen(true);
@@ -29,6 +48,8 @@ export default function ProductsManagementPage() {
       text: "¿Está seguro que desea eliminar este producto?",
       icon: "warning",
       confirmButtonText: "Sí, eliminar",
+      confirmButtonColor: "#1c398e",
+      cancelButtonColor: "#d33",
       cancelButtonText: "Cancelar",
       onConfirm: async () => {
         toast.promise(
@@ -50,7 +71,19 @@ export default function ProductsManagementPage() {
     <div className="flex flex-col w-full h-full gap-2">
 
       <FiltersComponent
-        onApply={() => { }}
+        stateFilter={true}
+        stockFilter={true}
+        stateOptions={[
+          { value: "all", label: "Todos los estados" },
+          { value: "active", label: "Activo" },
+          { value: "blocked", label: "Bloqueado" },
+        ]}
+        stockOptions={[
+          { value: "all", label: "Todos" },
+          { value: "available", label: "Disponibles (≥ 1 Ud.)" },
+          { value: "soldOut", label: "Agotados (0 Uds.)" },
+          { value: "last", label: "Ultima unidad (1 Ud.)" },
+        ]}
         button={true}
         buttonContent={
           <div className="flex flex-row justify-center items-center gap-2 w-35">
@@ -59,6 +92,7 @@ export default function ProductsManagementPage() {
           </div>
         }
         buttonOnClick={() => handleOpenModal('create', null)}
+        onApply={(f, t, u, state, search, r, stock) => { handleFilter(state, search, stock) }}
       />
 
       <div className="bg-white rounded-lg h-full shadow w-full overflow-hidden">
@@ -115,7 +149,7 @@ export default function ProductsManagementPage() {
                           : "bg-red-100 text-red-800"
                           }`}
                       >
-                        {product.status === "active" ? "ACTIVO" : "INACTIVO"}
+                        {product.status === "active" ? "ACTIVO" : "BLOQUEADO"}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-center">

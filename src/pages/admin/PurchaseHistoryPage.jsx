@@ -11,22 +11,37 @@ import UserPaymentHistoryModal from "../../components/modals/UserPaymentHistoryM
 import confetti from "canvas-confetti";
 import toast from "react-hot-toast";
 import { useMarkTotalDebtAsPaid } from "../../api/hooks/buyLogsHooks";
+import { useDebounce } from "../../api/hooks/useDebounce";
 
 export default function PurchaseHistoryPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [isOpenReport, setIsOpenModalReport] = useState(false)
   const [isOpenUserPaymentHistory, setIsOpenUserPaymentHistory] = useState(false)
-  const { data: users, isLoading, isError, refetch } = useUsers(currentPage, 10);
   const [user, setUser] = useState(null);
   const { mutateAsync: markTotalDebtAsPaid } = useMarkTotalDebtAsPaid();
 
-  const handleFilter = () => {
-    // console.log(from, to, uid)
-    // setFromDate(from);
-    // setToDate(to);
-    // setUserId(uid || null);
-    // setCurrentPage(1);
-  };
+  const [search, setSearch] = useState("")
+  const [role, setRole] = useState("")
+  const [debt, setDebt] = useState("all")
+  const debouncedSearch = useDebounce(search, 400)
+
+
+  const { data: users, isLoading, isError, refetch } = useUsers({
+    page: currentPage,
+    limit: 10,
+    status: "all",
+    search: debouncedSearch,
+    role,
+    debt
+  });
+
+  const handleFilter = (search, rol, debt) => {
+    setCurrentPage(1);
+    setSearch(search);
+    setRole(rol);
+    setDebt(debt)
+    // console.log(state, search, rol)
+  }
 
 
   const handleCollectPayment = async (user) => {
@@ -49,7 +64,8 @@ export default function PurchaseHistoryPage() {
       confirmButtonColor: "#3041A0",
       cancelButtonColor: "#d33",
       confirmButtonText: "Confirmar",
-      cancelButtonText: "Cancelar"
+      cancelButtonText: "Cancelar",
+      reverseButtons: true,
     });
 
     if (!result.isConfirmed) return;
@@ -78,11 +94,9 @@ export default function PurchaseHistoryPage() {
   return (
     <div className="flex flex-col w-full h-full gap-2">
       <FiltersComponent
-        searchFilter={false}
-        userFilter={true}
-        stateFilter={true}
-        dateRangeFilter={false}
-        onApply={handleFilter}
+        onApply={(f, t, u, s, search, rol, st, debt) => { handleFilter(search, rol, debt) }}
+        rolFilter={true}
+        debtFilter={true}
         button={true}
         buttonContent={
           <div className="flex flex-row justify-center items-center gap-2 w-35">
@@ -92,7 +106,6 @@ export default function PurchaseHistoryPage() {
         }
         buttonOnClick={() => { setIsOpenModalReport(true) }}
       />
-
 
       <div className="bg-white rounded-lg h-full shadow w-full overflow-hidden">
         <div className="overflow-auto w-full h-full">

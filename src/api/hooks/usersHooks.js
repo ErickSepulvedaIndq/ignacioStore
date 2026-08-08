@@ -1,17 +1,19 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { API } from "../apiConfig";
 
 
 // Hook para obtener todos los usuarios
-export const useUsers = (page = 1, limit = 10) => {
+export const useUsers = ({ page = 1, limit = 10, status, search, role, debt }) => {
     return useQuery({
-        queryKey: ['users', page, limit],
-        queryFn: async () => {
+        queryKey: ['users', page, limit, status, search, role, debt],
+        queryFn: async ({ signal }) => {
             const response = await API.get("/users", {
-                params: { page, limit },
+                params: { page, limit, status, search, role, debt },
+                signal
             });
             return response.data.data;
-        }
+        },
+        placeholderData: keepPreviousData,
     })
 }
 
@@ -22,7 +24,8 @@ export const useUsersNames = () => {
         queryFn: async () => {
             const response = await API.get("/users/names");
             return response.data.data;
-        }
+        },
+        placeholderData: keepPreviousData,
     })
 }
 
@@ -35,6 +38,7 @@ export const useUser = (userId) => {
             return response.data.data;
         },
         enabled: !!userId,
+        placeholderData: keepPreviousData,
     })
 }
 

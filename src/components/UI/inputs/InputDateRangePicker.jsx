@@ -3,7 +3,7 @@ import { es } from "date-fns/locale/es";
 import { useState } from "react";
 import { format } from "date-fns";
 
-const InputDateRangePicker = ({ from, to, onChange, styles, label, portalId }) => {
+const InputDateRangePicker = ({ from, to, onChange, styles, label, portalId = "calendar-portal" }) => {
     const [hoverDate, setHoverDate] = useState(null);
 
     return (
@@ -36,7 +36,7 @@ const InputDateRangePicker = ({ from, to, onChange, styles, label, portalId }) =
                 onDayMouseEnter={(date) => setHoverDate(date)}
                 onCalendarClose={() => setHoverDate(null)}
                 popperClassName="idr-popper"
-                calendarClassName="idr-calendar"
+                calendarClassName="idr-calendar z-60!"
                 dayClassName={(date) => {
                     if (!from) return undefined;
                     const isStart = date.toDateString() === from.toDateString();

@@ -12,9 +12,11 @@ export default function MyPurchasesPage() {
   const [showModal, setShowModal] = useState(false);
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
+  const [state, setState] = useState("all")
   const [page, setPage] = useState(1);
   const { user } = useAuth();
-  const { data: buyLogs, isLoading, isError, refetch } = useBuyLogs(user.userId, page, fromDate, toDate);
+
+  const { data: buyLogs, isLoading, isError, refetch } = useBuyLogs({ userId: user.userId, page, limit: 10, from: fromDate, to: toDate, status: state });
 
   const formatDateLong = (value) => {
     return new Date(value).toLocaleDateString("es-MX", {
@@ -37,13 +39,28 @@ export default function MyPurchasesPage() {
     setShowModal(true);
   };
 
+  const handleFilter = (from, to, state) => {
+    setPage(1);
+    setFromDate(from);
+    setToDate(to);
+    setState(state);
+    console.log(from, to, state)
+  }
+
   return (
     <div className="flex flex-col w-full h-full gap-2">
-      <FiltersComponent searchFilter={false} userFilter={false} stateFilter={true} dateRangeFilter={true} onApply={(from, to) => {
-        setFromDate(from);
-        setToDate(to);
-      }} />
-
+      <FiltersComponent
+        searchFilter={false}
+        userFilter={false}
+        stateFilter={true}
+        stateOptions={[
+          { value: "all", label: "Todos los estados" },
+          { value: "paid", label: "Pagado" },
+          { value: "pending", label: "Pendiente" }
+        ]}
+        dateRangeFilter={true}
+        onApply={(from, to, u, state) => { handleFilter(from, to, state) }}
+      />
 
       <div className="bg-white rounded-lg h-full shadow w-full overflow-hidden">
         {/* contenedor para tabla responsive */}
@@ -111,14 +128,12 @@ export default function MyPurchasesPage() {
         </div>
       </div>
 
-      {buyLogs?.data?.docs?.length > 0 && (
-        <Paginator
-          currentPage={page}
-          totalPages={buyLogs?.data?.limit}
-          onPageChange={(p) => setPage(p)}
-          loading={isLoading}
-        />
-      )}
+      <Paginator
+        currentPage={page}
+        totalPages={buyLogs?.data?.totalPages}
+        onPageChange={(p) => setPage(p)}
+        loading={isLoading}
+      />
 
       <PurchaseDetailModal
         isOpen={showModal}

@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query"
+import { keepPreviousData, useQuery } from "@tanstack/react-query"
 import { API } from "../apiConfig";
 
 // Hook para obtener todas las compras
@@ -11,6 +11,7 @@ export const usePurchases = (page, limit, from, to) => {
             });
             return response.data.data;
         },
+        placeholderData: keepPreviousData,
     })
 }
 
@@ -26,5 +27,6 @@ export function usePurchasesByUser(userId, page, limit, from, to, options = {}) 
         },
         enabled: !!userId && (options.enabled ?? true),
         ...options,
+        placeholderData: keepPreviousData,
     });
 }
