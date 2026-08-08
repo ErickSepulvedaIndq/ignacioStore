@@ -3,6 +3,7 @@ import { useBuyProducts, useGetCartProducts } from "../../api/hooks/productsHook
 import { useAuth } from "../../context/AuthContext";
 import toast from "react-hot-toast";
 import CartProductCard from "../UI/CartProductCard";
+import confetti from "canvas-confetti";
 
 const ShoppingCartModal = ({ onClose, isCartOpen, productsNumber }) => {
     const { user } = useAuth();
@@ -46,7 +47,15 @@ const ShoppingCartModal = ({ onClose, isCartOpen, productsNumber }) => {
             buyProducts({ products }),
             {
                 loading: 'Comprando...',
-                success: 'Compra hecha!',
+                success: () => {
+                    confetti({
+                        particleCount: 120,
+                        spread: 80,
+                        origin: { y: 0.6 },
+                        zIndex: 9999,
+                    });
+                    return 'Compra hecha!'
+                },
                 error: (err) => {
                     console.error(err);
                     if (err.response.data.message === 'Supera el stock') {

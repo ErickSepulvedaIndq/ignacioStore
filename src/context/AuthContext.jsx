@@ -109,10 +109,17 @@ export const AuthProvider = ({ children }) => {
 
       return true;
     } catch (error) {
-      if (error.response.status === 404) {
+      if (error.response.status === 401) {
         showToast({
           icon: "error",
           title: "Credenciales incorrectas.",
+          position: "top-right",
+          timer: 1800,
+        });
+      } else if (error.response.status === 403) {
+        showToast({
+          icon: "error",
+          title: "Error: Usuario deshabilitado.",
           position: "top-right",
           timer: 1800,
         });

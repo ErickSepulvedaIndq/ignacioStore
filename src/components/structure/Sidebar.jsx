@@ -5,9 +5,11 @@ import { useAuth } from "../../context/AuthContext";
 import { NavLink, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import ProfilePhotoComponent from "../UI/ProfilePhotoComponent";
+import { useUser } from "../../api/hooks/usersHooks";
 
 const Sidebar = () => {
     const { user, isAdmin, logout } = useAuth();
+    const { data: userData } = useUser(user.userId)
     const navigate = useNavigate();
 
 
@@ -92,14 +94,15 @@ const Sidebar = () => {
     }
 
     const handleOnClick = () => {
-        const mediaQuery = window.matchMedia("(min-width: 1024px)");
-        if (!mediaQuery.matches) setIsOpen(close)
+        const mediaQuery = window.matchMedia("(min-width: 768px)");
+        if (!mediaQuery.matches) setIsOpen(false)
     }
 
     return (
         <>
-            <div className={`group flex flex-col justify-between absolute md:static md:h-auto h-full z-50 ${isOpen ? "w-70 overflow-x-hidden" : "w-0 md:w-20 "} 
-                        transition-all ease-in-out duration-200  
+            <div className={`group shrink-0 flex flex-col justify-between absolute md:static md:h-auto h-full z-50 
+                            ${isOpen ? "w-70 overflow-x-hidden" : "w-0 md:w-20"} 
+                            transition-all ease-in-out duration-200  
                             bg-blue-900 border-r border-slate-500 rounded`}>
 
                 <div>
@@ -126,7 +129,7 @@ const Sidebar = () => {
                         </div>
 
                         <div className="text-white overflow-hidden whitespace-nowrap w-full h-full flex flex-row gap-2 items-center">
-                            <div className={`${isOpen ? "w-6 md:w-10" : "md:w-1"} md:shrink-0 h-full transition-all duration-200`}></div>
+                            <div className={`${isOpen ? "w-12" : "md:w-1"} md:shrink-0 h-full transition-all duration-200`}></div>
 
                             <img
                                 className="h-11 md-11 md:h-13 md:shrink-0 md:w-13 bg-white rounded-full p-1"
@@ -181,22 +184,29 @@ const Sidebar = () => {
 
                 {/* footer */}
                 <div className={`overflow-hidden flex flex-row gap-4 justify-center items-center mb-4`}>
-                    <div className="flex flex-row justify-center items-center gap-2 p-4">
-                        <ProfilePhotoComponent size={'h-14 w-14'} />
-                        <div className={`flex flex-col p-1 justify-center items-center gap-1 ${isOpen ? "" : "hidden!"}`}>
-                            <p className="text-xs text-white font-bold max-w-25 truncate">{user.username}</p>
-                            <h1 className={`rounded p-1 text-xs font-bold text-center w-fit uppercase text-white shadow-custom
-                            ${isAdmin() ? "bg-yellow-600 " : "bg-blue-600"}`}>
-                                {user.role}
-                            </h1>
+                    <div className={`flex flex-row gap-1 justify-center items-center  shadow-custom-xl ${isOpen ? "rounded-lg" : "rounded-full"}`}>
+                        <div className={`flex flex-row gap-1 items-center  ${isOpen ? "bg-white px-1 py-0.5 rounded-l-lg " : ""}`}>
+                            <ProfilePhotoComponent image={userData?.profilePhoto?.url} iconStyle={'text-xl'} size={'h-11 w-11 border-2!'} />
+                            <div className={`flex flex-col p-1 justify-center items-center ${isOpen ? "" : "hidden!"}`}>
+                                <p className="text-xs text-blue-900 font-bold max-w-25 truncate">{userData?.username || user.username}</p>
+                                <span
+                                    className={`px-2 py-1 rounded-full font-semibold text-[10px] ${user.role === "admin"
+                                        ? "bg-yellow-200 text-yellow-800"
+                                        : "bg-blue-100 text-blue-800"
+                                        }`}
+                                >
+                                    {user.role === 'admin' ? "ADMIN" : "USER"}
+                                </span>
+                            </div>
                         </div>
-                        <button
-                            onClick={handleLogout}
-                            title="Cerrar session"
-                            style={{ fontWeight: 'bold', fontSize: '1.25rem' }}
-                            className={`bg-whitee pi pi-sign-out hover:scale-110 hover:bg-red-700 text-white 
-                            hover:text-white py-2 px-3 rounded  transition cursor-pointer ${isOpen ? "" : "hidden!"}`}
-                        ></button>
+                        <div className={`self-stretch w-fit flex bg-white rounded-r-lg justify-center items-center py-2 px-3 ${isOpen ? "" : "hidden!"}`}>
+                            <button
+                                onClick={handleLogout}
+                                title="Cerrar session"
+                                className={`text-red-500 pi pi-sign-out hover:scale-115
+                                  rounded  transition cursor-pointer `}
+                            ></button>
+                        </div>
                     </div>
                 </div>
             </div >

@@ -115,7 +115,7 @@ export default function UserManagementPage() {
                   {/* <th className="px-6 py-3 text-center text-xs font-bold uppercase">
                     Deuda
                   </th> */}
-                  <th className="px-6 py-3 text-center text-xs font-bold uppercase hidden md:table-cell">
+                  <th className="px-6 py-3 text-center text-xs font-bold uppercase">
                     Estado
                   </th>
                   <th className="px-6 py-3 text-center text-xs font-bold uppercase flex justify-center">
@@ -126,33 +126,33 @@ export default function UserManagementPage() {
 
               <tbody className="bg-white divide-y divide-gray-200">
                 {users?.docs?.map((item) => (
-                  item?._id === user.userId ? null : (
-                    <tr key={item?._id} className="hover:bg-gray-50">
 
-                      <td className="px-6 py-4 flex justify-center items-center">
-                        <ProfilePhotoComponent iconStyle={'text-xl'} size={'h-10 w-10 border-2!'} image={item?.profilePhoto?.url} />
-                      </td>
+                  <tr key={item?._id} className="hover:bg-gray-50">
 
-                      <td className="px-6 py-4 text-sm font-medium text-gray-900 text-center">
-                        {item?.firstName} {item?.lastName}
-                      </td>
+                    <td className="px-6 py-4 flex justify-center items-center">
+                      <ProfilePhotoComponent iconStyle={'text-xl'} size={'h-10 w-10 border-2!'} image={item?.profilePhoto?.url} />
+                    </td>
 
-                      <td className="px-6 py-4 text-sm text-gray-900 hidden md:table-cell text-center">
-                        {item?.username}
-                      </td>
+                    <td className="px-6 py-4 text-sm font-medium text-gray-900 text-center">
+                      {item?.firstName} {item?.lastName}
+                    </td>
 
-                      <td className="px-1 md:px-6 py-4 text-sm text-center">
-                        <span
-                          className={`px-2 py-1 rounded-full font-semibold text-xs ${item?.role === "admin"
-                            ? "bg-yellow-100 text-yellow-800"
-                            : "bg-blue-100 text-blue-800"
-                            }`}
-                        >
-                          {item?.role === 'admin' ? "ADMIN" : "USUARIO"}
-                        </span>
-                      </td>
+                    <td className="px-6 py-4 text-sm text-gray-900 hidden md:table-cell text-center">
+                      {item?.username}
+                    </td>
 
-                      {/* <td className="px-6 py-4 text-sm text-center">
+                    <td className="px-1 md:px-6 py-4 text-sm text-center">
+                      <span
+                        className={`px-2 py-1 rounded-full font-semibold text-xs ${item?.role === "admin"
+                          ? "bg-yellow-100 text-yellow-800"
+                          : "bg-blue-100 text-blue-800"
+                          }`}
+                      >
+                        {item?.role === 'admin' ? "ADMIN" : "USUARIO"}
+                      </span>
+                    </td>
+
+                    {/* <td className="px-6 py-4 text-sm text-center">
                         <span
                           className={`${item?.debt > 0
                             ? "text-red-600 font-semibold"
@@ -163,49 +163,53 @@ export default function UserManagementPage() {
                         </span>
                       </td> */}
 
-                      <td className="px-2 py-4 md:px-6 text-center hidden md:table-cell">
-                        <span
-                          className={`px-2 py-1 inline-flex text-xs font-semibold rounded-full ${item?.status === "active"
-                            ? "bg-green-100 text-green-800"
-                            : "bg-red-100 text-red-800"
-                            }`}
-                        >
-                          {item?.status === 'inactive' ? "INACTIVO" : "ACTIVO"}
-                        </span>
-                      </td>
+                    <td className="px-2 py-4 md:px-6 text-center">
+                      <span
+                        className={`px-2 py-1 inline-flex text-xs font-semibold rounded-full ${item?.status === "active"
+                          ? "bg-green-100 text-green-800"
+                          : "bg-red-100 text-red-800"
+                          }`}
+                      >
+                        {item?.status === 'inactive' ? "INACTIVO" : "ACTIVO"}
+                      </span>
+                    </td>
 
-                      <td className="text-sm font-medium align-middle">
-                        <div className="flex flex-row items-center justify-center gap-0">
-                          <button
-                            className="text-blue-800 mr-3 cursor-pointer hover:scale-140
+                    <td className="text-sm font-medium align-middle">
+                      <div className="flex flex-row items-center justify-center gap-0">
+                        <button
+                          className="text-blue-800 mr-3 cursor-pointer hover:scale-140
                                   transform transition-all duration-200 ease-in-out"
-                            onClick={() => handleModal(item, "view")}
-                            title="Ver usuario"
-                          >
-                            <i className="pi pi-eye text-base md:text-sm"></i>
-                          </button>
+                          onClick={() => handleModal(item, "view")}
+                          title="Ver usuario"
+                        >
+                          <i className="pi pi-eye text-base md:text-sm"></i>
+                        </button>
 
-                          <button
-                            className={`text-blue-800 mr-3 cursor-pointer hover:scale-140
-                                  transform transition-all duration-200 ease-in-out`}
-                            onClick={() => handleModal(item, "edit")}
-                            title="Editar usuario"
-                          >
-                            <i className="pi pi-pencil text-base md:text-sm"></i>
-                          </button>
+                        {item?._id === user.userId ? "" : (
+                          <>
+                            <button
+                              className={`text-blue-800 mr-3 cursor-pointer hover:scale-140
+                            transform transition-all duration-200 ease-in-out`}
+                              onClick={() => handleModal(item, "edit")}
+                              title="Editar usuario"
+                            >
+                              <i className="pi pi-pencil text-base md:text-sm"></i>
+                            </button>
 
-                          <button
-                            className={`text-red-600 hover:text-red-800 cursor-pointer hover:scale-140
-                                  transform transition-all duration-200 ease-in-out`}
-                            onClick={() => handleDelete(item?._id)}
-                            title="Deshabilitar usuario"
-                          >
-                            <i className="pi pi-user-minus text-base md:text-sm"></i>
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  )
+                            <button
+                              className={`text-red-600 hover:text-red-800 cursor-pointer hover:scale-140
+                          transform transition-all duration-200 ease-in-out`}
+                              onClick={() => handleDelete(item?._id)}
+                              title="Deshabilitar usuario"
+                            >
+                              <i className="pi pi-user-minus text-base md:text-sm"></i>
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+
                 ))}
               </tbody>
             </table>

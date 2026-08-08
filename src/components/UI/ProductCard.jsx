@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import { useAuth } from "../../context/AuthContext";
 import { useRef } from "react";
 import { useEffect } from "react";
+import confetti from "canvas-confetti";
 
 export default function ProductCard({ product }) {
   const isOutOfStock = product?.stock === 0;
@@ -14,6 +15,7 @@ export default function ProductCard({ product }) {
   const { mutateAsync: addToCart } = useAddProductsToCart();
   const { user } = useAuth();
   const cardRef = useRef(null);
+  const flyBtnRef = useRef(null);
 
 
   useEffect(() => {
@@ -30,26 +32,32 @@ export default function ProductCard({ product }) {
   }, []);
 
   const handleAddToCart = async () => {
-    toast.promise(
-      addToCart({ productId: product?._id, quantity: quantity, userId: user.userId }),
-      {
-        loading: 'Agregando...',
-        success: 'Productos agregados!',
-        error: (err) => {
-          console.error(err);
-          if (err.response.data.message === "Supera el stock") {
-            return (
-              <div className="flex flex-col">
-                <p className="font-semibold">Supera la cantidad máxima de stock.</p>
-                <p>Verifique su carrito de compras.</p>
-              </div>
-            )
+    try {
+      await toast.promise(
+        addToCart({ productId: product?._id, quantity: quantity, userId: user.userId }),
+        {
+          loading: 'Agregando...',
+          success: 'Productos agregados!',
+          error: (err) => {
+            console.error(err);
+            if (err?.response?.data?.message === "Supera el stock") {
+              return (
+                <div className="flex flex-col">
+                  <p className="font-semibold">Supera la cantidad máxima de stock.</p>
+                  <p>Verifique su carrito de compras.</p>
+                </div>
+              )
+            }
+            return 'Error al agregar productos al carrito, intente más tarde.'
           }
-          return 'Error al agregar productos al carrito, intente más tarde.'
         }
-      }
-    )
-    setQuantity(1);
+      )
+
+      flyBtnRef.current?.click();
+      setQuantity(1);
+    } catch {
+      return;
+    }
   };
 
   const handleBuyNow = async () => {
@@ -66,7 +74,15 @@ export default function ProductCard({ product }) {
       buyProduct({ productId: product?._id, quantity }),
       {
         loading: 'Comprando...',
-        success: 'Compra realizada exitosamente!',
+        success: () => {
+          confetti({
+            particleCount: 120,
+            spread: 80,
+            origin: { y: 0.6 },
+            zIndex: 9999,
+          });
+          return 'Compra realizada exitosamente!'
+        },
         error: (err) => {
           console.error(err);
           return 'Error al realizar la compra, intente mas tarde.';
@@ -82,6 +98,14 @@ export default function ProductCard({ product }) {
         onClick={() => setIsFocus(!isFocus)}
         className={`product-item relative group bg-white z-10 ${isFocus ? isOutOfStock ? "scale-100" : "z-55 scale-105 md:scale-100 rounded-b" : "z-10"} hover:z-50 shadow-custom-xs rounded-lg rounded-b hover:rounded-b w-full max-h-90  hover:scale-105 transition-all hover:duration-100 duration-300 ${!isOutOfStock ? "hover:rounded-b-none" : ''} `}
       >
+        <button
+          ref={flyBtnRef}
+          type="button"
+          aria-hidden="true"
+          tabIndex={-1}
+          className="add-to-cart-btn absolute top-0 left-0 w-0 h-0 opacity-0 pointer-events-none"
+        />
+
         {/* Datos principales */}
         <div className="p-2 px-4 ">
           <div className="flex items-center justify-center py-3 px-1">
@@ -164,7 +188,7 @@ export default function ProductCard({ product }) {
             </div>
             <div className="flex flex-col gap-1">
               <button
-                className="add-to-cart-btn w-full h-7 text-xs flex flex-row items-center justify-center gap-2 2xl:gap-1 bg-blue-800 py-1 px-4 2xl:px-1  text-white rounded-lg cursor-pointer hover:bg-blue-900 disabled:cursor-not-allowed"
+                className="w-full h-7 text-xs flex flex-row items-center justify-center gap-2 2xl:gap-1 bg-blue-800 py-1 px-4 2xl:px-1  text-white rounded-lg cursor-pointer hover:bg-blue-900 disabled:cursor-not-allowed"
                 onClick={handleAddToCart}
               >
                 <i className="pi pi-shopping-cart text-base" />
