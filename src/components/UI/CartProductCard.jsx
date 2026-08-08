@@ -51,7 +51,7 @@ const CartProductCard = ({ product }) => {
                 title="Quitar del carrito"
             ></button>
 
-            <div className="w-23 h-23 rounded border border-gray-100 overflow-hidden bg-gray-50">
+            <div className="w-23 h-23  rounded border border-gray-100 overflow-hidden bg-gray-50">
                 <img
                     src={product?.product_id?.image?.url}
                     alt={product?.product_id?.name}
@@ -59,7 +59,7 @@ const CartProductCard = ({ product }) => {
                 />
             </div>
 
-            <div className="flex flex-col gap-1<">
+            <div className="flex flex-col">
                 <div className="absolute pointer-events-none w-full top-0 z-50 overflow-hidden right-0 h-30">
                     <div className={`absolute top-7 shadow-custom-xl p-1 -right-8 bg-purple-700 rotate-45 flex justify-center w-35 ${isOutOfStock ? "block" : "hidden"}`}>
                         <p className={`text-white text-center text-xs font-bold `}>
@@ -69,13 +69,13 @@ const CartProductCard = ({ product }) => {
                 </div>
                 <div className="flex flex-row">
                     <div className="flex-1">
-                        <h3 className={`font-semibold text-sm ${isOutOfStock ? "text-gray-500" : "text-gray-800"} truncate w-50`}>
+                        <h3 className={`font-semibold text-sm ${isOutOfStock ? "text-gray-500" : "text-gray-800"} truncate w-45 md:w-50`}>
                             {product?.product_id?.name}
                         </h3>
-                        <p className="font-semibold text-xs text-gray-500 line-clamp-2 w-53">
+                        <p className="font-semibold text-xs text-gray-500 line-clamp-2 w-45 md:w-53">
                             {product?.product_id?.description === " " ? 'Sin descripción.' : product?.product_id?.description}
                         </p>
-                        <p className={`font-semibold text-xs pt-1 h-5 text-gray-600 line-clamp-2 w-53 ${isOutOfStock ? "opacity-0" : "opacity-100"}`}>
+                        <p className={`font-semibold text-xs pt-1 h-5 text-gray-600 line-clamp-2 w-45 md:w-53 ${isOutOfStock ? "opacity-0" : "opacity-100"}`}>
                             {`${product?.product_id?.stock} ${product?.product_id?.stock === 1 ? "disponible." : "disponibles."}`}
                         </p>
                     </div>
@@ -83,7 +83,11 @@ const CartProductCard = ({ product }) => {
                 <div className="flex flex-row justify-between items-end pr-2">
                     <div className="flex w-fit flex-col items-center text-xs gap-1">
                         <div className="flex items-center gap-1">
-                            <InputNumberShoppingCart key={product?.quantity} currentQuantity={product?.quantity} stock={product?.product_id?.stock} onChange={(v) => handleChangeQuantity(product?.product_id?._id, v, product?.quantity)} />
+                            <InputNumberShoppingCart
+                                currentQuantity={product?.quantity}
+                                stock={product?.product_id?.stock}
+                                onChange={(v) => handleChangeQuantity(product?.product_id?._id, v, product?.quantity)}
+                            />
                         </div>
                     </div>
                     <div className="flex flex-col items-center">
