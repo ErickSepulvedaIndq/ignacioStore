@@ -1,143 +1,220 @@
 import { useState } from "react";
-import DateRangeFilter from "../../components/forms/DateRangeFilter";
 import Paginator from "../../components/UI/Paginator";
-import Loading from "../../components/UI/Loading";
-import PurchaseDetailModal from "../../components/UI/purchaseDetailModal";
-import { usePurchasesByUser, usePurchases } from "../../api/hooks/purchasesHooks";
+import LoadingComponent from "../../components/UI/LoadingComponent";
+import ErrorComponent from "../../components/UI/ErrorComponent";
+import FiltersComponent from "../../components/forms/FiltersComponent";
+import GenerateReportModal from "../../components/modals/GenerateReportModal";
+import ProfilePhotoComponent from "../../components/UI/ProfilePhotoComponent";
+import { useUsers } from "../../api/hooks/usersHooks";
+import Swal from "sweetalert2";
+import UserPaymentHistoryModal from "../../components/modals/UserPaymentHistoryModal";
+import confetti from "canvas-confetti";
+import toast from "react-hot-toast";
+import { useMarkTotalDebtAsPaid } from "../../api/hooks/buyLogsHooks";
+import { useDebounce } from "../../api/hooks/useDebounce";
 
 export default function PurchaseHistoryPage() {
-  const [selectedPurchased, setSelectedPurchase] = useState(null);
-  const [showModal, setShowModal] = useState(false);
-  const [fromDate, setFromDate] = useState("");
-  const [toDate, setToDate] = useState("");
-  const [userId, setUserId] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [isOpenReport, setIsOpenModalReport] = useState(false)
+  const [isOpenUserPaymentHistory, setIsOpenUserPaymentHistory] = useState(false)
+  const [user, setUser] = useState(null);
+  const { mutateAsync: markTotalDebtAsPaid } = useMarkTotalDebtAsPaid();
 
-  const {
-    data: allPurchases,
-    isFetching: isFetchingAll,
-    isError: allError,
-  } = usePurchases(currentPage, 10, fromDate, toDate, {
-    enabled: !userId,
+  const [search, setSearch] = useState("")
+  const [role, setRole] = useState("")
+  const [debt, setDebt] = useState("all")
+  const debouncedSearch = useDebounce(search, 400)
+
+
+  const { data: users, isLoading, isError, refetch } = useUsers({
+    page: currentPage,
+    limit: 10,
+    status: "all",
+    search: debouncedSearch,
+    role,
+    debt
   });
 
-  const {
-    data: userPurchasesData,
-    isFetching: isFetchingUser,
-    isError: userError,
-  } = usePurchasesByUser(userId, currentPage, 10, fromDate, toDate, {
-    enabled: !!userId,
-  });
-
-  const purchases = userId ? userPurchasesData : allPurchases;
-  const isLoading = userId ? isFetchingUser : isFetchingAll;
-  const hasError = userId ? userError : allError;
-
-  const formatDateLong = (value) =>
-    new Date(value).toLocaleDateString("es-MX", {
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-    });
-
-  const handleFilter = (from, to, uid) => {
-    setFromDate(from);
-    setToDate(to);
-    setUserId(uid || null);
+  const handleFilter = (search, rol, debt) => {
     setCurrentPage(1);
-  };
-
-  const handelOpenTicket = (purchase) => {
-    setSelectedPurchase(purchase);
-    setShowModal(true);
-  };
-
-  const handleCloseModal = () => {
-    setShowModal(false);
-    setSelectedPurchase(null);
-  };
-
-  if (hasError) {
-    return (
-      <div className="container mx-auto p-6">
-        <h1 className="text-3xl font-bold mb-6 text-gray-800">Historial de Compras</h1>
-        <div className="bg-red-100 rounded-lg p-8 text-center">
-          <p className="text-red-600">Error al cargar los datos, intente más tarde.</p>
-        </div>
-      </div>
-    );
+    setSearch(search);
+    setRole(rol);
+    setDebt(debt)
+    // console.log(state, search, rol)
   }
 
-  return (
-    <div className="container mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-6 text-gray-800">Historial de Compras</h1>
-      <DateRangeFilter userFilter={true} onApply={handleFilter} />
 
-      {isLoading ? (
-        <Loading />
-      ) : !purchases?.docs?.length ? (
-        <div className="bg-gray-100 rounded-lg p-8 text-center">
-          <p className="text-red-500">No se encontraron compras con esos filtros.</p>
-        </div>
-      ) : (
-        <div className="bg-white rounded-lg shadow overflow-hidden">
-          <div className="overflow-x-auto">
+  const handleCollectPayment = async (user) => {
+    // validar que payment existe
+    if (!user) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "No se pudo obtener los datos de la compra"
+      });
+      return;
+    }
+
+    // confirmación antes de cobrar
+    const result = await Swal.fire({
+      title: "¿Seguro que quiere cobrar el total?",
+      text: `Cobrar $${user?.debt.toFixed(2)} a ${user?.firstName} ${user?.lastName}`,
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonColor: "#3041A0",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Confirmar",
+      cancelButtonText: "Cancelar",
+      reverseButtons: true,
+    });
+
+    if (!result.isConfirmed) return;
+
+    toast.promise(
+      markTotalDebtAsPaid({ userId: user?._id }),
+      {
+        isLoading: "Cobrando...",
+        success: () => {
+          confetti({
+            particleCount: 120,
+            spread: 80,
+            origin: { y: 0.6 },
+            zIndex: 9999,
+          });
+          return "Listo!"
+        },
+        error: (e) => {
+          console.error(e);
+          return "Error al cobrar, intente de nuevo más tarde."
+        }
+      }
+    )
+  };
+
+  return (
+    <div className="flex flex-col w-full h-full gap-2">
+      <FiltersComponent
+        onApply={(f, t, u, s, search, rol, st, debt) => { handleFilter(search, rol, debt) }}
+        rolFilter={true}
+        debtFilter={true}
+        button={true}
+        buttonContent={
+          <div className="flex flex-row justify-center items-center gap-2 w-35">
+            <i className="pi pi-file-export"></i>
+            <p>Generar reporte</p>
+          </div>
+        }
+        buttonOnClick={() => { setIsOpenModalReport(true) }}
+      />
+
+      <div className="bg-white rounded-lg h-full shadow w-full overflow-hidden">
+        <div className="overflow-auto w-full h-full">
+          {isLoading ? <LoadingComponent /> : isError ? <ErrorComponent refetch={refetch} /> : (
             <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-[#3041A0] text-white">
+              <thead className="bg-blue-900 text-white sticky top-0">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Usuario</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Fecha</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Total</th>
-                  <th className="px-6 py-3 text-left t{/*  */}ext-xs font-medium uppercase tracking-wider">Estado</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Acciones</th>
+                  <th className="px-6 py-3 text-center text-xs font-bold uppercase">
+                    Foto
+                  </th>
+                  <th className="px-6 py-3 text-center text-xs font-bold uppercase">
+                    Nombre
+                  </th>
+                  <th className="px-6 py-3 text-center text-xs font-bold uppercase hidden md:table-cell">
+                    Nombre de usuario
+                  </th>
+                  <th className="px-6 py-3 text-center text-xs font-bold uppercase">
+                    Rol
+                  </th>
+                  <th className="px-6 py-3 text-center text-xs font-bold uppercase">
+                    Deuda total
+                  </th>
+                  <th className="px-6 py-3 text-center text-xs font-bold uppercase">
+                    Acciones
+                  </th>
                 </tr>
               </thead>
+
               <tbody className="bg-white divide-y divide-gray-200">
-                {purchases.docs.map((purchase) => (
-                  <tr key={purchase.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      {purchase.userName}
+                {users?.docs?.map((item) => (
+
+                  <tr key={item?._id} className="hover:bg-gray-50">
+
+                    <td className="px-6 py-4 flex justify-center items-center">
+                      <ProfilePhotoComponent iconStyle={'text-xl'} size={'h-10 w-10 border-2!'} image={item?.profilePhoto?.url} />
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {formatDateLong(purchase.updatedAt)}
+
+                    <td className="px-6 py-4 text-sm font-medium text-gray-900 text-center">
+                      {item?.firstName} {item?.lastName}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">
-                      ${purchase.totalCost.toFixed(2)}
+
+                    <td className="px-6 py-4 text-sm text-gray-900 hidden md:table-cell text-center">
+                      {item?.username}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+
+                    <td className="px-1 md:px-6 py-4 text-sm text-center">
                       <span
-                        className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${purchase.status === "Pagado"
-                          ? "bg-green-100 text-green-800"
-                          : "bg-yellow-100 text-yellow-800"
+                        className={`px-2 py-1 rounded-full font-semibold text-xs ${item?.role === "admin"
+                          ? "bg-yellow-100 text-yellow-800"
+                          : "bg-blue-100 text-blue-800"
                           }`}
                       >
-                        {purchase.isPaid === false ? "Pendiente" : "Pagado"}
+                        {item?.role === 'admin' ? "ADMIN" : "USUARIO"}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <button
-                        onClick={() => handelOpenTicket(purchase)}
-                        className="bg-[#687bd7] hover:bg-[#0d3395] text-white px-4 py-1 rounded mr-2 transition cursor-pointer"
+
+                    <td className="px-2 py-4 md:px-6 text-center">
+                      <span
+                        className={`inline-flex font-semibold rounded-full ${item?.debt === 0
+                          ? "text-green-500"
+                          : "text-red-500"
+                          }`}
                       >
-                        Ver Detalles
-                      </button>
+                        {`$${item?.debt.toFixed(2)}`}
+                      </span>
+                    </td>
+
+
+                    <td className="text-sm font-medium align-middle">
+                      <div className="flex flex-row items-center justify-center gap-0">
+                        <button
+                          className="text-blue-800 mr-3 cursor-pointer hover:scale-140
+                            transform transition-all duration-200 ease-in-out pointer-fine:pointer-events-auto"
+                          aria-label="View product"
+                          title="Ver historial"
+                          onClick={() => { setIsOpenUserPaymentHistory(true); setUser(item?._id) }}
+                        >
+                          <i className="pi pi-eye text-base md:text-lg"></i>
+                        </button>
+                        <button
+                          className={`text-green-600 mr-3 cursor-pointer hover:scale-140
+                              transform transition-all duration-200 ease-in-out 
+                              pointer-fine:pointer-events-auto ${item?.debt === 0 ? "hidden" : ""}`}
+
+                          title="Cobrar Total"
+                          onClick={() => handleCollectPayment(item)}
+                        >
+                          <i className="pi pi-money-bill text-base md:text-lg"></i>
+                        </button>
+                      </div>
                     </td>
                   </tr>
+
                 ))}
               </tbody>
             </table>
-          </div>
+          )}
         </div>
-      )}
+      </div>
 
       <Paginator
         currentPage={currentPage}
-        totalPages={purchases?.totalPages}
+        totalPages={users?.totalPages}
         onPageChange={(p) => setCurrentPage(p)}
         loading={isLoading}
       />
 
-      <PurchaseDetailModal isOpen={showModal} purchase={selectedPurchased} onClose={handleCloseModal} />
+      <UserPaymentHistoryModal isOpen={isOpenUserPaymentHistory} onClose={() => { setIsOpenUserPaymentHistory(false); setUser(null) }} userId={user} />
+      <GenerateReportModal isOpen={isOpenReport} onClose={() => setIsOpenModalReport(false)} />
     </div>
   );
 }

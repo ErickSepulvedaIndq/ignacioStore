@@ -1,11 +1,27 @@
-import { Field, Form, Formik } from "formik";
-import { useCreateUser, useUpdateUser } from "../../api/hooks/usersHooks";
+import { Form, Formik } from "formik";
+import { useChangeProfilePhoto, useCreateUser, useUpdateUser } from "../../api/hooks/usersHooks";
 import toast from "react-hot-toast";
-//import { useAuth } from "../../context/AuthContext";
+import CustomInputComponent from "../UI/inputs/CustomInputComponent";
+import ModalComponent from "../modals/ModalComponent";
+import CustomButtonComponent from "../UI/CustomButtonComponent";
+import ProfilePhotoComponent from "../UI/ProfilePhotoComponent";
+import { useRef } from "react";
+import { useState } from "react";
+import UpdateUserScheme from "./schemes/UpdateUserScheme";
+import CreateUserScheme from "./schemes/CreateUserScheme";
 
 export default function UserFormModal({ isOpen, onClose, user, mode = "create" }) {
   const { mutateAsync: createUser } = useCreateUser();
   const { mutateAsync: editUser } = useUpdateUser();
+  const { mutateAsync: changeProfilePhoto } = useChangeProfilePhoto();
+  const fileInputRef = useRef(null);
+  const [profilePhotoUrl, setProfilePhotoUrl] = useState(user?.profilePhoto?.url);
+  const [prevUserId, setPrevUserId] = useState(user?._id);
+
+  if (user?._id !== prevUserId) {
+    setPrevUserId(user?._id);
+    setProfilePhotoUrl(user?.profilePhoto?.url);
+  }
 
   const formData = {
     firstName: user?.firstName || "",
@@ -13,7 +29,7 @@ export default function UserFormModal({ isOpen, onClose, user, mode = "create" }
     username: user?.username || "",
     password: user?.password || "",
     role: user?.role || "user",
-    debt: user?.debt || 0,
+    // debt: user?.debt || 0,
     status: user?.status || "active",
   }
 
@@ -46,162 +62,130 @@ export default function UserFormModal({ isOpen, onClose, user, mode = "create" }
     onClose()
   };
 
-  if (!isOpen) return null;
+  const handleFileSelected = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    toast.promise(
+      changeProfilePhoto({ userId: user._id, userPhoto: file }),
+      {
+        loading: "Actualizando foto de perfil...",
+        success: () => {
+          const url = URL.createObjectURL(file);
+          setProfilePhotoUrl(url);
+          return "Foto de perfil actualizada!"
+        },
+        error: (e) => {
+          console.error(e);
+          return "Error al actualizar la foto de perfil, intente más tarde."
+        }
+      }
+    )
+  };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-      <div className="bg-gray-100 rounded-2xl shadow-2xl w-full max-w-3xl p-10 relative animate-fade-in">
-        {/* Header */}
-        <div className="flex justify-between items-center mb-8">
-          <h2 className="text-2xl font-bold text-gray-800">
-            {mode === "edit" ? "Editar Usuario" : mode === "view" ? "Ver Usuario" : "Crear Usuario"}
-          </h2>
-          <button
-            className="text-gray-500 text-xl transition cursor-pointer hover:scale-120 hover:text-red-500"
-            title="Cerrar"
-            onClick={onClose}
-          >
-            ✕
-          </button>
-        </div>
-        <Formik
-          initialValues={formData}
-          onSubmit={handleSubmit}
-        >
-          {({ isSubmitting }) => (
-            <Form className="space-y-6">
-              {/* Nombre y Apellido */}
-              <div className="grid grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Nombre
-                  </label>
-                  <Field
-                    id="firstName"
-                    type="text"
-                    name="firstName"
-                    required
-                    disabled={mode === "view"}
-                    className="w-full rounded-lg border-2 border-gray-300 bg-white px-4 py-3 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition disabled:bg-gray-100"
-                  />
+    <ModalComponent
+      isOpen={isOpen}
+      onClose={onClose}
+      title={mode === "edit" ? "Editar usuario" : mode === "view" ? "Ver usuario" : "Crear usuario"}
+      iconStyles={mode === "edit" ? "pi-pencil" : mode === "view" ? "pi-eye" : "pi-user-plus"}
+      childrenStyles={"p-0!"}
+    >
+      <Formik
+        initialValues={formData}
+        onSubmit={handleSubmit}
+        validationSchema={mode === "edit" ? UpdateUserScheme : CreateUserScheme}
+      >
+        {({ isSubmitting, values, isValid }) => (
+          <div className="md:max-w-lg max-w-[calc(100svw-30px)] max-h-[calc(100svh-150px)] overflow-y-auto p-2 pr-3">
+            <Form className="space-y-4 md:space-y-6">
+              <div className='flex flex-col gap-3'>
+
+                <div className="w-full h-full">
+                  <h1 className="font-bold text-gray-500 pl-1">Foto de perfil:</h1>
+                  <div className="flex-col inset-shadow-custom p-6 rounded-lg flex justify-center items-center gap-3 md:gap-2">
+                    <ProfilePhotoComponent image={profilePhotoUrl} size={'h-30 w-30'} iconStyle={'text-7xl'} />
+                    <input
+                      type="file"
+                      accept="image/*"
+                      ref={fileInputRef}
+                      onChange={handleFileSelected}
+                      className="hidden"
+                    />
+                    <CustomButtonComponent onClick={() => fileInputRef.current.click()} buttonStyles={mode === 'view' ? "hidden!" : ''} type={"button"} >
+                      <i className="pi pi-image"></i>
+                      <p>{mode === 'edit' ? 'Cambiar foto de perfil' : 'Agregar foto de perfil'}</p>
+                    </CustomButtonComponent>
+                  </div>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Apellido
-                  </label>
-                  <Field
-                    id="lastName"
-                    type="text"
-                    name="lastName"
-                    required
-                    disabled={mode === "view"}
-                    className="w-full rounded-lg border-2 border-gray-300 bg-white px-4 py-3 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition disabled:bg-gray-100"
-                  />
+                <div className="flex flex-row gap-6">
+                  <CustomInputComponent name={"firstName"} type={"text"} label={"Nombre"} value={values.firstName} disabled={mode === "view"} />
+                  <CustomInputComponent name={"lastName"} type={"text"} label={"Apellido"} value={values.lastName} disabled={mode === "view"} />
                 </div>
-              </div>
 
-              {/* Username */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Usuario
-                </label>
-                <Field
-                  id="username"
-                  type="text"
-                  name="username"
-                  required
-                  disabled={mode === "view"}
-                  className="w-full rounded-lg border-2 border-gray-300 bg-white px-4 py-3 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition disabled:bg-gray-100"
-                />
               </div>
+              <CustomInputComponent name={"username"} type={"text"} label={"Nombre de usuario"} value={values.username} disabled={mode === "view"} />
 
-              {/* Password */}
               {mode !== "view" && (
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    {mode === "edit" ? "Nueva contraseña (opcional)" : "Contraseña"}
-                  </label>
-                  <Field
-                    id="password"
-                    type="password"
-                    name="password"
-                    className="w-full rounded-lg border-2 border-gray-300 bg-white px-4 py-3 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition"
-                  />
-                </div>
+                <CustomInputComponent name={"password"} type={"password"} placeholder={'********'} label={mode === "edit" ? "Nueva contraseña (opcional)" : "Contraseña"} value={values.password} />
               )}
 
-              {/* Rol, Deuda y Status*/}
-              <div className="grid grid-cols-3 gap-6">
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Estado
-                  </label>
-                  <Field
-                    id="status"
-                    name="status"
-                    as="select"
-                    disabled={mode === "view"}
-                    className="w-full rounded-lg border-2 border-gray-300 bg-white px-4 py-3 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition disabled:bg-gray-100"
-                  >
-                    <option value="active">Activo</option>
-                    <option value="inactive">Inactivo</option>
-                  </Field>
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Rol
-                  </label>
-                  <Field
-                    id="role"
-                    name="role"
-                    as="select"
-                    disabled={mode === "view"}
-                    className="w-full rounded-lg border-2 border-gray-300 bg-white px-4 py-3 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition disabled:bg-gray-100"
-                  >
-                    <option value="admin">Admin</option>
-                    <option value="user">Usuario</option>
-                  </Field>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Deuda
-                  </label>
-                  <Field
-                    id="debt"
-                    type="number"
-                    name="debt"
-                    disabled={mode === "view"}
-                    className="w-full rounded-lg border-2 border-gray-300 bg-white px-4 py-3 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition disabled:bg-gray-100"
-                  />
-                </div>
+              <div className="grid grid-cols-2 gap-6">
+                <CustomInputComponent
+                  name={"status"}
+                  type={"select"}
+                  label={"Estado"}
+                  value={values.status}
+                  disabled={mode === "view"}
+                  options={[
+                    { value: "active", label: "Activo" },
+                    { value: "inactive", label: "Inactivo" },
+                  ]}
+                />
+                <CustomInputComponent
+                  name={"role"}
+                  type={"select"}
+                  label={"Rol"}
+                  value={values.role}
+                  disabled={mode === "view"}
+                  options={[
+                    { value: "admin", label: "Admin" },
+                    { value: "user", label: "Usuario" },
+                  ]}
+                />
+                {/* <CustomInputComponent
+                  name={"debt"}
+                  type={"number"}
+                  label={"Deuda"}
+                  value={values.debt}
+                  disabled={mode === "view"}
+                /> */}
               </div>
 
-              {/* Botones */}
               {mode !== "view" && (
                 <div className="flex justify-end space-x-4 pt-4">
-                  <button
+                  <CustomButtonComponent
                     type="button"
-                    className="px-6 py-3 cursor-pointer bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 transition font-medium"
                     onClick={onClose}
+                    buttonStyles={'bg-red-500'}
                   >
                     Cancelar
-                  </button>
+                  </CustomButtonComponent>
 
-                  <button
+                  <CustomButtonComponent
                     type="submit"
-                    disabled={isSubmitting}
-                    className="px-6 py-3 cursor-pointer bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition font-semibold shadow-md disabled:opacity-50"
+                    disabled={isSubmitting | !isValid}
                   >
+                    <i className="pi pi-save"></i>
                     {isSubmitting ? "Guardando..." : "Guardar"}
-                  </button>
+                  </CustomButtonComponent>
                 </div>
               )}
             </Form>
-          )}
-        </Formik>
-      </div>
-    </div>
+          </div>
+        )}
+      </Formik>
+    </ModalComponent>
   );
 }

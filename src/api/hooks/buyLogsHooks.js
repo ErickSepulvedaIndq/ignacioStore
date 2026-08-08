@@ -1,17 +1,24 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { API } from "../apiConfig";
 
 
 // Hook para obtener todas las compras por el id del usuario
-export const useBuyLogs = (userId, page = 1, limit = 10, from = "", to = "") => {
+export const useBuyLogs = ({
+    userId, page = 1, limit = 10, from = "", to = "", status = "all"
+}) => {
     return useQuery({
-        queryKey: ['buyLogs', userId, page, limit, from, to],
-        queryFn: async () => {
-            const response = await API.get(`/buyLogs/user/${userId}`, {
-                params: { page, limit, from, to },
-            })
+        queryKey: ['buyLogs', userId, page, limit, from, to, status],
+        queryFn: async ({ signal }) => {
+            const params = { page, limit }
+            if (from) params.from = from
+            if (to) params.to = to
+            if (status && status !== "all") params.status = status
+
+            const response = await API.get(`/buyLogs/user/${userId}`, { params, signal })
             return response.data;
-        }
+        },
+        enabled: !!userId,
+        placeholderData: keepPreviousData,
     })
 }
 
@@ -38,7 +45,8 @@ export const usePendingBuyLogs = (page = 1, limit = 10, from = "", to = "") => {
                 { params: { page, limit, from, to, } }
             )
             return response.data;
-        }
+        },
+        placeholderData: keepPreviousData,
     })
 }
 
@@ -52,6 +60,22 @@ export const useMarkBuyLogAsPaid = () => {
         },
         onSuccess: () => {
             queryClient.invalidateQueries(['buyLogs'])
+            queryClient.invalidateQueries(['users'])
+        }
+    })
+}
+
+// Hook para marcar deuda total como pagada
+export const useMarkTotalDebtAsPaid = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async ({ userId }) => {
+            const response = await API.patch(`/buyLogs/total/${userId}/pay`);
+            return response.data;
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries(['buyLogs'])
+            queryClient.invalidateQueries(['users'])
         }
     })
 }

@@ -1,18 +1,26 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { API } from "../apiConfig";
 
 // Hook para obtener todos los productos
-export const useProducts = (page = 1, limit = 10, includeBlocked = false) => {
+export const useProducts = ({
+    page = 1,
+    limit = 10,
+    status = "all",
+    search = "",
+    stockStatus = "all",
+} = {}) => {
     return useQuery({
-        queryKey: ['products', page],
-        queryFn: async () => {
-            const response = await API.get('/products', {
-                params: { page, limit, includeBlocked }
+        queryKey: ['products', page, limit, status, search, stockStatus],
+        queryFn: async ({ signal }) => {
+            const response = await API.get("/products", {
+                params: { page, limit, status, search, stockStatus },
+                signal
             });
             return response.data.data;
-        }
-    })
-}
+        },
+        placeholderData: keepPreviousData,
+    });
+};
 
 // Hook para obtener un producto por id
 export const useProduct = (id) => {
@@ -21,7 +29,8 @@ export const useProduct = (id) => {
         queryFn: async () => {
             const response = await API.get(`/products/${id}`);
             return response.data;
-        }
+        },
+        placeholderData: keepPreviousData,
     })
 }
 
@@ -34,7 +43,8 @@ export const useSearchProductByName = (name, page = 1, limit = 10) => {
                 params: { page, limit },
             });
             return response.data.data;
-        }
+        },
+        placeholderData: keepPreviousData,
     })
 }
 
@@ -143,7 +153,8 @@ export const useGetCartProducts = (userId) => {
         queryFn: async () => {
             const response = await API.get(`/products/getCartProducts/${userId}`)
             return response.data
-        }
+        },
+        placeholderData: keepPreviousData,
     })
 }
 

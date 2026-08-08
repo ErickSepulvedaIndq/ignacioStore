@@ -72,8 +72,8 @@ export const showBuyConfirmDialog = async ({
     showCancelButton: true,
     confirmButtonText: "Confirmar",
     cancelButtonText: "Cancelar",
-    confirmButtonColor: "#3041A0",
-    cancelButtonColor: "#6B7280",
+    confirmButtonColor: "#1c398e",
+    cancelButtonColor: "#d33",
     reverseButtons: true,
     width: "480px",
     customClass: {

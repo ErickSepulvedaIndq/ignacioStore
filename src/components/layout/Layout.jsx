@@ -1,20 +1,25 @@
-// este layout es el que se encarga de mostrar el header y el sidenav en todas las paginas
-// el Outlet es donde se renderizan las paginas segun la ruta
-// asi que cada pagina se mostrara dentro de este layout
-
 import { Outlet } from 'react-router-dom';
-import Header from '../UI/header';
-import SideNav from '../structure/sideNav';
+import Navbar from '../structure/Navbar';
 import { useStockSync } from '../../api/hooks/stockSyncHook';
+import Sidebar from '../structure/Sidebar';
 export default function Layout() {
+
     useStockSync();
+
+
     return (
-        <div className="min-h-screen bg-gray-50">
-            <Header />
-            <SideNav />
-            <main className="w-full pt-24 md:pt-28 px-1 md:p-4 lg:px-15 xl:px-35">
-                <Outlet />
-            </main>
+        <div className="h-svh overflow-hidden bg-blue-900 flex flex-row flex-1">
+            {/* <SideNav /> */}
+            <Sidebar />
+            <div className='flex flex-col flex-1'>
+                <Navbar />
+
+                <div className='bg-blue-900 flex flex-1 h-[calc(100svh-100px)] px-1 pb-1 md:px-4 md:pb-4 pt-0'>
+                    <div className='bg-gray-50 flex flex-1 w-[calc(100svw-10px)] md:w-auto  h-[calc(100svh-83px)] md:h-[calc(100vh-116px)] p-2 rounded-2xl overflow-hidden'>
+                        <Outlet />
+                    </div>
+                </div>
+            </div>
         </div>
     );
 }
